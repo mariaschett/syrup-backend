@@ -12,7 +12,7 @@ module Instruction = struct
   [@@deriving show {with_path = false}, enumerate]
 end
 
-(* stack utilization *)
+(* stack utilization at stack index i after j instructions *)
 let mk_u i j = Z3util.boolconst ("u" ^ [%show: int] i ^ "_" ^ [%show: int] j)
 
 (* word *)
@@ -37,10 +37,10 @@ let eqs=
 let enc_add j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
   let x_1 = mk_x 1 j in
-  let b_0 = mk_u 0 j and b_1 = mk_u 1 j in
+  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let open Z3Ops in
   (* fixed to example *)
-  (b_0 && b_1) ==>
+  (u_0 && u_1) ==>
   (((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1))
 
 (* preserve *)
@@ -56,46 +56,41 @@ let enc_pres_move_up_from = enc_pres_from_delta 1
 let enc_pres_all_from = enc_pres_from_delta 0
 let enc_pres_move_down = enc_pres_from_delta (-1)
 
-(* stack counter *)
+(* stack utilization *)
 
-let enc_sc_init k l =
-  let b_x i = mk_u i 0 in
-  let ks = List.range l k in
-  let ls = List.range 0 l in
+let enc_sk_utilz_init k l =
+  let u i = mk_u i 0 in
+  let is_utilzd i =  if i < l then top else btm in
   let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> b_x i == btm)) &&
-  conj (List.map ls ~f:(fun i -> b_x i == top))
+  conj (List.init k ~f:(fun i -> u i == is_utilzd i))
 
-let enc_sc_unchanged k j =
-  let b_x i = mk_u i j and b'_x i = mk_u i (j+1) in
-  let ks = List.range 0 k in
+let enc_sk_utilz_shft k j shft =
+  let u' i = mk_u i (j+1) in
   let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> b_x i == b'_x i))
+  conj (List.init k ~f:(fun i -> u' i == shft i))
 
-let enc_sc_add_one k j =
-  let ks = List.range 0 (k-1) in
-  let b_x i = mk_u i j in
-  let b'_x' i = mk_u (i+1) (j+1) in
-  let b'_btm = mk_u 0 (j+1) in
-  let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> b'_x' i == b_x i)) && (b'_btm == top)
+(* assumes u_k-1_j is not utilized *)
+let enc_sk_utilz_add k j delta =
+  let u i = mk_u i j in
+  let shft i = if i < delta then top else u (i-delta) in
+  enc_sk_utilz_shft k j shft
 
-let enc_sc_rm_one k j =
-  let ks = List.range 1 k in
-  let b_x i = mk_u i j in
-  let b'_x' i = mk_u (i-1) (j+1) in
-  let b'_fin = b'_x' (k-1) in
-  let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> b'_x' i == b_x i)) && (b'_fin == btm)
+(* no effect if u_0_j is not utilized *)
+let enc_sk_utilz_rm k j delta =
+  let u i = mk_u i j in
+  let shft i = if i > k - delta then btm else u (i+delta) in
+  enc_sk_utilz_shft k j shft
+
+let enc_sk_utilz_unchanged k j = enc_sk_utilz_add k j 0
 
 (* effect *)
 
 let enc_swap j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
   let x_1 = mk_x 1 j and x'_1 = mk_x 1 (j+1) in
-  let b_0 = mk_u 0 j and b_1 = mk_u 1 j in
+  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let open Z3Ops in
-  (b_0 && b_1) ==>
+  (u_0 && u_1) ==>
   ((x'_0 == x_1) && (x'_1 == x_0))
 
 let enc_dup j =
@@ -114,17 +109,17 @@ let effect k iota j =
   let open Z3Ops in
   match iota with
   | Instruction.SWAP ->
-    enc_swap j && enc_pres_all_from k 2 j && enc_sc_unchanged k j
+    enc_swap j && enc_pres_all_from k 2 j && enc_sk_utilz_unchanged k j
   | Instruction.DUP ->
-    enc_dup j && enc_pres_move_up_from k 1 j && enc_sc_add_one k j
+    enc_dup j && enc_pres_move_up_from k 1 j && enc_sk_utilz_add k j 1
   | Instruction.POP ->
-    enc_pres_move_down k 1 j && enc_sc_rm_one k j
+    enc_pres_move_down k 1 j && enc_sk_utilz_rm k j 1
   | Instruction.NOP ->
-    enc_pres_all_from k 0 j && enc_sc_unchanged k j
+    enc_pres_all_from k 0 j && enc_sk_utilz_unchanged k j
   | Instruction.ADD ->
-    enc_add j && enc_pres_move_up_from k 2 j && enc_sc_rm_one k j
+    enc_add j && enc_pres_move_up_from k 2 j && enc_sk_utilz_rm k j 1
   | Instruction.PUSH ->
-    enc_push j && enc_pres_move_up_from k 0 j && enc_sc_add_one k j
+    enc_push j && enc_pres_move_up_from k 0 j && enc_sk_utilz_add k j 1
 
 let pick_instr k j =
   let t_j = mk_t j in
@@ -153,6 +148,6 @@ let enc_block_192 =
   let xT_0 = mk_x 0 (n-1) in
   let xT_1 = mk_x 1 (n-1) in
   let open Z3Ops in
-  let trgt_sk = conj [ s_0 == xT_0 ; s_1 == xT_1] in
+  let trgt_sk = conj [s_0 == xT_0 ; s_1 == xT_1] in
   (foralls ss (trgt_sk && pick_target k n && nop_propagate n)) && eqs
-  && enc_sc_init k 2
+  && enc_sk_utilz_init k 2
