@@ -120,6 +120,21 @@ let sk_utilz =
           [btm; btm; btm; btm]
           (List.map (u's k j) ~f:(eval_const m))
       );
+
+    "Utilization after one word is added and then removed">:: (fun _ ->
+        let k = 4 and j = 2 in
+        let utlzd = [top; top; btm; btm] in
+        let c = sk_utlz k j utlzd in
+        let c' = Enc.enc_sk_utilz_add k j 1 in
+        let c'' = Enc.enc_sk_utilz_rm k (j+1) 1 in
+        let m = solve_model_exn [c; c'; c''] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          utlzd
+          (List.map (u's k (j+1)) ~f:(eval_const m))
+      );
+
   ]
 
 let suite = "suite" >::: sk_utilz
