@@ -1,0 +1,29 @@
+opam-version: "2.0"
+name: "opti"
+version: "1.0"
+synopsis: "OPTI"
+maintainer: [ "mail@maria-a-schett.net" ]
+authors: [ "mail@maria-a-schett.net" ]
+license: "Apache-2.0"
+homepage: ""
+dev-repo: ""
+bug-reports: ""
+depends: [
+  "ocaml"
+  "dune"
+  "ocamlfind"
+  "z3" {= "4.7.1"}
+  "core"
+  "sedlex"
+  "csv"
+  "zarith"
+  "ounit" {with-test}
+  "ppx_sexp_conv"
+  "ppx_enumerate"
+  "ppx_deriving"
+]
+build: [
+  [ "dune" "subst" ] {pinned}
+  [ "dune" "build" "-p" name "-j" jobs ]
+]
+run-test: [make "test"]

@@ -1,0 +1,5 @@
+.merlin
+.ocamlinit
+_build/
+.#*
+*.install

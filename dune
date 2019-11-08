@@ -1,0 +1,6 @@
+(executable (name main)
+ (modules main)
+ (libraries core z3 opti)
+ (preprocess (pps ppx_jane ppx_deriving.std))
+ (public_name opti)
+)
