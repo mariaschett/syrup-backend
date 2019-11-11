@@ -37,11 +37,9 @@ let eqs=
 let enc_add j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
   let x_1 = mk_x 1 j in
-  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let open Z3Ops in
   (* fixed to example *)
-  (u_0 && u_1) ==>
-  (((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1))
+  ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1)
 
 (* preserve *)
 
@@ -106,20 +104,27 @@ let enc_push j =
   (x'_0 == a)
 
 let effect k iota j =
+  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
+  let u_l = mk_u (k-1) j in
   let open Z3Ops in
   match iota with
   | Instruction.SWAP ->
-    enc_swap j && enc_pres_all_from k 2 j && enc_sk_utilz_unchanged k j
+    u_0 && u_1 ==>
+    (enc_swap j && enc_pres_all_from k 2 j && enc_sk_utilz_unchanged k j)
   | Instruction.DUP ->
-    enc_dup j && enc_pres_move_up_from k 1 j && enc_sk_utilz_add k j 1
+    u_0 && ~! u_l ==>
+    (enc_dup j && enc_pres_move_up_from k 1 j && enc_sk_utilz_add k j 1)
   | Instruction.POP ->
-    enc_pres_move_down k 1 j && enc_sk_utilz_rm k j 1
+    u_0 ==>
+    (enc_pres_move_down k 1 j && enc_sk_utilz_rm k j 1)
   | Instruction.NOP ->
     enc_pres_all_from k 0 j && enc_sk_utilz_unchanged k j
   | Instruction.ADD ->
-    enc_add j && enc_pres_move_up_from k 2 j && enc_sk_utilz_rm k j 1
+    u_0 && u_1 ==>
+    (enc_add j && enc_pres_move_up_from k 2 j && enc_sk_utilz_rm k j 1)
   | Instruction.PUSH ->
-    enc_push j && enc_pres_move_up_from k 0 j && enc_sk_utilz_add k j 1
+    ~! u_l ==>
+    (enc_push j && enc_pres_move_up_from k 0 j && enc_sk_utilz_add k j 1)
 
 let pick_instr k j =
   let t_j = mk_t j in
