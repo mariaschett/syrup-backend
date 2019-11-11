@@ -99,7 +99,7 @@ let enc_dup j =
 
 let enc_push j =
   let x'_0 = mk_x 0 (j+1) in
-  let a = mk_a j in
+  let a = mk_a (j+1) in
   let open Z3Ops in
   (x'_0 == a)
 
