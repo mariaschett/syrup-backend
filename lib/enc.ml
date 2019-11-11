@@ -13,7 +13,7 @@ module Instruction = struct
 end
 
 (* stack utilization at stack index i after j instructions *)
-let mk_u i j = Z3util.boolconst ("u" ^ [%show: int] i ^ "_" ^ [%show: int] j)
+let mk_u i j = Z3util.boolconst ("u_" ^ [%show: int] i ^ "_" ^ [%show: int] j)
 
 (* word *)
 let mk_x i j = Z3util.intconst ("x_" ^ [%show: int] i ^ "_" ^ [%show: int] j)
