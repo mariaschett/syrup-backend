@@ -23,7 +23,9 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
+        let block_192 = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] Enc.enc_block_192 in
         set_options p_model p_smt;
-        print_string (Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] Enc.enc_block_192)
+        print_string block_192;
+        Out_channel.write_all "examples/block_192.smt" ~data:block_192
     ]
   |> Command.run ~version:"0.0"
