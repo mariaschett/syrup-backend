@@ -155,4 +155,4 @@ let enc_block_192 =
   let open Z3Ops in
   let trgt_sk = conj [s_0 == xT_0 ; s_1 == xT_1] in
   (foralls ss (trgt_sk && pick_target k n && nop_propagate n)) && eqs
-  && enc_sk_utilz_init k 2
+  && enc_sk_utilz_init k 1
