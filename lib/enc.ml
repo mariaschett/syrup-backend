@@ -56,10 +56,10 @@ let enc_add j =
 
 let enc_prsv_from_delta delta k l j =
   let x i = mk_x i j and x' i = mk_x (i+delta) (j+1) in
-  (* TODO check range! *)
-  let ks = List.range l (k - delta) in
+  let u i = mk_u i j in
+  let ks = List.range l k in
   let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> x' i == x i))
+  conj (List.map ks ~f:(fun i -> u i ==> (x' i == x i)))
 
 let enc_prsv_move_up_from = enc_prsv_from_delta 1
 let enc_prsv_all_from = enc_prsv_from_delta 0
