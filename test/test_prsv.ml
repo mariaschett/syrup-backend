@@ -56,7 +56,7 @@ let prsv =
           (List.map (x's l j) ~f:(eval_const m))
       );
 
-    "Stack is preserved after two elements">:: (fun _ ->
+    "Stack is preserved after index 2">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals_prsv = [num 3; num 4;] in
         let vals_chng = [num 1; num 2;] in
@@ -70,7 +70,7 @@ let prsv =
           (List.map [Enc.mk_x 2 (j+1); Enc.mk_x 3 (j+1)] ~f:(eval_const m))
       );
 
-    "Stack is preserved moving one element up from index 1">:: (fun _ ->
+    "Stack is preserved after moving one element up from index 1">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let c = sk_init j vals in
@@ -83,7 +83,7 @@ let prsv =
           (List.map [Enc.mk_x 2 (j+1); Enc.mk_x 3 (j+1)] ~f:(eval_const m))
       );
 
-    "Stack is preserved moving one element down from index 0">:: (fun _ ->
+    "Stack is preserved after moving one element down from index 0">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let c = sk_init j vals in
