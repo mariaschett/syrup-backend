@@ -1,6 +1,12 @@
 open Core
 open Z3util
 
+(* program counter *)
+type pc = int [@@deriving show {with_path = false}]
+
+(* stack index *)
+type si = int [@@deriving show {with_path = false}]
+
 module Instruction = struct
   type t =
       SWAP
@@ -12,33 +18,38 @@ module Instruction = struct
   [@@deriving show {with_path = false}, enumerate]
 end
 
-(* stack utilization at stack index i after j instructions *)
-let mk_u i j = Z3util.boolconst ("u_" ^ [%show: int] i ^ "_" ^ [%show: int] j)
+(* stack utilization u at stack index i after j instructions *)
+let mk_u (i : si) (j : pc) =
+  Z3util.boolconst ("u_" ^ [%show: pc] i ^ "_" ^ [%show: si] j)
 
-(* word *)
-let mk_x i j = Z3util.intconst ("x_" ^ [%show: int] i ^ "_" ^ [%show: int] j)
-let mk_a j = Z3util.intconst ("a_" ^ [%show: int] j)
-let mk_s j = Z3util.intconst ("s_" ^ [%show: int] j)
+(* words on stack are modeled as integer *)
+(* word x at stack index i after executing j instructions *)
+let mk_x (i : si) (j : pc) =
+  Z3util.intconst ("x_" ^ [%show: pc] i ^ "_" ^ [%show: si] j)
+(* argument a of instruction after j instructions *)
+let mk_a (j : pc) = Z3util.intconst ("a_" ^ [%show: pc] j)
 
-(* instruction *)
-let mk_instr n = Z3util.intconst ("instr_" ^ [%show: Instruction.t] n)
-let mk_t j = Z3util.intconst ("t_" ^ [%show: int] j)
+(* instructions are modeled as integers *)
+let mk_instr iota =
+  Z3util.intconst ("instr_" ^ [%show: Instruction.t] iota)
+(* template t to assign instructions *)
+let mk_t (j : pc) = Z3util.intconst ("t_" ^ [%show: pc] j)
 
-(* current elements on the stack *)
-let s_0 = mk_s 0
-let s_1 = mk_s 1
-let s_2 = Z3util.intconst ("sk_x")
+(* words on the final stack *)
+let mk_s (j : pc) = Z3util.intconst ("s_" ^ [%show: int] j)
+
+(* fixed to example block 192 *)
+let s_0 = mk_s 0 (* =^= 146 *)
+let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *)
+let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *)
 let ss = [s_1; s_2]
+let eqs= let open Z3Ops in (s_0 == num 146)
 
-let eqs=
-  let open Z3Ops in
-  (s_0 == num 146)
-
+(* fixed to example block 192 *)
 let enc_add j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
   let x_1 = mk_x 1 j in
   let open Z3Ops in
-  (* fixed to example *)
   ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1)
 
 (* preserve *)
