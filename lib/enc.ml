@@ -43,7 +43,6 @@ let s_0 = mk_s 0 (* =^= 146 *)
 let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *)
 let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *)
 let ss = [s_1; s_2]
-let eqs= let open Z3Ops in (s_0 == num 146)
 
 (* fixed to example block 192 *)
 let enc_add j =
@@ -156,6 +155,11 @@ let nop_propagate n =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
+let eqs k =
+  let x_0_0 = mk_x 0 0 in
+  let open Z3Ops in
+  (s_0 == num 146) && (x_0_0 == s_2) && enc_sk_utlz_init k 1
+
 let enc_block_192 =
   (* max elements ever on stack *)
   let k = 3 in
@@ -165,5 +169,4 @@ let enc_block_192 =
   let xT_1 = mk_x 1 (n-1) in
   let open Z3Ops in
   let trgt_sk = conj [s_0 == xT_0 ; s_1 == xT_1] in
-  (foralls ss (trgt_sk && pick_target k n && nop_propagate n)) && eqs
-  && enc_sk_utlz_init k 1
+  (foralls ss (trgt_sk && pick_target k n && nop_propagate n)) && eqs k
