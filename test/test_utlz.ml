@@ -14,7 +14,7 @@ let utlz =
   [
     "An empty initial stack">:: (fun _ ->
         let k = 3 and l = 0 and i = 0 in
-        let c = Enc.enc_sk_utilz_init k l in
+        let c = Enc.enc_sk_utlz_init k l in
         let m = solve_model_exn [c] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -25,7 +25,7 @@ let utlz =
 
     "Initial stack is all utilized">:: (fun _ ->
         let k = 3 in let l = k and i = 0 in
-        let c = Enc.enc_sk_utilz_init k l in
+        let c = Enc.enc_sk_utlz_init k l in
         let m = solve_model_exn [c] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -36,7 +36,7 @@ let utlz =
 
     "Initial stack contains one element">:: (fun _ ->
         let k = 4 and l = 1 and i = 0 in
-        let c = Enc.enc_sk_utilz_init k l in
+        let c = Enc.enc_sk_utlz_init k l in
         let m = solve_model_exn [c] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -47,7 +47,7 @@ let utlz =
 
     "Initial stack contains two elements">:: (fun _ ->
         let k = 4 in let l = 2 in
-        let c = Enc.enc_sk_utilz_init k l in
+        let c = Enc.enc_sk_utlz_init k l in
         let m = solve_model_exn [c] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -60,7 +60,7 @@ let utlz =
         let k = 4 and j = 2 in
         let utlzd = [top; top; btm; btm] in
         let c = sk_utlz k j utlzd in
-        let c' = Enc.enc_sk_utilz_unchanged k j in
+        let c' = Enc.enc_sk_utlz_unchanged k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -73,7 +73,7 @@ let utlz =
         let k = 4 and j = 2 in
         let utlzd = [top; top; btm; btm] in
         let c = sk_utlz k j utlzd in
-        let c' = Enc.enc_sk_utilz_add k j 1 in
+        let c' = Enc.enc_sk_utlz_add k j 1 in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -86,7 +86,7 @@ let utlz =
         let k = 4 and j = 2 in
         let utlzd = [top; btm; btm; btm] in
         let c = sk_utlz k j utlzd in
-        let c' = Enc.enc_sk_utilz_add k j 2 in
+        let c' = Enc.enc_sk_utlz_add k j 2 in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -99,7 +99,7 @@ let utlz =
         let k = 4 and j = 2 in
         let utlzd = [top; top; btm; btm] in
         let c = sk_utlz k j utlzd in
-        let c' = Enc.enc_sk_utilz_rm k j 1 in
+        let c' = Enc.enc_sk_utlz_rm k j 1 in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -112,7 +112,7 @@ let utlz =
         let k = 4 and j = 2 in
         let utlzd = [top; top; btm; btm] in
         let c = sk_utlz k j utlzd in
-        let c' = Enc.enc_sk_utilz_rm k j 2 in
+        let c' = Enc.enc_sk_utlz_rm k j 2 in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -125,8 +125,8 @@ let utlz =
         let k = 4 and j = 2 in
         let utlzd = [top; top; btm; btm] in
         let c = sk_utlz k j utlzd in
-        let c' = Enc.enc_sk_utilz_add k j 1 in
-        let c'' = Enc.enc_sk_utilz_rm k (j+1) 1 in
+        let c' = Enc.enc_sk_utlz_add k j 1 in
+        let c'' = Enc.enc_sk_utlz_rm k (j+1) 1 in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]

@@ -67,30 +67,30 @@ let enc_pres_move_down = enc_pres_from_delta (-1)
 
 (* stack utilization *)
 
-let enc_sk_utilz_init k l =
+let enc_sk_utlz_init k l =
   let u i = mk_u i 0 in
-  let is_utilzd i =  if i < l then top else btm in
+  let is_utlzd i =  if i < l then top else btm in
   let open Z3Ops in
-  conj (List.init k ~f:(fun i -> u i == is_utilzd i))
+  conj (List.init k ~f:(fun i -> u i == is_utlzd i))
 
-let enc_sk_utilz_shft k j shft =
+let enc_sk_utlz_shft k j shft =
   let u' i = mk_u i (j+1) in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
 
 (* assumes u_k-1_j is not utilized *)
-let enc_sk_utilz_add k j delta =
+let enc_sk_utlz_add k j delta =
   let u i = mk_u i j in
   let shft i = if i < delta then top else u (i-delta) in
-  enc_sk_utilz_shft k j shft
+  enc_sk_utlz_shft k j shft
 
 (* no effect if u_0_j is not utilized *)
-let enc_sk_utilz_rm k j delta =
+let enc_sk_utlz_rm k j delta =
   let u i = mk_u i j in
   let shft i = if i > k - delta then btm else u (i+delta) in
-  enc_sk_utilz_shft k j shft
+  enc_sk_utlz_shft k j shft
 
-let enc_sk_utilz_unchanged k j = enc_sk_utilz_add k j 0
+let enc_sk_utlz_unchanged k j = enc_sk_utlz_add k j 0
 
 (* effect *)
 
@@ -121,21 +121,21 @@ let effect k iota j =
   match iota with
   | Instruction.SWAP ->
     u_0 && u_1 ==>
-    (enc_swap j && enc_pres_all_from k 2 j && enc_sk_utilz_unchanged k j)
+    (enc_swap j && enc_pres_all_from k 2 j && enc_sk_utlz_unchanged k j)
   | Instruction.DUP ->
     u_0 && ~! u_l ==>
-    (enc_dup j && enc_pres_move_up_from k 1 j && enc_sk_utilz_add k j 1)
+    (enc_dup j && enc_pres_move_up_from k 1 j && enc_sk_utlz_add k j 1)
   | Instruction.POP ->
     u_0 ==>
-    (enc_pres_move_down k 1 j && enc_sk_utilz_rm k j 1)
+    (enc_pres_move_down k 1 j && enc_sk_utlz_rm k j 1)
   | Instruction.NOP ->
-    enc_pres_all_from k 0 j && enc_sk_utilz_unchanged k j
+    enc_pres_all_from k 0 j && enc_sk_utlz_unchanged k j
   | Instruction.ADD ->
     u_0 && u_1 ==>
-    (enc_add j && enc_pres_move_up_from k 2 j && enc_sk_utilz_rm k j 1)
+    (enc_add j && enc_pres_move_up_from k 2 j && enc_sk_utlz_rm k j 1)
   | Instruction.PUSH ->
     ~! u_l ==>
-    (enc_push j && enc_pres_move_up_from k 0 j && enc_sk_utilz_add k j 1)
+    (enc_push j && enc_pres_move_up_from k 0 j && enc_sk_utlz_add k j 1)
 
 let pick_instr k j =
   let t_j = mk_t j in
@@ -166,4 +166,4 @@ let enc_block_192 =
   let open Z3Ops in
   let trgt_sk = conj [s_0 == xT_0 ; s_1 == xT_1] in
   (foralls ss (trgt_sk && pick_target k n && nop_propagate n)) && eqs
-  && enc_sk_utilz_init k 1
+  && enc_sk_utlz_init k 1
