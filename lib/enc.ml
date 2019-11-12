@@ -151,7 +151,7 @@ let pick_target k n =
 let nop_propagate n =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
-  let ns = List.range 0 n in
+  let ns = List.range 0 (n-1) in
   let nop = mk_instr Instruction.NOP in
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
