@@ -51,19 +51,6 @@ let enc_add j =
   let open Z3Ops in
   ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1)
 
-(* preserve *)
-
-let enc_prsv_from_delta delta k l j =
-  let x i = mk_x i j and x' i = mk_x (i+delta) (j+1) in
-  let u i = mk_u i j in
-  let ks = List.range l k in
-  let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> u i ==> (x' i == x i)))
-
-let enc_prsv_move_up_from = enc_prsv_from_delta 1
-let enc_prsv_all_from = enc_prsv_from_delta 0
-let enc_prsv_move_down = enc_prsv_from_delta (-1)
-
 (* stack utilization *)
 
 let enc_sk_utlz_init k l =
@@ -90,6 +77,20 @@ let enc_sk_utlz_rm k j delta =
   enc_sk_utlz_shft k j shft
 
 let enc_sk_utlz_unchanged k j = enc_sk_utlz_add k j 0
+
+
+(* preserve *)
+
+let enc_prsv_from_delta delta k l j =
+  let x i = mk_x i j and x' i = mk_x (i+delta) (j+1) in
+  let u i = mk_u i j in
+  let ks = List.range l k in
+  let open Z3Ops in
+  conj (List.map ks ~f:(fun i -> u i ==> (x' i == x i)))
+
+let enc_prsv_move_up_from = enc_prsv_from_delta 1
+let enc_prsv_all_from = enc_prsv_from_delta 0
+let enc_prsv_move_down = enc_prsv_from_delta (-1)
 
 (* effect *)
 
