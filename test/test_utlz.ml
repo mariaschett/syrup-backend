@@ -10,19 +10,7 @@ let sk_utlz k j utzd =
   let open Z3Ops in
   conj (List.map2_exn (us k j) utzd ~f:(fun u uz -> u == uz))
 
-let utlz =
-  [
-    "An empty initial stack">:: (fun _ ->
-        let k = 3 and l = 0 and i = 0 in
-        let c = Enc.enc_sk_utlz_init k l in
-        let m = solve_model_exn [c] in
-        assert_equal
-          ~cmp:[%eq: Z3.Expr.t list]
-          ~printer:(List.to_string ~f:Z3.Expr.to_string)
-          (List.map (us k i) ~f:(fun _ -> btm))
-          (List.map (us k i) ~f:(eval_const m))
-      );
-
+let utlz = [
     "Initial stack is all utilized">:: (fun _ ->
         let k = 3 in let l = k and i = 0 in
         let c = Enc.enc_sk_utlz_init k l in

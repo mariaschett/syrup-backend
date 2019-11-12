@@ -10,8 +10,7 @@ let sk_init j vals =
   let open Z3Ops in
   conj (List.mapi vals ~f:(fun i v -> Enc.mk_x i j == v))
 
-let prsv =
-  [
+let init = [
     "Initializing stack works as expected">:: (fun _ ->
         let j = 2 in
         let vals = [num 1; num 2;] in
@@ -24,7 +23,10 @@ let prsv =
           vals
           (List.map (xs l j) ~f:(eval_const m))
       );
+]
 
+let prsv =
+  [
     "All stack is preserved">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2;] in
@@ -80,7 +82,7 @@ let prsv =
       );
   ]
 
-let suite = "suite" >::: prsv
+let suite = "suite" >::: (init @ prsv)
 
 let () =
   run_test_tt_main suite
