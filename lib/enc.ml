@@ -25,19 +25,6 @@ let mk_t (j : pc) = Z3util.intconst ("t_" ^ [%show: pc] j)
 (* words on the final stack *)
 let mk_s (j : pc) = Z3util.intconst ("s_" ^ [%show: int] j)
 
-(* fixed to example block 192 *)
-let s_0 = mk_s 0 (* =^= 146 *)
-let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *)
-let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *)
-let ss = [s_1; s_2]
-
-(* fixed to example block 192 *)
-let enc_block_192 j =
-  let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
-  let x_1 = mk_x 1 j in
-  let open Z3Ops in
-  ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1)
-
 (* stack utilization *)
 
 let enc_sk_utlz_init k l =
@@ -99,7 +86,7 @@ let enc_push j =
   let open Z3Ops in
   (x'_0 == a)
 
-let effect k iota j =
+let effect k enc_userdef iota j =
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let u_l = mk_u (k-1) j in
   let open Z3Ops in
@@ -115,19 +102,17 @@ let effect k iota j =
     (enc_prsv k j iota && enc_sk_utlz_rm k j 1)
   | NOP ->
     enc_prsv k j iota && enc_sk_utlz_unchanged k j
-  | USERDEF Block_192 ->
-    u_0 && u_1 ==>
-    (enc_block_192 j && enc_prsv k j iota && enc_sk_utlz_rm k j 1)
+  | USERDEF Block_192 -> enc_userdef j
   | PUSH ->
     ~! u_l ==>
     (enc_push j && enc_prsv k j iota && enc_sk_utlz_add k j 1)
 
-let pick_instr k j =
+let pick_instr k enc_userdef j =
   let t_j = mk_t j in
   let instr iota = Instruction.enc iota in
   let instrs = Instruction.all in
   let open Z3Ops in
-  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k iota j)))
+  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k enc_userdef iota j)))
 
 let nop_propagate n =
   let t j = mk_t j in
@@ -137,16 +122,31 @@ let nop_propagate n =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
-let enc_block k n c_s c_t ss =
+let enc_block k n c_s c_t ss enc_userdef =
   let ns = List.range 0 n in
   let open Z3Ops in
-  foralls ss (c_s && c_t && conj (List.map ns ~f:(pick_instr k)) && nop_propagate n)
+  foralls ss (c_s && c_t && conj (List.map ns ~f:(pick_instr k enc_userdef)) && nop_propagate n)
 
 let enc_block_192 =
   (* max elements ever on stack *)
   let k = 3 in
   (* max target program simze *)
   let n = 2 in
+  let s_0 = mk_s 0 (* =^= 146 *) in
+  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+  let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *) in
+  let ss = [s_1; s_2] in
+
+  (* fixed to example block 192 *)
+  let enc_instr_block_192 j =
+    let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
+    let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
+    let x_1 = mk_x 1 j in
+    let open Z3Ops in
+    u_0 && u_1 ==> (
+        ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1) &&
+        enc_prsv k j (USERDEF Block_192) && enc_sk_utlz_rm k j 1)
+  in
   let c_s =
     let x_0_0 = mk_x 0 0 in
     let open Z3Ops in
@@ -158,4 +158,4 @@ let enc_block_192 =
     let open Z3Ops in
     (s_0 == num 146) && conj [s_0 == xT_0 ; s_1 == xT_1]
   in
-  enc_block k n c_s c_t ss
+  enc_block k n c_s c_t ss enc_instr_block_192
