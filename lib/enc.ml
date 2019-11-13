@@ -1,5 +1,5 @@
 open Core
-open Z3util
+open Z3util open Instruction
 
 (* program counter *)
 type pc = int [@@deriving show {with_path = false}]
@@ -106,21 +106,21 @@ let effect k iota j =
   let u_l = mk_u (k-1) j in
   let open Z3Ops in
   match iota with
-  | Instruction.SWAP ->
+  | SWAP ->
     u_0 && u_1 ==>
     (enc_swap j && enc_prsv_all_from k 2 j && enc_sk_utlz_unchanged k j)
-  | Instruction.DUP ->
+  | DUP ->
     u_0 && ~! u_l ==>
     (enc_dup j && enc_prsv_move_up_from k 1 j && enc_sk_utlz_add k j 1)
-  | Instruction.POP ->
+  | POP ->
     u_0 ==>
     (enc_prsv_move_down k 1 j && enc_sk_utlz_rm k j 1)
-  | Instruction.NOP ->
+  | NOP ->
     enc_prsv_all_from k 0 j && enc_sk_utlz_unchanged k j
-  | Instruction.ADD ->
+  | ADD ->
     u_0 && u_1 ==>
     (enc_add j && enc_prsv_move_up_from k 2 j && enc_sk_utlz_rm k j 1)
-  | Instruction.PUSH ->
+  | PUSH ->
     ~! u_l ==>
     (enc_push j && enc_prsv_move_up_from k 0 j && enc_sk_utlz_add k j 1)
 
@@ -139,7 +139,7 @@ let nop_propagate n =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
   let ns = List.range 0 (n-1) in
-  let nop = Instruction.enc Instruction.NOP in
+  let nop = Instruction.enc NOP in
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
