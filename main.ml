@@ -24,8 +24,10 @@ let () =
       in
       fun () ->
         let block_192 = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] Enc.enc_block_192 in
+        let block_ex1 = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] Enc.enc_block_ex1 in
         set_options p_model p_smt;
         print_string block_192;
-        Out_channel.write_all "examples/block_192.smt" ~data:block_192
+        Out_channel.write_all "examples/block_192.smt" ~data:block_192;
+        Out_channel.write_all "examples/block_ex1.smt" ~data:(block_ex1^"(get-model)");
     ]
   |> Command.run ~version:"0.0"

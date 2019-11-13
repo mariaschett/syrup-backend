@@ -6,7 +6,7 @@ module User_instr = struct
   [@@deriving show {with_path = false}, enumerate]
 
   let enc = function
-    | Block_192 -> 6
+    | Block_192 -> 5
 
   let alpha_delta = function
     | Block_192 -> (2,1)

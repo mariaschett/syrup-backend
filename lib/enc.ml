@@ -112,7 +112,8 @@ let pick_instr k enc_userdef j =
   let instr iota = Instruction.enc iota in
   let instrs = Instruction.all in
   let open Z3Ops in
-  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k enc_userdef iota j)))
+  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k enc_userdef iota j))) &&
+  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j)))
 
 let nop_propagate n =
   let t j = mk_t j in
@@ -159,3 +160,23 @@ let enc_block_192 =
     (s_0 == num 146) && conj [s_0 == xT_0 ; s_1 == xT_1]
   in
   enc_block k n c_s c_t ss enc_instr_block_192
+
+
+let enc_block_ex1 =
+  (* max elements ever on stack *)
+  let k = 3 in
+  (* max target program simze *)
+  let n = 2 in
+  let s_0 = mk_s 0 (* =^= 146 *) in
+  let ss = [] in
+  (* fixed to example block 192 *)
+  let enc_instr_block_ex1 _ = Z3util.btm
+  in
+  let c_s = enc_sk_utlz_init k 0
+  in
+  let c_t =
+    let xT_0 = mk_x 0 (n-1) in
+    let open Z3Ops in
+    (s_0 == num 146) && conj [s_0 == xT_0]
+  in
+  enc_block k n c_s c_t ss enc_instr_block_ex1
