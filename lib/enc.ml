@@ -67,16 +67,16 @@ let enc_sk_utlz_unchanged k j = enc_sk_utlz_add k j 0
 
 (* preserve *)
 
-let enc_prsv_from_delta delta k l j =
-  let x i = mk_x i j and x' i = mk_x (i+delta) (j+1) in
+let enc_prsv_from_diff diff k l j =
+  let x i = mk_x i j and x' i = mk_x (i-diff) (j+1) in
   let u i = mk_u i j in
   let ks = List.range l k in
   let open Z3Ops in
   conj (List.map ks ~f:(fun i -> u i ==> (x' i == x i)))
 
-let enc_prsv_move_up_from = enc_prsv_from_delta 1
+let enc_prsv_move_up_from = enc_prsv_from_delta (-1)
 let enc_prsv_all_from = enc_prsv_from_delta 0
-let enc_prsv_move_down = enc_prsv_from_delta (-1)
+let enc_prsv_move_down = enc_prsv_from_delta 1
 
 (* effect *)
 
