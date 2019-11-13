@@ -137,12 +137,16 @@ let nop_propagate n =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
+let enc_block k n c_s c_t ss =
+  let ns = List.range 0 n in
+  let open Z3Ops in
+  foralls ss (c_s && c_t && conj (List.map ns ~f:(pick_instr k)) && nop_propagate n)
+
 let enc_block_192 =
   (* max elements ever on stack *)
   let k = 3 in
   (* max target program simze *)
   let n = 2 in
-  let ns = List.range 0 n in
   let c_s =
     let x_0_0 = mk_x 0 0 in
     let open Z3Ops in
@@ -154,5 +158,4 @@ let enc_block_192 =
     let open Z3Ops in
     (s_0 == num 146) && conj [s_0 == xT_0 ; s_1 == xT_1]
   in
-  let open Z3Ops in
-  foralls ss (c_s && c_t && conj (List.map ns ~f:(pick_instr k)) && nop_propagate n)
+  enc_block k n c_s c_t ss
