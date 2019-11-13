@@ -129,10 +129,6 @@ let pick_instr k j =
   let open Z3Ops in
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k iota j)))
 
-let pick_target k n =
-  let ns = List.range 0 n in
-  conj (List.map ns ~f:(pick_instr k))
-
 let nop_propagate n =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
@@ -151,8 +147,9 @@ let enc_block_192 =
   let k = 3 in
   (* max target program simze *)
   let n = 2 in
+  let ns = List.range 0 n in
   let xT_0 = mk_x 0 (n-1) in
   let xT_1 = mk_x 1 (n-1) in
   let open Z3Ops in
   let trgt_sk = conj [s_0 == xT_0 ; s_1 == xT_1] in
-  foralls ss (trgt_sk && pick_target k n && nop_propagate n && eqs k)
+  foralls ss (trgt_sk && eqs k && conj (List.map ns ~f:(pick_instr k)) && nop_propagate n)
