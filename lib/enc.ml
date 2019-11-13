@@ -65,7 +65,6 @@ let enc_sk_utlz_rm k j delta =
 
 let enc_sk_utlz_unchanged k j = enc_sk_utlz_add k j 0
 
-
 (* preserve *)
 
 let enc_prsv_from_delta delta k l j =
