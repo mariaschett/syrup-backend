@@ -16,19 +16,18 @@ module Instruction = struct
     | DUP
     | NOP
   [@@deriving show {with_path = false}, enumerate]
-end
-open Instruction
 
-let enc_instr iota =
-  let i =
-    match iota with
-    | SWAP -> 0
-    | PUSH -> 1
-    | ADD -> 2
-    | POP -> 3
-    | DUP -> 4
-    | NOP -> 5
-  in Z3util.num i
+  let enc iota =
+    let i =
+      match iota with
+      | SWAP -> 0
+      | PUSH -> 1
+      | ADD -> 2
+      | POP -> 3
+      | DUP -> 4
+      | NOP -> 5
+    in Z3util.num i
+end
 
 (* stack utilization u at stack index i after j instructions *)
 let mk_u (i : si) (j : pc) =
@@ -149,7 +148,7 @@ let effect k iota j =
 
 let pick_instr k j =
   let t_j = mk_t j in
-  let instr iota = enc_instr iota in
+  let instr iota = Instruction.enc iota in
   let instrs = Instruction.all in
   let open Z3Ops in
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k iota j)))
@@ -162,7 +161,7 @@ let nop_propagate n =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
   let ns = List.range 0 (n-1) in
-  let nop = enc_instr Instruction.NOP in
+  let nop = Instruction.enc Instruction.NOP in
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
