@@ -32,7 +32,7 @@ let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *)
 let ss = [s_1; s_2]
 
 (* fixed to example block 192 *)
-let enc_add j =
+let enc_block_192 j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
   let x_1 = mk_x 1 j in
   let open Z3Ops in
@@ -115,9 +115,9 @@ let effect k iota j =
     (enc_prsv k j iota && enc_sk_utlz_rm k j 1)
   | NOP ->
     enc_prsv k j iota && enc_sk_utlz_unchanged k j
-  | ADD ->
+  | USERDEF Block_192 ->
     u_0 && u_1 ==>
-    (enc_add j && enc_prsv k j iota && enc_sk_utlz_rm k j 1)
+    (enc_block_192 j && enc_prsv k j iota && enc_sk_utlz_rm k j 1)
   | PUSH ->
     ~! u_l ==>
     (enc_push j && enc_prsv k j iota && enc_sk_utlz_add k j 1)
