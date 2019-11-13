@@ -47,7 +47,7 @@ let prsv =
         let vals = [num 1; num 2;] in
         let l = List.length vals in
         let c = sk_init j vals in
-        let c' = Enc.enc_prsv_all_from k 0 j in
+        let c' = Enc.enc_prsv_from_diff 0 k 0 j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -61,7 +61,7 @@ let prsv =
         let vals_prsv = [num 3; num 4;] in
         let vals_chng = [num 1; num 2;] in
         let c = sk_init j (vals_chng @ vals_prsv) in
-        let c' = Enc.enc_prsv_all_from k 2 j in
+        let c' = Enc.enc_prsv_from_diff 0 k 2 j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -74,7 +74,7 @@ let prsv =
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let c = sk_init j vals in
-        let c' = Enc.enc_prsv_move_up_from k 1 j in
+        let c' = Enc.enc_prsv_from_diff (-1) k 1 j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -87,7 +87,7 @@ let prsv =
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let c = sk_init j vals in
-        let c' = Enc.enc_prsv_move_down k 0 j in
+        let c' = Enc.enc_prsv_from_diff 1 k 0 j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]

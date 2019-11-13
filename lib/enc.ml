@@ -74,9 +74,8 @@ let enc_prsv_from_diff diff k l j =
   let open Z3Ops in
   conj (List.map ks ~f:(fun i -> u i ==> (x' i == x i)))
 
-let enc_prsv_move_up_from = enc_prsv_from_delta (-1)
-let enc_prsv_all_from = enc_prsv_from_delta 0
-let enc_prsv_move_down = enc_prsv_from_delta 1
+let enc_prsv k j iota =
+  enc_prsv_from_diff (diff iota) k (alpha iota) j
 
 (* effect *)
 
@@ -107,21 +106,21 @@ let effect k iota j =
   match iota with
   | SWAP ->
     u_0 && u_1 ==>
-    (enc_swap j && enc_prsv_all_from k 2 j && enc_sk_utlz_unchanged k j)
+    (enc_swap j && enc_prsv k j iota && enc_sk_utlz_unchanged k j)
   | DUP ->
     u_0 && ~! u_l ==>
-    (enc_dup j && enc_prsv_move_up_from k 1 j && enc_sk_utlz_add k j 1)
+    (enc_dup j && enc_prsv k j iota && enc_sk_utlz_add k j 1)
   | POP ->
     u_0 ==>
-    (enc_prsv_move_down k 1 j && enc_sk_utlz_rm k j 1)
+    (enc_prsv k j iota && enc_sk_utlz_rm k j 1)
   | NOP ->
-    enc_prsv_all_from k 0 j && enc_sk_utlz_unchanged k j
+    enc_prsv k j iota && enc_sk_utlz_unchanged k j
   | ADD ->
     u_0 && u_1 ==>
-    (enc_add j && enc_prsv_move_up_from k 2 j && enc_sk_utlz_rm k j 1)
+    (enc_add j && enc_prsv k j iota && enc_sk_utlz_rm k j 1)
   | PUSH ->
     ~! u_l ==>
-    (enc_push j && enc_prsv_move_up_from k 0 j && enc_sk_utlz_add k j 1)
+    (enc_push j && enc_prsv k j iota && enc_sk_utlz_add k j 1)
 
 let pick_instr k j =
   let t_j = mk_t j in
