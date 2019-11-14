@@ -13,8 +13,8 @@ module User_instr = struct
 end
 
 type t =
-    SWAP
   | PUSH
+  | SWAP
   | POP
   | DUP
   | NOP
@@ -24,8 +24,8 @@ type t =
 let enc iota =
   let i =
     match iota with
-    | SWAP -> 0
     | PUSH -> 1
+    | SWAP -> 0
     | POP -> 2
     | DUP -> 3
     | NOP -> 4
@@ -33,8 +33,8 @@ let enc iota =
   in Z3util.num i
 
 let alpha_delta = function
-  | SWAP -> (2,2)
   | PUSH -> (0,1)
+  | SWAP -> (2,2)
   | POP -> (1,0)
   | DUP -> (1,2)
   | NOP -> (0,0)
