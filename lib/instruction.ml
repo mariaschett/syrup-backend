@@ -14,8 +14,8 @@ end
 
 type t =
   | PUSH
-  | SWAP
   | POP
+  | SWAP
   | DUP
   | NOP
   | USERDEF of User_instr.t
@@ -25,8 +25,8 @@ let enc iota =
   let i =
     match iota with
     | PUSH -> 1
-    | SWAP -> 0
     | POP -> 2
+    | SWAP -> 0
     | DUP -> 3
     | NOP -> 4
     | USERDEF instr -> User_instr.enc instr
@@ -34,8 +34,8 @@ let enc iota =
 
 let alpha_delta = function
   | PUSH -> (0,1)
-  | SWAP -> (2,2)
   | POP -> (1,0)
+  | SWAP -> (2,2)
   | DUP -> (1,2)
   | NOP -> (0,0)
   | USERDEF instr -> User_instr.alpha_delta instr

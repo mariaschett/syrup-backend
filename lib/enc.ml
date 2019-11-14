@@ -79,13 +79,13 @@ let enc_pop k j =
   let open Z3Ops in
   u_0 && (enc_prsv k j POP && enc_sk_utlz_rm k j 1)
 
-let enc_swap j =
+let enc_swap k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
   let x_1 = mk_x 1 j and x'_1 = mk_x 1 (j+1) in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let open Z3Ops in
-  (u_0 && u_1) ==>
-  ((x'_0 == x_1) && (x'_1 == x_0))
+  u_0 && u_1 &&
+  ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j SWAP && enc_sk_utlz_unchanged k j
 
 let enc_dup j =
   let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
@@ -94,15 +94,13 @@ let enc_dup j =
   (x'_0 == x_0) && (x'_1 == x_0)
 
 let effect k enc_userdef iota j =
-  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
+  let u_0 = mk_u 0 j in
   let u_l = mk_u (k-1) j in
   let open Z3Ops in
   match iota with
   | PUSH -> enc_push k j
   | POP -> enc_pop k j
-  | SWAP ->
-    u_0 && u_1 ==>
-    (enc_swap j && enc_prsv k j iota && enc_sk_utlz_unchanged k j)
+  | SWAP -> enc_swap k j
   | DUP ->
     u_0 && ~! u_l ==>
     (enc_dup j && enc_prsv k j iota && enc_sk_utlz_add k j 1)
