@@ -33,7 +33,7 @@ let enc_sk_utlz_unchanged k j = enc_sk_utlz_add k j 0
 (* preserve *)
 
 let enc_prsv_from_diff diff k l j =
-  let x i = mk_x i j and x' i = mk_x (i-diff) (j+1) in
+  let x i = mk_x i j and x' i = mk_x' (i-diff) j in
   let u i = mk_u i j in
   let ks = List.range l k in
   let open Z3Ops in
@@ -45,7 +45,7 @@ let enc_prsv k j iota =
 (* effect *)
 
 let enc_push k j =
-  let x'_0 = mk_x 0 (j+1) in
+  let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in
   let a = mk_a j in
   let open Z3Ops in
@@ -58,16 +58,16 @@ let enc_pop k j =
   u_0 && (enc_prsv k j (PREDEF POP) && enc_sk_utlz_rm k j 1)
 
 let enc_swap k j =
-  let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
-  let x_1 = mk_x 1 j and x'_1 = mk_x 1 (j+1) in
+  let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
+  let x_1 = mk_x 1 j and x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let open Z3Ops in
   u_0 && u_1 &&
   ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j (PREDEF SWAP) && enc_sk_utlz_unchanged k j
 
 let enc_dup k j =
-  let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
-  let x'_1 = mk_x 1 (j+1) in
+  let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
+  let x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_l = mk_u (k-1) j in
   let open Z3Ops in
   u_0 && ~! u_l &&
@@ -121,7 +121,7 @@ let enc_block_192 =
   (* fixed to example block 192 *)
   let enc_instr_block_192 j =
     let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
-    let x_0 = mk_x 0 j and x'_0 = mk_x 0 (j+1) in
+    let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
     let x_1 = mk_x 1 j in
     let open Z3Ops in
     u_0 && u_1 ==> (

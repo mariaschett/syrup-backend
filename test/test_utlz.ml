@@ -2,13 +2,7 @@ open Core
 open OUnit2
 open Opti
 open Z3util
-
-let us k j = List.init k ~f:(fun i -> Consts.mk_u i j)
-let u's k j = List.init k ~f:(fun i -> Consts.mk_u' i j)
-
-let sk_utlz k j utzd =
-  let open Z3Ops in
-  conj (List.map2_exn (us k j) utzd ~f:(fun u uz -> u == uz))
+open Test_util
 
 let utlz = [
     "Initial stack is all utilized">:: (fun _ ->

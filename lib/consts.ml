@@ -15,6 +15,7 @@ let mk_u' (i : si) (j : pc) = mk_u i (j+1)
 (* word x at stack index i after executing j instructions *)
 let mk_x (i : si) (j : pc) =
   Z3util.intconst ("x_" ^ [%show: pc] i ^ "_" ^ [%show: si] j)
+let mk_x' (i : si) (j : pc) = mk_x i (j+1)
 (* argument a of instruction after j instructions *)
 let mk_a (j : pc) = Z3util.intconst ("a_" ^ [%show: pc] j)
 
