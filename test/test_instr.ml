@@ -364,7 +364,36 @@ let dup = [
     );
 ]
 
-let suite = "suite" >::: push @ pop @ swap @ dup
+let nop = [
+
+  "forwards: NOP preserves words on stack">:: (fun _ ->
+      let k = 4 and j = 0 in
+      let vals = [num 1; num 2;] in
+      let c = sk_init k j vals in
+      let c' = Enc.enc_nop k j in
+      let m = solve_model_exn [c; c'] in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+        vals
+        (List.map [Enc.mk_x 0 (j+1); Enc.mk_x 1 (j+1)] ~f:(eval_const m))
+    );
+
+  "forwards: NOP keeps utilization of stack">:: (fun _ ->
+      let k = 4 and j = 0 in
+      let vals = [num 1; num 2;] in
+      let c = sk_init k j vals in
+      let c' = Enc.enc_nop k j in
+      let m = solve_model_exn [c; c'] in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [top; top; btm; btm]
+          (List.map (u's k j) ~f:(eval_const m))
+    );
+]
+
+let suite = "suite" >::: push @ pop @ swap @ dup @ nop
 
 let () =
   run_test_tt_main suite

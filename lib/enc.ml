@@ -95,15 +95,17 @@ let enc_dup k j =
   u_0 && ~! u_l &&
   ((x'_0 == x_0) && (x'_1 == x_0) && enc_prsv k j DUP && enc_sk_utlz_add k j 1)
 
-let effect k enc_userdef iota j =
+let enc_nop k j =
   let open Z3Ops in
+  enc_prsv k j NOP && enc_sk_utlz_unchanged k j
+
+let effect k enc_userdef iota j =
   match iota with
   | PUSH -> enc_push k j
   | POP -> enc_pop k j
   | SWAP -> enc_swap k j
   | DUP -> enc_dup k j
-  | NOP ->
-    enc_prsv k j iota && enc_sk_utlz_unchanged k j
+  | NOP -> enc_nop k j
   | USERDEF Block_192 -> enc_userdef j
 
 
