@@ -105,16 +105,73 @@ let push = [
       let c' = Enc.enc_push k j in
       assert_bool "" (is_unsat [c; c'] )
     );
-  "Cannot PUSH on fully utilized stack stack">:: (fun _ ->
-      let k = 3 and j = 0 in
-      let vals = [num 1; num 2; num 1;] in
+]
+
+let pop = [
+
+  "forwards: POP preserves words">:: (fun _ ->
+      let k = 4 and j = 0 in
+      let vals = [num 1; num 2; num 3] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_push k j in
+      let c' = Enc.enc_pop k j in
+      let m = solve_model_exn [c; c'] in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+        [num 2; num 3]
+        (List.map [Enc.mk_x 0 (j+1); Enc.mk_x 1 (j+1);] ~f:(eval_const m))
+    );
+
+  "forwards: POP utilization of stack">:: (fun _ ->
+      let k = 4 and j = 0 in
+      let vals = [num 1; num 2; num 3] in
+      let c = sk_init k j vals in
+      let c' = Enc.enc_pop k j in
+      let m = solve_model_exn [c; c'] in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [top; top; btm; btm]
+          (List.map (u's k j) ~f:(eval_const m))
+    );
+
+  "backwards: POP preserves words">:: (fun _ ->
+      let k = 4 and j = 2 in
+      let vals = [num 2; num 3] in
+      let c' = sk_init k (j+1) vals in
+      let c = Enc.enc_pop k j in
+      let m = solve_model_exn [c; c'] in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+        [num 2; num 3]
+        (List.map [Enc.mk_x 1 j; Enc.mk_x 2 j;] ~f:(eval_const m))
+    );
+
+  "backwards: POP utilization of stack">:: (fun _ ->
+      let k = 4 and j = 2 in
+      let vals = [num 1; num 2;] in
+      let c' = sk_init k (j+1) vals in
+      let c = Enc.enc_pop k j in
+      let m = solve_model_exn [c; c'] in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [top; top; top; btm]
+          (List.map (us k j) ~f:(eval_const m))
+    );
+
+  "Cannot POP from emtpy stack">:: (fun _ ->
+      let k = 3 and j = 0 in
+      let vals = [] in
+      let c = sk_init k j vals in
+      let c' = Enc.enc_pop k j in
       assert_bool "" (is_unsat [c; c'] )
     );
   ]
 
-let suite = "suite" >::: push
+
+let suite = "suite" >::: push @ pop
 
 let () =
   run_test_tt_main suite
