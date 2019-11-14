@@ -11,23 +11,23 @@ let enc_sk_utlz_init k l =
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u i == is_utlzd i))
 
-let enc_sk_utlz_shft k j delta add_delta =
+let enc_sk_utlz_shft k j diff =
   let u' i = mk_u' i j in
   let u i = mk_u i j in
   let shft i =
-    if add_delta
-    then (if i < delta then top else u (i-delta))
-    else (if i > k + delta then btm else u (i-delta))
+    if (diff >= 0)
+    then (if i < diff then top else u (i-diff))
+    else (if i > k + diff then btm else u (i-diff))
   in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
 
 (* assumes u_k-1_j is not utilized *)
-let enc_sk_utlz_add k j delta = enc_sk_utlz_shft k j delta true
-let enc_sk_utlz_unchanged k j = enc_sk_utlz_shft k j 0 true
+let enc_sk_utlz_add k j delta = enc_sk_utlz_shft k j delta
+let enc_sk_utlz_unchanged k j = enc_sk_utlz_shft k j 0
 
 (* no effect if u_0_j is not utilized *)
-let enc_sk_utlz_rm k j delta = enc_sk_utlz_shft k j (-delta) false
+let enc_sk_utlz_rm k j delta = enc_sk_utlz_shft k j (-delta)
 
 (* preserve *)
 
