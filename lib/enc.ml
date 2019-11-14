@@ -12,7 +12,7 @@ let enc_sk_utlz_init k l =
   conj (List.init k ~f:(fun i -> u i == is_utlzd i))
 
 let enc_sk_utlz_shft k j shft =
-  let u' i = mk_u i (j+1) in
+  let u' i = mk_u' i j in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
 

@@ -4,7 +4,7 @@ open Opti
 open Z3util
 
 let us k j = List.init k ~f:(fun i -> Consts.mk_u i j)
-let u's k j = List.init k ~f:(fun i -> Consts.mk_u i (j + 1))
+let u's k j = List.init k ~f:(fun i -> Consts.mk_u' i j)
 
 let sk_utlz k j utzd =
   let open Z3Ops in

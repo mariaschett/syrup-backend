@@ -9,6 +9,7 @@ type si = int [@@deriving show {with_path = false}]
 (* stack utilization u at stack index i after j instructions *)
 let mk_u (i : si) (j : pc) =
   Z3util.boolconst ("u_" ^ [%show: pc] i ^ "_" ^ [%show: si] j)
+let mk_u' (i : si) (j : pc) = mk_u i (j+1)
 
 (* words on stack are modeled as integer *)
 (* word x at stack index i after executing j instructions *)

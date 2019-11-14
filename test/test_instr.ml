@@ -7,7 +7,7 @@ let xs l j = List.init l ~f:(fun i -> Consts.mk_x i j)
 let x's l j = List.init l ~f:(fun i -> Consts.mk_x i (j+1))
 
 let us k j = List.init k ~f:(fun i -> Consts.mk_u i j)
-let u's k j = List.init k ~f:(fun i -> Consts.mk_u i (j+1))
+let u's k j = List.init k ~f:(fun i -> Consts.mk_u' i j)
 
 let sk_init k j vals =
   let l = List.length vals in
