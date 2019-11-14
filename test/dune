@@ -1,5 +1,5 @@
 (executables
- (names test_utlz test_prsv)
+ (names test_utlz test_prsv test_instr)
  (libraries core opti oUnit z3)
  (preprocess (pps ppx_deriving.std))
 )
@@ -13,5 +13,11 @@
 (alias
  (name runtest)
  (deps (:x test_prsv.exe))
+ (action (run %{x}))
+)
+
+(alias
+ (name runtest)
+ (deps (:x test_instr.exe))
  (action (run %{x}))
 )
