@@ -3,8 +3,8 @@ open OUnit2
 open Opti
 open Z3util
 
-let us k j = List.init k ~f:(fun i -> Enc.mk_u i j)
-let u's k j = List.init k ~f:(fun i -> Enc.mk_u i (j + 1))
+let us k j = List.init k ~f:(fun i -> Consts.mk_u i j)
+let u's k j = List.init k ~f:(fun i -> Consts.mk_u i (j + 1))
 
 let sk_utlz k j utzd =
   let open Z3Ops in

@@ -3,18 +3,18 @@ open OUnit2
 open Opti
 open Z3util
 
-let xs l j = List.init l ~f:(fun i -> Enc.mk_x i j)
-let x's l j = List.init l ~f:(fun i -> Enc.mk_x i (j+1))
+let xs l j = List.init l ~f:(fun i -> Consts.mk_x i j)
+let x's l j = List.init l ~f:(fun i -> Consts.mk_x i (j+1))
 
-let us k j = List.init k ~f:(fun i -> Enc.mk_u i j)
-let u's k j = List.init k ~f:(fun i -> Enc.mk_u i (j+1))
+let us k j = List.init k ~f:(fun i -> Consts.mk_u i j)
+let u's k j = List.init k ~f:(fun i -> Consts.mk_u i (j+1))
 
 let sk_init k j vals =
   let l = List.length vals in
   let open Z3Ops in
   conj (
-    (List.mapi vals ~f:(fun i v -> (Enc.mk_x i j == v) && (Enc.mk_u i j == top))) @
-    (List.map (List.range l k) ~f:(fun i -> (Enc.mk_u i j == btm)))
+    (List.mapi vals ~f:(fun i v -> (Consts.mk_x i j == v) && (Consts.mk_u i j == top))) @
+    (List.map (List.range l k) ~f:(fun i -> (Consts.mk_u i j == btm)))
   )
 
 let push = [
@@ -24,13 +24,13 @@ let push = [
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
       let c' = Enc.enc_push k j in
-      let c_word = Enc.mk_x 0 (j+1) <==> num 42 in
+      let c_word = Consts.mk_x 0 (j+1) <==> num 42 in
       let m = solve_model_exn [c; c'; c_word] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t]
         ~printer:Z3.Expr.to_string
         (num 42)
-        (eval_const m (Enc.mk_a j))
+        (eval_const m (Consts.mk_a j))
     );
 
   "forwards: PUSH preserves words">:: (fun _ ->
@@ -43,7 +43,7 @@ let push = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         vals
-        (List.map [Enc.mk_x 1 (j+1); Enc.mk_x 2 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x 1 (j+1); Consts.mk_x 2 (j+1)] ~f:(eval_const m))
     );
 
   "forwards: PUSH utilization of stack">:: (fun _ ->
@@ -69,7 +69,7 @@ let push = [
         ~cmp:[%eq: Z3.Expr.t]
         ~printer:Z3.Expr.to_string
         (num 42)
-        (eval_const m (Enc.mk_a j))
+        (eval_const m (Consts.mk_a j))
     );
 
   "backwards: PUSH preserves words">:: (fun _ ->
@@ -82,7 +82,7 @@ let push = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2]
-        (List.map [Enc.mk_x 0 j] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 j] ~f:(eval_const m))
     );
 
   "backwards: PUSH utilization of stack">:: (fun _ ->
@@ -119,7 +119,7 @@ let pop = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2; num 3]
-        (List.map [Enc.mk_x 0 (j+1); Enc.mk_x 1 (j+1);] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 (j+1); Consts.mk_x 1 (j+1);] ~f:(eval_const m))
     );
 
   "forwards: POP utilization of stack">:: (fun _ ->
@@ -145,7 +145,7 @@ let pop = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2; num 3]
-        (List.map [Enc.mk_x 1 j; Enc.mk_x 2 j;] ~f:(eval_const m))
+        (List.map [Consts.mk_x 1 j; Consts.mk_x 2 j;] ~f:(eval_const m))
     );
 
   "backwards: POP utilization of stack">:: (fun _ ->
@@ -182,7 +182,7 @@ let swap = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2; num 1]
-        (List.map [Enc.mk_x 0 (j+1); Enc.mk_x 1 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 (j+1); Consts.mk_x 1 (j+1)] ~f:(eval_const m))
     );
 
   "forwards: SWAP preserves words">:: (fun _ ->
@@ -195,7 +195,7 @@ let swap = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 3;]
-        (List.map [Enc.mk_x 2 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x 2 (j+1)] ~f:(eval_const m))
     );
 
   "forwards: SWAP utilization of stack">:: (fun _ ->
@@ -221,7 +221,7 @@ let swap = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2; num 1]
-        (List.map [Enc.mk_x 0 j; Enc.mk_x 1 j] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 j; Consts.mk_x 1 j] ~f:(eval_const m))
     );
 
   "backwards: SWAP preserves words">:: (fun _ ->
@@ -234,7 +234,7 @@ let swap = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 3;]
-        (List.map [Enc.mk_x 2 j] ~f:(eval_const m))
+        (List.map [Consts.mk_x 2 j] ~f:(eval_const m))
     );
 
   "backwards: SWAP utilization of stack">:: (fun _ ->
@@ -279,7 +279,7 @@ let dup = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 21; num 21]
-        (List.map [Enc.mk_x 0 (j+1); Enc.mk_x 1 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 (j+1); Consts.mk_x 1 (j+1)] ~f:(eval_const m))
     );
 
   "forwards: DUP preserves words">:: (fun _ ->
@@ -292,7 +292,7 @@ let dup = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2;]
-        (List.map [Enc.mk_x 2 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x 2 (j+1)] ~f:(eval_const m))
     );
 
   "forwards: DUP utilization of stack">:: (fun _ ->
@@ -318,7 +318,7 @@ let dup = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 21;]
-        (List.map [Enc.mk_x 0 j] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 j] ~f:(eval_const m))
     );
 
   "backwards: DUP preserves words">:: (fun _ ->
@@ -331,7 +331,7 @@ let dup = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         [num 2;]
-        (List.map [Enc.mk_x 1 j] ~f:(eval_const m))
+        (List.map [Consts.mk_x 1 j] ~f:(eval_const m))
     );
 
   "backwards: DUP utilization of stack">:: (fun _ ->
@@ -376,7 +376,7 @@ let nop = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         vals
-        (List.map [Enc.mk_x 0 (j+1); Enc.mk_x 1 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x 0 (j+1); Consts.mk_x 1 (j+1)] ~f:(eval_const m))
     );
 
   "forwards: NOP keeps utilization of stack">:: (fun _ ->
