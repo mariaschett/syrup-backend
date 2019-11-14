@@ -23,11 +23,11 @@ let enc_sk_utlz_shft k j diff =
   conj (List.init k ~f:(fun i -> u' i == shft i))
 
 (* assumes u_k-1_j is not utilized *)
-let enc_sk_utlz_add k j delta = enc_sk_utlz_shft k j delta
+let enc_sk_utlz_add k j diff = enc_sk_utlz_shft k j diff
 let enc_sk_utlz_unchanged k j = enc_sk_utlz_shft k j 0
 
 (* no effect if u_0_j is not utilized *)
-let enc_sk_utlz_rm k j delta = enc_sk_utlz_shft k j (-delta)
+let enc_sk_utlz_rm k j diff = enc_sk_utlz_shft k j (-diff)
 
 let enc_sk_utlz k j iota = enc_sk_utlz_shft k j (-(diff iota))
 
