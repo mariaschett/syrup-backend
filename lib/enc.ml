@@ -15,21 +15,23 @@ let enc_sk_utlz_shft k j diff =
   let u' i = mk_u' i j in
   let u i = mk_u i j in
   let shft i =
-    if (diff >= 0)
-    then (if i < diff then top else u (i-diff))
-    else (if i > k + diff then btm else u (i-diff))
+    if (diff < 0)
+    then
+      (if i < abs(diff) then top else u (i+diff))
+    else
+      (if i > k - diff then btm else u (i+diff))
   in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
 
 (* assumes u_k-1_j is not utilized *)
-let enc_sk_utlz_add k j diff = enc_sk_utlz_shft k j diff
+let enc_sk_utlz_add k j diff = enc_sk_utlz_shft k j (-diff)
 let enc_sk_utlz_unchanged k j = enc_sk_utlz_shft k j 0
 
 (* no effect if u_0_j is not utilized *)
-let enc_sk_utlz_rm k j diff = enc_sk_utlz_shft k j (-diff)
+let enc_sk_utlz_rm k j diff = enc_sk_utlz_shft k j diff
 
-let enc_sk_utlz k j iota = enc_sk_utlz_shft k j (-(diff iota))
+let enc_sk_utlz k j iota = enc_sk_utlz_shft k j (diff iota)
 
 (* preserve *)
 
