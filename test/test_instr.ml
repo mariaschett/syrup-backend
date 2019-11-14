@@ -347,7 +347,7 @@ let dup = [
           (List.map (us k j) ~f:(eval_const m))
     );
 
-    "cannot DUP on full stack">:: (fun _ ->
+  "Cannot DUP on full stack">:: (fun _ ->
       let k = 3 and j = 0 in
       let vals = [num 3; num 2; num 3] in
       let c = sk_init k j vals in
