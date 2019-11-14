@@ -72,7 +72,7 @@ let enc_push k j =
   let a = mk_a j in
   let open Z3Ops in
   ~! u_k &&
-  (x'_0 == a && enc_prsv k j (PUSH) && enc_sk_utlz_add k j 1)
+  (x'_0 == a && enc_prsv k j PUSH && enc_sk_utlz_add k j 1)
 
 let enc_pop k j =
   let u_0 = mk_u 0 j in
