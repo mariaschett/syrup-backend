@@ -24,13 +24,6 @@ let enc_sk_utlz_shft k j diff =
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
 
-(* assumes u_k-1_j is not utilized *)
-let enc_sk_utlz_add k j diff = enc_sk_utlz_shft k j (-diff)
-let enc_sk_utlz_unchanged k j = enc_sk_utlz_shft k j 0
-
-(* no effect if u_0_j is not utilized *)
-let enc_sk_utlz_rm k j diff = enc_sk_utlz_shft k j diff
-
 let enc_sk_utlz k j iota = enc_sk_utlz_shft k j (diff iota)
 
 (* preserve *)
@@ -129,7 +122,7 @@ let enc_block_192 =
     let open Z3Ops in
     u_0 && u_1 ==> (
         ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1) &&
-        enc_prsv k j (USERDEF Block_192) && enc_sk_utlz_rm k j 1)
+        enc_prsv k j (USERDEF Block_192) && enc_sk_utlz k j (USERDEF Block_192))
   in
   let c_s =
     let x_0_0 = mk_x 0 0 in
