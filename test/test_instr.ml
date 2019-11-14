@@ -98,6 +98,13 @@ let push = [
           (List.map (us k j) ~f:(eval_const m))
     );
 
+  "Cannot PUSH on fully utilized stack">:: (fun _ ->
+      let k = 3 and j = 0 in
+      let vals = [num 1; num 2; num 1;] in
+      let c = sk_init k j vals in
+      let c' = Enc.enc_push k j in
+      assert_bool "" (is_unsat [c; c'] )
+    );
   "Cannot PUSH on fully utilized stack stack">:: (fun _ ->
       let k = 3 and j = 0 in
       let vals = [num 1; num 2; num 1;] in
