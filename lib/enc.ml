@@ -97,10 +97,10 @@ let nop_propagate n =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
-let enc_block k n c_s c_t ss enc_userdef =
+let enc_block k n enc_userdef =
   let ns = List.range 0 n in
   let open Z3Ops in
-  foralls ss (c_s && c_t && conj (List.map ns ~f:(pick_instr k enc_userdef)) && nop_propagate n)
+  conj (List.map ns ~f:(pick_instr k enc_userdef)) && nop_propagate n
 
 let enc_block_192 =
   (* max elements ever on stack *)
@@ -123,18 +123,22 @@ let enc_block_192 =
         enc_prsv k j (USERDEF Block_192) && enc_sk_utlz k j (USERDEF Block_192))
   in
   let c_s =
-    let x_0_0 = mk_x 0 0 in
-    let open Z3Ops in
-    (x_0_0 == s_2) && enc_sk_utlz_init k 1
+    enc_sk_utlz_init k 1
   in
   let c_t =
     let xT_0 = mk_x 0 (n-1) in
-    let xT_1 = mk_x 1 (n-1) in
     let open Z3Ops in
-    (s_0 == num 146) && conj [s_0 == xT_0 ; s_1 == xT_1]
+    (s_0 == num 146) && s_0 == xT_0
   in
-  enc_block k n c_s c_t ss enc_instr_block_192
-
+  let
+    target =
+    let xT_1 = mk_x 1 (n-1) in
+    let x_0_0 = mk_x 0 0 in
+    let open Z3Ops in
+    s_1 == xT_1 && (x_0_0 == s_2)
+  in
+  let open Z3Ops in
+  foralls ss (target ==> c_s && c_t && (enc_block k n enc_instr_block_192))
 
 let enc_block_ex1 =
   (* max elements ever on stack *)
@@ -149,8 +153,13 @@ let enc_block_ex1 =
   let c_s = enc_sk_utlz_init k 0
   in
   let c_t =
+    let open Z3Ops in
+    (s_0 == num 146)
+  in
+  let target =
     let xT_0 = mk_x 0 (n-1) in
     let open Z3Ops in
-    (s_0 == num 146) && conj [s_0 == xT_0]
+    s_0 == xT_0
   in
-  enc_block k n c_s c_t ss enc_instr_block_ex1
+  let open Z3Ops in
+  foralls ss (target ==> c_s && c_t && (enc_block k n enc_instr_block_ex1))
