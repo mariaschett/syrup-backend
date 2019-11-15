@@ -1,0 +1,2 @@
+[((PREDEF PUSH), 0); ((PREDEF POP), 1); ((PREDEF SWAP), 2);
+  ((PREDEF DUP), 3); ((PREDEF NOP), 4); ((USERDEF Block_192), 5)]

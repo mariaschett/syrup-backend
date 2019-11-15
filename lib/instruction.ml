@@ -5,9 +5,6 @@ module User_instr = struct
     | Block_192
   [@@deriving show {with_path = false}, enumerate]
 
-  let enc = function
-    | Block_192 -> Z3util.num 5
-
   let alpha_delta = function
     | Block_192 -> (2,1)
 end
@@ -21,16 +18,6 @@ module Predef_instr = struct
     | NOP
   [@@deriving show {with_path = false}, enumerate]
 
-  let enc iota =
-    let i =
-      match iota with
-      | PUSH -> 1
-      | POP -> 2
-      | SWAP -> 0
-      | DUP -> 3
-      | NOP -> 4
-    in Z3util.num i
-
   let alpha_delta = function
     | PUSH -> (0,1)
     | POP -> (1,0)
@@ -43,10 +30,6 @@ type t =
   | PREDEF of Predef_instr.t
   | USERDEF of User_instr.t
 [@@deriving show {with_path = false}, enumerate]
-
-let enc = function
-  | PREDEF instr -> Predef_instr.enc instr
-  | USERDEF instr -> User_instr.enc instr
 
 let alpha_delta = function
   | PREDEF instr -> Predef_instr.alpha_delta instr

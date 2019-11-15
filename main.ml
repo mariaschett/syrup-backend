@@ -12,6 +12,10 @@ let show_smt ex =
   (* hack get model *)
   smt ^ "(get-model)"
 
+let write_smt_and_map fn ex params =
+  Out_channel.write_all ("examples/"^fn^".smt") ~data:ex;
+  Out_channel.write_all ("examples/"^fn^".map") ~data:(Params.show_map params)
+
 let outputcfg =
   ref {pmodel = false; psmt = false;}
 
@@ -28,12 +32,11 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let instrs = Instruction.all in
-        let block_192 = show_smt (Enc.enc_block_192 instrs) in
-        let block_ex1 = show_smt (Enc.enc_block_ex1 instrs) in
+        let params = Params.mk Instruction.all in
+        let block_192 = show_smt (Enc.enc_block_192 params) in
+        let block_ex1 = show_smt (Enc.enc_block_ex1 params) in
         set_options p_model p_smt;
-        print_string block_192;
-        Out_channel.write_all "examples/block_192.smt" ~data:block_192;
-        Out_channel.write_all "examples/block_ex1.smt" ~data:block_ex1;
+        write_smt_and_map "block_192" block_192 params;
+        write_smt_and_map "block_ex1" block_ex1 params
     ]
   |> Command.run ~version:"0.0"

@@ -2,6 +2,7 @@ open Core
 open Z3util
 open Consts
 open Instruction
+open Params
 
 (* stack utilization *)
 
@@ -80,28 +81,28 @@ let effect k enc_userdef iota j =
   | PREDEF NOP -> enc_nop k j
   | USERDEF Block_192 -> enc_userdef j
 
-
-let pick_instr k instrs enc_userdef j =
+let pick_instr k params enc_userdef j =
   let t_j = mk_t j in
-  let instr iota = Instruction.enc iota in
+  let instrs = params.instrs in
+  let instr iota = Params.enc_instr_name params iota in
   let open Z3Ops in
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k enc_userdef iota j))) &&
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j)))
 
-let nop_propagate n =
+let nop_propagate params n =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
   let ns = List.range 0 (n-1) in
-  let nop = Instruction.enc (PREDEF NOP) in
+  let nop = Params.enc_instr_name params (PREDEF NOP) in
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
-let enc_block k n instrs enc_userdef =
+let enc_block k n params enc_userdef =
   let ns = List.range 0 n in
   let open Z3Ops in
-  conj (List.map ns ~f:(pick_instr k instrs enc_userdef)) && nop_propagate n
+  conj (List.map ns ~f:(pick_instr k params enc_userdef)) && nop_propagate params n
 
-let enc_block_192 instrs =
+let enc_block_192 params =
   (* max elements ever on stack *)
   let k = 3 in
   (* max target program simze *)
@@ -137,9 +138,9 @@ let enc_block_192 instrs =
     s_1 == xT_1 && (x_0_0 == s_2)
   in
   let open Z3Ops in
-  foralls ss (target ==> c_s && c_t && (enc_block k n instrs enc_instr_block_192))
+  foralls ss (target ==> c_s && c_t && (enc_block k n params enc_instr_block_192))
 
-let enc_block_ex1 instrs =
+let enc_block_ex1 params =
   (* max elements ever on stack *)
   let k = 3 in
   (* max target program simze *)
@@ -161,4 +162,4 @@ let enc_block_ex1 instrs =
     s_0 == xT_0
   in
   let open Z3Ops in
-  foralls ss (target ==> c_s && c_t && (enc_block k n instrs enc_instr_block_ex1))
+  foralls ss (target ==> c_s && c_t && (enc_block k n params enc_instr_block_ex1))
