@@ -81,10 +81,9 @@ let effect k enc_userdef iota j =
   | USERDEF Block_192 -> enc_userdef j
 
 
-let pick_instr k enc_userdef j =
+let pick_instr k instrs enc_userdef j =
   let t_j = mk_t j in
   let instr iota = Instruction.enc iota in
-  let instrs = Instruction.all in
   let open Z3Ops in
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (effect k enc_userdef iota j))) &&
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j)))
@@ -97,12 +96,12 @@ let nop_propagate n =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
-let enc_block k n enc_userdef =
+let enc_block k n instrs enc_userdef =
   let ns = List.range 0 n in
   let open Z3Ops in
-  conj (List.map ns ~f:(pick_instr k enc_userdef)) && nop_propagate n
+  conj (List.map ns ~f:(pick_instr k instrs enc_userdef)) && nop_propagate n
 
-let enc_block_192 =
+let enc_block_192 instrs =
   (* max elements ever on stack *)
   let k = 3 in
   (* max target program simze *)
@@ -113,7 +112,7 @@ let enc_block_192 =
   let ss = [s_1; s_2] in
 
   (* fixed to example block 192 *)
-  let enc_instr_block_192 j =
+  let enc_instr_block_192  j =
     let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
     let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
     let x_1 = mk_x 1 j in
@@ -138,9 +137,9 @@ let enc_block_192 =
     s_1 == xT_1 && (x_0_0 == s_2)
   in
   let open Z3Ops in
-  foralls ss (target ==> c_s && c_t && (enc_block k n enc_instr_block_192))
+  foralls ss (target ==> c_s && c_t && (enc_block k n instrs enc_instr_block_192))
 
-let enc_block_ex1 =
+let enc_block_ex1 instrs =
   (* max elements ever on stack *)
   let k = 3 in
   (* max target program simze *)
@@ -162,4 +161,4 @@ let enc_block_ex1 =
     s_0 == xT_0
   in
   let open Z3Ops in
-  foralls ss (target ==> c_s && c_t && (enc_block k n enc_instr_block_ex1))
+  foralls ss (target ==> c_s && c_t && (enc_block k n instrs enc_instr_block_ex1))

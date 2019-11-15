@@ -28,8 +28,9 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let block_192 = show_smt Enc.enc_block_192 in
-        let block_ex1 = show_smt Enc.enc_block_ex1 in
+        let instrs = Instruction.all in
+        let block_192 = show_smt (Enc.enc_block_192 instrs) in
+        let block_ex1 = show_smt (Enc.enc_block_ex1 instrs) in
         set_options p_model p_smt;
         print_string block_192;
         Out_channel.write_all "examples/block_192.smt" ~data:block_192;
