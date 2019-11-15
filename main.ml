@@ -7,6 +7,11 @@ type output_options =
   ; psmt : bool
   }
 
+let show_smt ex =
+  let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
+  (* hack get model *)
+  smt ^ "(get-model)"
+
 let outputcfg =
   ref {pmodel = false; psmt = false;}
 
@@ -23,11 +28,11 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let block_192 = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] Enc.enc_block_192 in
-        let block_ex1 = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] Enc.enc_block_ex1 in
+        let block_192 = show_smt Enc.enc_block_192 in
+        let block_ex1 = show_smt Enc.enc_block_ex1 in
         set_options p_model p_smt;
         print_string block_192;
-        Out_channel.write_all "examples/block_192.smt" ~data:(block_192^"(get-model)");
-        Out_channel.write_all "examples/block_ex1.smt" ~data:(block_ex1^"(get-model)");
+        Out_channel.write_all "examples/block_192.smt" ~data:block_192;
+        Out_channel.write_all "examples/block_ex1.smt" ~data:block_ex1;
     ]
   |> Command.run ~version:"0.0"
