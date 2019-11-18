@@ -3,94 +3,79 @@ open Z3util
 open Consts
 open Instruction_util
 
-module User_instr = struct
-  type t =
-    | Block_192
-  [@@deriving show {with_path = false}, enumerate]
+type t = {
+  name : string;
+  alpha : int;
+  delta : int;
+  enc : int -> int -> Z3.Expr.expr;
+} [@@deriving show {with_path = false}]
 
-  let delta_alpha = function
-    | Block_192 -> (2,1)
-end
+let mk name alpha delta enc = {
+    name = name;
+    alpha = alpha;
+    delta = delta;
+    enc = enc;
+  }
 
-module Predef_instr = struct
-  type t =
-    | PUSH
-    | POP
-    | SWAP
-    | DUP
-    | NOP
-  [@@deriving show {with_path = false}, enumerate]
-
-  let delta_alpha = function
-    | PUSH -> (0,1)
-    | POP -> (1,0)
-    | SWAP -> (2,2)
-    | DUP -> (1,2)
-    | NOP -> (0,0)
-end
-
-type t =
-  | PREDEF of Predef_instr.t
-  | USERDEF of User_instr.t
-[@@deriving show {with_path = false}, enumerate]
-
-let delta_alpha = function
-  | PREDEF instr -> Predef_instr.delta_alpha instr
-  | USERDEF instr -> User_instr.delta_alpha instr
-
-let diff iota =
-  let (delta, alpha) = delta_alpha iota in
-  (alpha - delta)
-
-let alpha iota = delta_alpha iota |> Tuple.T2.get2
-
-let delta iota = delta_alpha iota |> Tuple.T2.get1
-
-(* effect *)
-
-let enc_push k j =
+let enc_push diff alpha k j  =
   let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in
   let a = mk_a j in
-  let diff = diff (PREDEF PUSH) and alpha = alpha (PREDEF PUSH) in
   let open Z3Ops in
   ~! u_k &&
   (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
-let enc_pop k j =
+let mk_PUSH =
+  let name = "PUSH" in
+  let alpha = 1 and delta = 0 in
+  let diff = alpha - delta in
+  mk name alpha delta (enc_push diff alpha)
+
+let enc_pop diff alpha k j =
   let u_0 = mk_u 0 j in
-  let diff = diff (PREDEF POP) and alpha = alpha (PREDEF POP) in
   let open Z3Ops in
   u_0 && (enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
-let enc_swap k j =
+let mk_POP =
+  let name = "POP" in
+  let alpha = 0 and delta = 1 in
+  let diff = alpha - delta in
+  mk name alpha delta (enc_pop diff alpha)
+
+let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x_1 = mk_x 1 j and x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
-  let diff = diff (PREDEF SWAP) and alpha = alpha (PREDEF SWAP) in
   let open Z3Ops in
   u_0 && u_1 &&
   ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j diff alpha && enc_sk_utlz k j diff
 
-let enc_dup k j =
+let mk_SWAP =
+  let name = "SWAP" in
+  let alpha = 2 and delta = 2 in
+  let diff = alpha - delta in
+  mk name alpha delta (enc_swap diff alpha)
+
+let enc_dup diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_l = mk_u (k-1) j in
-  let diff = diff (PREDEF DUP) and alpha = alpha (PREDEF DUP) in
   let open Z3Ops in
   u_0 && ~! u_l &&
   ((x'_0 == x_0) && (x'_1 == x_0) && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
-let enc_nop k j =
-  let diff = diff (PREDEF NOP) and alpha = alpha (PREDEF NOP) in
+let mk_DUP =
+  let name = "DUP" in
+  let alpha = 2 and delta = 1 in
+  let diff = alpha - delta in
+  mk name alpha delta (enc_dup diff alpha)
+
+let enc_nop diff alpha k j =
   let open Z3Ops in
   enc_prsv k j diff alpha  && enc_sk_utlz k j diff
 
-let effect k enc_userdef iota j =
-  match iota with
-  | PREDEF PUSH -> enc_push k j
-  | PREDEF POP -> enc_pop k j
-  | PREDEF SWAP -> enc_swap k j
-  | PREDEF DUP -> enc_dup k j
-  | PREDEF NOP -> enc_nop k j
-  | USERDEF Block_192 -> enc_userdef j
+let mk_NOP =
+  let name = "NOP" in
+  let alpha = 0 and delta = 0 in
+  let diff = alpha - delta in
+  mk name alpha delta (enc_nop diff alpha)

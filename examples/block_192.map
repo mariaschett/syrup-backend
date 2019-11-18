@@ -1,2 +1,6 @@
-[((PREDEF PUSH), 0); ((PREDEF POP), 1); ((PREDEF SWAP), 2);
-  ((PREDEF DUP), 3); ((PREDEF NOP), 4); ((USERDEF Block_192), 5)]
+[({ name = "PUSH"; alpha = 1; delta = 0; enc = <fun> }, 0);
+  ({ name = "POP"; alpha = 0; delta = 1; enc = <fun> }, 1);
+  ({ name = "SWAP"; alpha = 2; delta = 2; enc = <fun> }, 2);
+  ({ name = "DUP"; alpha = 2; delta = 1; enc = <fun> }, 3);
+  ({ name = "NOP"; alpha = 0; delta = 0; enc = <fun> }, 4);
+  ({ name = "ADD(sk_x, 1)"; alpha = 0; delta = 0; enc = <fun> }, 5)]
