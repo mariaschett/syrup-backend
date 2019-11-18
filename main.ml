@@ -24,7 +24,7 @@ let enc_block_192 diff alpha k j =
       ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1) &&
       enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
-let block_192 =
+let mk_block_192 =
   let name = "ADD(sk_x, 1)" in
   let alpha = 0 and delta = 0 in
   let diff = alpha - delta in
@@ -56,7 +56,7 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let params_block_192 = Params.mk (predef @ [block_192]) in
+        let params_block_192 = Params.mk (predef @ [mk_block_192]) in
         let params_block_ex1 = Params.mk predef in
         let block_192 = Enc.enc_block_192 params_block_192 in
         let block_ex1 = Enc.enc_block_ex1 params_block_ex1 in
