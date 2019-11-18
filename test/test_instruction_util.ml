@@ -74,7 +74,7 @@ let prsv =
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let c = sk_init k j vals in
-        let c' = enc_prsv_from_diff (-1) k 1 j in
+        let c' = enc_prsv_from_diff 1 k 1 j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -87,7 +87,7 @@ let prsv =
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let c = sk_init k j vals in
-        let c' = enc_prsv_from_diff 1 k 0 j in
+        let c' = enc_prsv_from_diff (-1) k 0 j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
