@@ -29,6 +29,13 @@ let mk_block_192 =
   let diff = alpha - delta in
   Instruction.mk name alpha delta (enc_block_192 diff alpha)
 
+let params_block_192 =
+  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+  let s_1 = mk_s 1 (* =^= ADD_1 *) in
+  Params.mk (predef @ [mk_block_192]) ~k:3 ~n:2 ~forall:[s_1; s_2]
+
+let params_block_ex1 = Params.mk predef ~k:3 ~n:2 ~forall:[]
+
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
   (* hack get model *)
@@ -55,8 +62,6 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let params_block_192 = Params.mk (predef @ [mk_block_192]) ~k:3 ~n:2 in
-        let params_block_ex1 = Params.mk predef ~k:3 ~n:2 in
         let block_192 = Enc.enc_block_192 params_block_192  in
         let block_ex1 = Enc.enc_block_ex1 params_block_ex1 in
         set_options p_model p_smt;

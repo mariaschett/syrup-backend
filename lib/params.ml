@@ -6,11 +6,12 @@ type params = {
   map : (Instruction.t * int) list;
   k : int;
   n : int;
+  ss : Z3.Expr.expr list;
 }
 
-let mk ~k:k ~n:n instrs =
+let mk ~k:k ~n:n ~forall:ss instrs =
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
-  { instrs = instrs; map = map; k; n}
+  { instrs = instrs; map = map; k = k; n = n; ss = ss}
 
 let enc_instr_name params iota =
   List.Assoc.find_exn (params.map) iota ~equal:(fun i1 i2 -> i1.name = i2.name) |> Z3util.num
