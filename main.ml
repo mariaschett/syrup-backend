@@ -12,10 +12,9 @@ type output_options =
 
 let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
-(* fixed to example block 192 *)
 let enc_block_192 diff alpha k j =
+  let s_1 = mk_s 1 (* =^= ADD_1 *) in
   let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *) in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x_1 = mk_x 1 j in
