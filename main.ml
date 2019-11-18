@@ -55,9 +55,9 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let params_block_192 = Params.mk (predef @ [mk_block_192]) in
-        let params_block_ex1 = Params.mk predef in
-        let block_192 = Enc.enc_block_192 params_block_192 in
+        let params_block_192 = Params.mk (predef @ [mk_block_192]) ~k:3 ~n:2 in
+        let params_block_ex1 = Params.mk predef ~k:3 ~n:2 in
+        let block_192 = Enc.enc_block_192 params_block_192  in
         let block_ex1 = Enc.enc_block_ex1 params_block_ex1 in
         set_options p_model p_smt;
         write_smt_and_map "block_192" block_192 params_block_192;

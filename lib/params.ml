@@ -4,11 +4,13 @@ open Instruction
 type params = {
   instrs : Instruction.t list;
   map : (Instruction.t * int) list;
+  k : int;
+  n : int;
 }
 
-let mk instrs =
+let mk ~k:k ~n:n instrs =
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
-  { instrs = instrs; map = map }
+  { instrs = instrs; map = map; k; n}
 
 let enc_instr_name params iota =
   List.Assoc.find_exn (params.map) iota ~equal:(fun i1 i2 -> i1.name = i2.name) |> Z3util.num
