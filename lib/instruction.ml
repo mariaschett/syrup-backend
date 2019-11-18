@@ -8,7 +8,7 @@ module User_instr = struct
     | Block_192
   [@@deriving show {with_path = false}, enumerate]
 
-  let alpha_delta = function
+  let delta_alpha = function
     | Block_192 -> (2,1)
 end
 
@@ -21,7 +21,7 @@ module Predef_instr = struct
     | NOP
   [@@deriving show {with_path = false}, enumerate]
 
-  let alpha_delta = function
+  let delta_alpha = function
     | PUSH -> (0,1)
     | POP -> (1,0)
     | SWAP -> (2,2)
@@ -34,17 +34,17 @@ type t =
   | USERDEF of User_instr.t
 [@@deriving show {with_path = false}, enumerate]
 
-let alpha_delta = function
-  | PREDEF instr -> Predef_instr.alpha_delta instr
-  | USERDEF instr -> User_instr.alpha_delta instr
+let delta_alpha = function
+  | PREDEF instr -> Predef_instr.delta_alpha instr
+  | USERDEF instr -> User_instr.delta_alpha instr
 
 let diff iota =
-  let (alpha, delta) = alpha_delta iota in
+  let (delta, alpha) = delta_alpha iota in
   (alpha - delta)
 
-let alpha iota = alpha_delta iota |> Tuple.T2.get1
+let alpha iota = delta_alpha iota |> Tuple.T2.get2
 
-let delta iota = alpha_delta iota |> Tuple.T2.get2
+let delta iota = delta_alpha iota |> Tuple.T2.get1
 
 (* effect *)
 
