@@ -11,34 +11,39 @@ let enc_push k j =
   let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in
   let a = mk_a j in
+  let diff = diff (PREDEF PUSH) and alpha = alpha (PREDEF PUSH) in
   let open Z3Ops in
   ~! u_k &&
-  (x'_0 == a && enc_prsv k j (PREDEF PUSH) && enc_sk_utlz k j (PREDEF PUSH))
+  (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
 let enc_pop k j =
   let u_0 = mk_u 0 j in
+  let diff = diff (PREDEF POP) and alpha = alpha (PREDEF POP) in
   let open Z3Ops in
-  u_0 && (enc_prsv k j (PREDEF POP) && enc_sk_utlz k j (PREDEF POP))
+  u_0 && (enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
 let enc_swap k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x_1 = mk_x 1 j and x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
+  let diff = diff (PREDEF SWAP) and alpha = alpha (PREDEF SWAP) in
   let open Z3Ops in
   u_0 && u_1 &&
-  ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j (PREDEF SWAP) && enc_sk_utlz k j (PREDEF SWAP)
+  ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j diff alpha && enc_sk_utlz k j diff
 
 let enc_dup k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_l = mk_u (k-1) j in
+  let diff = diff (PREDEF DUP) and alpha = alpha (PREDEF DUP) in
   let open Z3Ops in
   u_0 && ~! u_l &&
-  ((x'_0 == x_0) && (x'_1 == x_0) && enc_prsv k j (PREDEF DUP) && enc_sk_utlz k j (PREDEF DUP))
+  ((x'_0 == x_0) && (x'_1 == x_0) && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
 let enc_nop k j =
+  let diff = diff (PREDEF NOP) and alpha = alpha (PREDEF NOP) in
   let open Z3Ops in
-  enc_prsv k j (PREDEF NOP) && enc_sk_utlz k j (PREDEF NOP)
+  enc_prsv k j diff alpha  && enc_sk_utlz k j diff
 
 let effect k enc_userdef iota j =
   match iota with
@@ -85,10 +90,12 @@ let enc_block_192 params =
     let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
     let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
     let x_1 = mk_x 1 j in
+    let diff = diff (USERDEF Block_192) in
+    let alpha = alpha (USERDEF Block_192) in
     let open Z3Ops in
     u_0 && u_1 ==> (
         ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1) &&
-        enc_prsv k j (USERDEF Block_192) && enc_sk_utlz k j (USERDEF Block_192))
+        enc_prsv k j diff alpha && enc_sk_utlz k j diff)
   in
   let c_s =
     enc_sk_utlz_init k 1
