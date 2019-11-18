@@ -30,12 +30,9 @@ let enc_block_192 params =
   let s_0 = mk_s 0 (* =^= 146 *) in
   let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let c_s =
-    enc_sk_utlz_init params.k 1
-  in
+  let c_s = enc_sk_utlz_init params.k 1 in
   let c_t =
-    let uT_0 = mk_u 0 params.n in
-    let uT_1 = mk_u 1 params.n in
+    let uT_0 = mk_u 0 params.n and uT_1 = mk_u 1 params.n in
     let xT_0 = mk_x 0 params.n in
     let open Z3Ops in
     (s_0 == num 146) && s_0 == xT_0 && uT_0 && uT_1

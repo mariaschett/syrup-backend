@@ -33,7 +33,7 @@ let params_block_192 =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
   Params.mk (predef @ [mk_block_192]) ~k:3 ~n:2 ~forall:[s_1; s_2]
 
-let params_block_ex1 = Params.mk predef ~k:3 ~n:2 ~forall:[]
+let params_block_ex1 = Params.mk predef ~k:3 ~n:4 ~forall:[]
 
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
