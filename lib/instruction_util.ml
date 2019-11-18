@@ -25,7 +25,7 @@ let enc_sk_utlz k j diff = enc_sk_utlz_shft k j diff
 
 (* preserve *)
 
-let enc_prsv_from_diff diff k l j =
+let enc_prsv_from_diff k j diff l =
   let u' i = mk_u' i j in
   let x i = mk_x (i-diff) j and x' i = mk_x' i j in
   let ks = List.range l k in
@@ -33,4 +33,4 @@ let enc_prsv_from_diff diff k l j =
   conj (List.map ks ~f:(fun i -> u' i ==> (x' i == x i)))
 
 let enc_prsv k j diff alpha =
-  enc_prsv_from_diff diff k alpha j
+  enc_prsv_from_diff k j diff alpha
