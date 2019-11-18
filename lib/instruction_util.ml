@@ -16,7 +16,7 @@ let enc_sk_utlz_shft k j diff =
   let shft i =
     if diff >= 0
     then if i < diff then top else u (i-diff)
-    else if i > k - (abs(diff)) then btm else u (i+(abs(diff)))
+    else if i >= k - (abs(diff)) then btm else u (i+(abs(diff)))
   in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
@@ -28,7 +28,9 @@ let enc_sk_utlz k j diff = enc_sk_utlz_shft k j diff
 let enc_prsv_from_diff k j diff l =
   let u' i = mk_u' i j in
   let x i = mk_x (i-diff) j and x' i = mk_x' i j in
-  let ks = List.range l k in
+  (* to avoid generating x_k_j *)
+  let k = if diff < 0 then k - abs(diff) else k in
+  let ks = List.range ~start:`inclusive ~stop:`exclusive l k in
   let open Z3Ops in
   conj (List.map ks ~f:(fun i -> u' i ==> (x' i == x i)))
 

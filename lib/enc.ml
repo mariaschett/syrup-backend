@@ -10,19 +10,19 @@ let pick_instr params j =
   let instrs = params.instrs in
   let instr iota = Params.enc_instr_name params iota in
   let open Z3Ops in
-  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (iota.effect params.k j))) &&
+  conj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (iota.effect params.k j))) &&
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j)))
 
 let nop_propagate params =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
-  let ns = List.range 0 (params.n-1) in
+  let ns = List.range ~start:`inclusive ~stop:`exclusive 0 (params.n - 1) in
   let nop = Z3util.num (Params.nop_enc_name params) in
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
 let enc_block params =
-  let ns = List.range 0 params.n in
+  let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
   let open Z3Ops in
   conj (List.map ns ~f:(pick_instr params)) && nop_propagate params
 
@@ -34,13 +34,15 @@ let enc_block_192 params =
     enc_sk_utlz_init params.k 1
   in
   let c_t =
-    let xT_0 = mk_x 0 (params.n-1) in
+    let uT_0 = mk_u 0 params.n in
+    let uT_1 = mk_u 1 params.n in
+    let xT_0 = mk_x 0 params.n in
     let open Z3Ops in
-    (s_0 == num 146) && s_0 == xT_0
+    (s_0 == num 146) && s_0 == xT_0 && uT_0 && uT_1
   in
   let
     target =
-    let xT_1 = mk_x 1 (params.n-1) in
+    let xT_1 = mk_x 1 params.n in
     let x_0_0 = mk_x 0 0 in
     let open Z3Ops in
     s_1 == xT_1 && (x_0_0 == s_2)
@@ -53,13 +55,12 @@ let enc_block_ex1 params =
   let c_s = enc_sk_utlz_init params.k 0
   in
   let c_t =
+    let xT_0 = mk_x 0 params.n in
+    let uT_0 = mk_u 0 params.n in
     let open Z3Ops in
-    (s_0 == num 146)
+    (s_0 == num 146) && (s_0 == xT_0) && uT_0
   in
-  let target =
-    let xT_0 = mk_x 0 (params.n-1) in
-    let open Z3Ops in
-    s_0 == xT_0
+  let target = top
   in
   let open Z3Ops in
-  foralls params.ss (target ==> c_s && c_t && (enc_block params))
+  foralls params.ss (target ==> (c_s && c_t && (enc_block params)))
