@@ -1,6 +1,2 @@
-[({ name = "PUSH"; alpha = 1; delta = 0; enc = <fun> }, 0);
-  ({ name = "POP"; alpha = 0; delta = 1; enc = <fun> }, 1);
-  ({ name = "SWAP"; alpha = 2; delta = 2; enc = <fun> }, 2);
-  ({ name = "DUP"; alpha = 2; delta = 1; enc = <fun> }, 3);
-  ({ name = "NOP"; alpha = 0; delta = 0; enc = <fun> }, 4);
-  ({ name = "ADD(sk_x, 1)"; alpha = 0; delta = 0; enc = <fun> }, 5)]
+[("PUSH", 0); ("POP", 1); ("SWAP", 2); ("DUP", 3); ("NOP", 4);
+  ("ADD(sk_x, 1)", 5)]
