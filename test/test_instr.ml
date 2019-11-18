@@ -10,7 +10,7 @@ let push = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_push k j in
+      let c' = Instruction.enc_push k j in
       let c_word = Consts.mk_x 0 (j+1) <==> num 42 in
       let m = solve_model_exn [c; c'; c_word] in
       assert_equal
@@ -24,7 +24,7 @@ let push = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_push k j in
+      let c' = Instruction.enc_push k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -37,7 +37,7 @@ let push = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_push k j in
+      let c' = Instruction.enc_push k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -50,7 +50,7 @@ let push = [
       let k = 4 and j = 2 in
       let vals = [num 42; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_push k j in
+      let c = Instruction.enc_push k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t]
@@ -63,7 +63,7 @@ let push = [
       let k = 4 and j = 2 in
       let vals = [num 42; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_push k j in
+      let c = Instruction.enc_push k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -76,7 +76,7 @@ let push = [
       let k = 4 and j = 2 in
       let vals = [num 1; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_push k j in
+      let c = Instruction.enc_push k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -89,7 +89,7 @@ let push = [
       let k = 3 and j = 0 in
       let vals = [num 1; num 2; num 1;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_push k j in
+      let c' = Instruction.enc_push k j in
       assert_bool "" (is_unsat [c; c'] )
     );
 ]
@@ -100,7 +100,7 @@ let pop = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2; num 3] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_pop k j in
+      let c' = Instruction.enc_pop k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -113,7 +113,7 @@ let pop = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2; num 3] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_pop k j in
+      let c' = Instruction.enc_pop k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -126,7 +126,7 @@ let pop = [
       let k = 4 and j = 2 in
       let vals = [num 2; num 3] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_pop k j in
+      let c = Instruction.enc_pop k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -139,7 +139,7 @@ let pop = [
       let k = 4 and j = 2 in
       let vals = [num 1; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_pop k j in
+      let c = Instruction.enc_pop k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -152,7 +152,7 @@ let pop = [
       let k = 3 and j = 0 in
       let vals = [] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_pop k j in
+      let c' = Instruction.enc_pop k j in
       assert_bool "" (is_unsat [c; c'] )
     );
   ]
@@ -163,7 +163,7 @@ let swap = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2; num 3;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_swap k j in
+      let c' = Instruction.enc_swap k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -176,7 +176,7 @@ let swap = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2; num 3;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_swap k j in
+      let c' = Instruction.enc_swap k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -189,7 +189,7 @@ let swap = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2; num 3;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_swap k j in
+      let c' = Instruction.enc_swap k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -202,7 +202,7 @@ let swap = [
       let k = 4 and j = 2 in
       let vals = [num 1; num 2; num 3;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_swap k j in
+      let c = Instruction.enc_swap k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -215,7 +215,7 @@ let swap = [
       let k = 4 and j = 2 in
       let vals = [num 1; num 2; num 3;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_swap k j in
+      let c = Instruction.enc_swap k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -228,7 +228,7 @@ let swap = [
       let k = 4 and j = 2 in
       let vals = [num 1; num 2; num 3;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_swap k j in
+      let c = Instruction.enc_swap k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -241,7 +241,7 @@ let swap = [
       let k = 3 and j = 0 in
       let vals = [num 3] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_swap k j in
+      let c' = Instruction.enc_swap k j in
       assert_bool "" (is_unsat [c; c'] )
     );
 
@@ -249,7 +249,7 @@ let swap = [
       let k = 3 and j = 0 in
       let vals = [] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_swap k j in
+      let c' = Instruction.enc_swap k j in
       assert_bool "" (is_unsat [c; c'] )
     );
 ]
@@ -260,7 +260,7 @@ let dup = [
       let k = 4 and j = 0 in
       let vals = [num 21; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_dup k j in
+      let c' = Instruction.enc_dup k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -273,7 +273,7 @@ let dup = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_dup k j in
+      let c' = Instruction.enc_dup k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -286,7 +286,7 @@ let dup = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_dup k j in
+      let c' = Instruction.enc_dup k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -299,7 +299,7 @@ let dup = [
       let k = 4 and j = 2 in
       let vals = [num 21; num 21; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_dup k j in
+      let c = Instruction.enc_dup k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -312,7 +312,7 @@ let dup = [
       let k = 4 and j = 2 in
       let vals = [num 21; num 21; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_dup k j in
+      let c = Instruction.enc_dup k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -325,7 +325,7 @@ let dup = [
       let k = 4 and j = 2 in
       let vals = [num 21; num 21; num 2;] in
       let c' = sk_init k (j+1) vals in
-      let c = Enc.enc_dup k j in
+      let c = Instruction.enc_dup k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -338,7 +338,7 @@ let dup = [
       let k = 3 and j = 0 in
       let vals = [num 3; num 2; num 3] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_dup k j in
+      let c' = Instruction.enc_dup k j in
       assert_bool "" (is_unsat [c; c'] )
     );
 
@@ -346,7 +346,7 @@ let dup = [
       let k = 3 and j = 0 in
       let vals = [] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_dup k j in
+      let c' = Instruction.enc_dup k j in
       assert_bool "" (is_unsat [c; c'] )
     );
 ]
@@ -357,7 +357,7 @@ let nop = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_nop k j in
+      let c' = Instruction.enc_nop k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
@@ -370,7 +370,7 @@ let nop = [
       let k = 4 and j = 0 in
       let vals = [num 1; num 2;] in
       let c = sk_init k j vals in
-      let c' = Enc.enc_nop k j in
+      let c' = Instruction.enc_nop k j in
       let m = solve_model_exn [c; c'] in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
