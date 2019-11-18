@@ -20,12 +20,11 @@ let enc_block_192 diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x_1 = mk_x 1 j in
   let open Z3Ops in
-  u_0 && u_1 && (
-      ((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1) &&
-      enc_prsv k j diff alpha && enc_sk_utlz k j diff)
+  u_0 && u_1 && (((x_0 == s_2) && (x_1 == (num 1))) ==> (x'_0 == s_1)) &&
+      enc_prsv k j diff alpha && enc_sk_utlz k j diff
 
 let mk_block_192 =
-  let name = "ADD(sk_x, 1)" in
+  let name = "ADD_1" in
   let alpha = 1 and delta = 2 in
   let diff = alpha - delta in
   Instruction.mk name alpha delta (enc_block_192 diff alpha)

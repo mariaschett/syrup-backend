@@ -33,7 +33,7 @@ let enc_block_192 params =
   let n = 2 in
   let s_0 = mk_s 0 (* =^= 146 *) in
   let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let s_1 = mk_s 1 (* =^= f_ADD(sk_x, 1) *) in
+  let s_1 = mk_s 1 (* =^= ADD_1 *) in
   let ss = [s_1; s_2]
   in
   let c_s =
