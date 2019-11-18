@@ -7,14 +7,14 @@ type t = {
   name : string;
   alpha : int;
   delta : int;
-  enc : int -> int -> Z3.Expr.expr;
+  effect : int -> int -> Z3.Expr.expr;
 } [@@deriving show {with_path = false}]
 
-let mk name alpha delta enc = {
+let mk name alpha delta effect = {
     name = name;
     alpha = alpha;
     delta = delta;
-    enc = enc;
+    effect = effect;
   }
 
 let enc_push diff alpha k j  =

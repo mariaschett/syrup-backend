@@ -5,7 +5,7 @@ open Z3util
 open Test_util
 
 let push =
-  let enc_push = (Instruction.mk_PUSH).enc in [
+  let enc_push = (Instruction.mk_PUSH).effect in [
 
     "forwards: PUSH word on stack">:: (fun _ ->
         let k = 4 and j = 0 in
@@ -95,7 +95,7 @@ let push =
       );
   ]
 
-let pop = let enc_pop = (Instruction.mk_POP).enc in
+let pop = let enc_pop = (Instruction.mk_POP).effect in
   [
     "forwards: POP preserves words">:: (fun _ ->
         let k = 4 and j = 0 in
@@ -158,7 +158,7 @@ let pop = let enc_pop = (Instruction.mk_POP).enc in
       );
   ]
 
-let swap = let enc_swap = (Instruction.mk_SWAP).enc in
+let swap = let enc_swap = (Instruction.mk_SWAP).effect in
   [
     "forwards: SWAP word on stack">:: (fun _ ->
         let k = 4 and j = 0 in
@@ -255,7 +255,7 @@ let swap = let enc_swap = (Instruction.mk_SWAP).enc in
       );
   ]
 
-let dup = let enc_dup = (Instruction.mk_DUP).enc in
+let dup = let enc_dup = (Instruction.mk_DUP).effect in
   [
     "forwards: DUP word on stack">:: (fun _ ->
         let k = 4 and j = 0 in
@@ -352,7 +352,7 @@ let dup = let enc_dup = (Instruction.mk_DUP).enc in
       );
   ]
 
-let nop = let enc_nop = (Instruction.mk_NOP).enc in
+let nop = let enc_nop = (Instruction.mk_NOP).effect in
   [
     "forwards: NOP preserves words on stack">:: (fun _ ->
         let k = 4 and j = 0 in

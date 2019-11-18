@@ -10,7 +10,7 @@ let pick_instr k params j =
   let instrs = params.instrs in
   let instr iota = Params.enc_instr_name params iota in
   let open Z3Ops in
-  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (iota.enc k j))) &&
+  disj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (iota.effect k j))) &&
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j)))
 
 let nop_propagate params n =
