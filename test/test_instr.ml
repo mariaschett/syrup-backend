@@ -30,7 +30,7 @@ let push = [
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
         vals
-        (List.map [Consts.mk_x 1 (j+1); Consts.mk_x 2 (j+1)] ~f:(eval_const m))
+        (List.map [Consts.mk_x' 1 j; Consts.mk_x' 2 j] ~f:(eval_const m))
     );
 
   "forwards: PUSH utilization of stack">:: (fun _ ->

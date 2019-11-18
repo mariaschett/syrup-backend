@@ -15,8 +15,8 @@ let enc_sk_utlz_shft k j diff =
   let u i = mk_u i j in
   let shft i =
     if diff >= 0
-    then if i > k - diff then btm else u (i+diff)
-    else if i < abs(diff) then top else u (i+diff)
+    then if i < diff then top else u (i-diff)
+    else if i > k - (abs(diff)) then btm else u (i+(abs(diff)))
   in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
