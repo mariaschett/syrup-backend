@@ -2,6 +2,7 @@ open Core
 open OUnit2
 open Opti
 open Z3util
+open Consts
 open Test_util
 
 let push =

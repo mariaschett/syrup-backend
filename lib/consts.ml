@@ -25,3 +25,9 @@ let mk_t (j : pc) = Z3util.intconst ("t_" ^ [%show: pc] j)
 
 (* words on the final stack *)
 let mk_s (j : pc) = Z3util.intconst ("s_" ^ [%show: int] j)
+
+let xs l j = List.init l ~f:(fun i -> mk_x i j)
+let x's l j = List.init l ~f:(fun i -> mk_x' i j)
+
+let us k j = List.init k ~f:(fun i -> mk_u i j)
+let u's k j = List.init k ~f:(fun i -> mk_u' i j)

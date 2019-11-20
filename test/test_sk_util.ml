@@ -13,8 +13,8 @@ let utlz = [
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
           ~printer:(List.to_string ~f:Z3.Expr.to_string)
-          (List.map (us k i) ~f:(fun _ -> top))
-          (List.map (us k i) ~f:(eval_const m))
+          (List.map (Consts.us k i) ~f:(fun _ -> top))
+          (List.map (Consts.us k i) ~f:(eval_const m))
       );
 
     "Initial stack contains one element">:: (fun _ ->
@@ -25,7 +25,7 @@ let utlz = [
           ~cmp:[%eq: Z3.Expr.t list]
           ~printer:(List.to_string ~f:Z3.Expr.to_string)
           (top :: (List.init (k-l) ~f:(fun _ -> btm)))
-          (List.map (us k i) ~f:(eval_const m))
+          (List.map (Consts.us k i) ~f:(eval_const m))
       );
 
     "Initial stack contains two elements">:: (fun _ ->
@@ -36,7 +36,7 @@ let utlz = [
           ~cmp:[%eq: Z3.Expr.t list]
           ~printer:(List.to_string ~f:Z3.Expr.to_string)
           ([top; top] @ (List.init (k-l) ~f:(fun _ -> btm)))
-          (List.map (us k 0) ~f:(eval_const m))
+          (List.map (Consts.us k 0) ~f:(eval_const m))
       );
   ]
 
@@ -54,7 +54,7 @@ let prsv =
           ~cmp:[%eq: Z3.Expr.t list]
           ~printer:(List.to_string ~f:Z3.Expr.to_string)
           vals
-          (List.map (x's l j) ~f:(eval_const m))
+          (List.map (Consts.x's l j) ~f:(eval_const m))
       );
 
     "Stack is preserved after index 2">:: (fun _ ->

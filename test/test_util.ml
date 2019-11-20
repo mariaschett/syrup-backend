@@ -3,12 +3,6 @@ open OUnit2
 open Opti
 open Z3util
 
-let xs l j = List.init l ~f:(fun i -> Consts.mk_x i j)
-let x's l j = List.init l ~f:(fun i -> Consts.mk_x' i j)
-
-let us k j = List.init k ~f:(fun i -> Consts.mk_u i j)
-let u's k j = List.init k ~f:(fun i -> Consts.mk_u' i j)
-
 let sk_init k j vals =
   let l = List.length vals in
   let open Z3Ops in
@@ -28,7 +22,7 @@ let init = [
           ~cmp:[%eq: Z3.Expr.t list]
           ~printer:(List.to_string ~f:Z3.Expr.to_string)
           vals
-          (List.map (xs l j) ~f:(eval_const m))
+          (List.map (Consts.xs l j) ~f:(eval_const m))
     );
 
     "Initializing stack initializes us">:: (fun _ ->
@@ -40,7 +34,7 @@ let init = [
           ~cmp:[%eq: Z3.Expr.t list]
           ~printer:(List.to_string ~f:Z3.Expr.to_string)
           [top; top; btm; btm]
-          (List.map (us k j) ~f:(eval_const m))
+          (List.map (Consts.us k j) ~f:(eval_const m))
       );
   ]
 
