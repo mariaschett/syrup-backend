@@ -2,6 +2,14 @@ open Core
 open Z3util
 open Consts
 
+let sk_init k j vals =
+  let l = List.length vals in
+  let open Z3Ops in
+  conj (
+    (List.mapi vals ~f:(fun i v -> (Consts.mk_x i j == v) && (Consts.mk_u i j == top))) @
+    (List.map (List.range l k) ~f:(fun i -> (Consts.mk_u i j == btm)))
+  )
+
 (* stack utilization *)
 
 let enc_sk_utlz_init k l =

@@ -3,7 +3,7 @@ open OUnit2
 open Opti
 open Z3util
 open Consts
-open Test_util
+open Sk_util
 
 let push =
   let enc_push = (Instruction.mk_PUSH).effect in [
