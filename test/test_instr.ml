@@ -381,7 +381,108 @@ let nop = let enc_nop = (Instruction.mk_NOP).effect in
       );
   ]
 
-let suite = "suite" >::: push @ pop @ swap @ dup @ nop
+let block_192_add_1 = let enc_add_1 = (Instruction.mk_block_192).effect in
+  [
+    "forwards: ADD_1 puts s_1 on stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_2 = Z3util.intconst ("sk_x") in
+        let vals = [s_2 ; num 1;] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        let s_1 = Consts.mk_s 1 in
+        let x'_0 = Consts.mk_x 0 j in
+        let c_s_1 = let open Z3Ops in s_1 == num 42 && x'_0 == s_1 in
+        let m = solve_model_exn [c; c'; c_s_1] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t]
+          ~printer:Z3.Expr.to_string
+          (num 42)
+          (eval_const m x'_0)
+      );
+
+    "forwards: ADD_1 is not applicable">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_2 = Z3util.intconst ("sk_x") in
+        let vals = [s_2 ; num 2;] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        assert_bool "" (is_unsat [c; c'])
+      );
+
+    "forwards: ADD_1 modifies utilization of stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+        let vals = [s_2 ; num 1;] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [top; btm; btm; btm]
+          (List.map (u's k j) ~f:(eval_const m))
+      );
+
+    "forwards: ADD_1 preserves stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+        let vals = [s_2 ; num 1; num 3;] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t]
+          ~printer:Z3.Expr.to_string
+          (num 3)
+          (eval_const m (Consts.mk_x' 1 j))
+      );
+
+    "backwards: ADD_1 x_sk and 1 on the stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_1 = Consts.mk_s 1 in
+        let vals = [s_1] in
+        let c' = sk_init k (j+1) vals in
+        let c = enc_add_1 k j in
+        let s_2 = Z3util.intconst ("sk_x") in
+        let c_sk = let open Z3Ops in s_2 == num 42 in
+        let m = solve_model_exn [c; c'; c_sk] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [num 42; num 1]
+          (List.map [Consts.mk_x 0 j; Consts.mk_x 1 j] ~f:(eval_const m))
+      );
+
+    "backwards: ADD_1 modifies utilization of stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_1 = Consts.mk_s 1 in
+        let vals = [s_1] in
+        let c' = sk_init k (j+1) vals in
+        let c = enc_add_1 k j in
+        let m = solve_model_exn [c; c';] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [top; top; btm; btm]
+          (List.map (us k j) ~f:(eval_const m))
+      );
+
+    "backwards: ADD_1 preserves stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let s_1 = Consts.mk_s 1 in
+        let vals = [s_1; num 3] in
+        let c' = sk_init k (j+1) vals in
+        let c = enc_add_1 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t]
+          ~printer:Z3.Expr.to_string
+          (num 3)
+          (eval_const m (Consts.mk_x 2 j))
+      );
+  ]
+
+let suite = "suite" >::: push @ pop @ swap @ dup @ nop @ block_192_add_1
 
 let () =
   run_test_tt_main suite

@@ -3,7 +3,6 @@ open Opti
 open Z3util
 open Instruction
 open Consts
-open Instruction_util
 
 type output_options =
   { pmodel : bool
@@ -11,22 +10,6 @@ type output_options =
   }
 
 let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
-
-let enc_block_192 diff alpha k j =
-  let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
-  let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
-  let x_1 = mk_x 1 j in
-  let open Z3Ops in
-  u_0 && u_1 && (x_0 == s_2 && x_1 == (num 1) && x'_0 == s_1) &&
-      enc_prsv k j diff alpha && enc_sk_utlz k j diff
-
-let mk_block_192 =
-  let name = "ADD_1" in
-  let alpha = 1 and delta = 2 in
-  let diff = alpha - delta in
-  Instruction.mk name alpha delta (enc_block_192 diff alpha)
 
 let params_block_192 =
   let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
