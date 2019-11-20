@@ -5,6 +5,7 @@ open Z3util
 open Sk_util
 
 let init = [
+
     "Initializing stack initializes xs">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2;] in
@@ -29,6 +30,31 @@ let init = [
           [top; top; btm; btm]
           (List.map (Consts.us k j) ~f:(eval_const m))
       );
+
+    "Initializing us of empty stack">:: (fun _ ->
+        let k = 4 and j = 2 in
+        let vals = [] in
+        let c = sk_init k j vals in
+        let m = solve_model_exn [c] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [btm; btm; btm; btm]
+          (List.map (Consts.us k j) ~f:(eval_const m))
+      );
+
+    "Initializing us of full stack">:: (fun _ ->
+        let k = 4 and j = 2 in
+        let vals = [num 1; num 2; num 3; num 4] in
+        let c = sk_init k j vals in
+        let m = solve_model_exn [c] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [top; top; top; top]
+          (List.map (Consts.us k j) ~f:(eval_const m))
+      );
+
   ]
 
 
