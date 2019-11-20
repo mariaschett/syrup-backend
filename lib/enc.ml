@@ -3,7 +3,7 @@ open Z3util
 open Consts
 open Instruction
 open Params
-open Instruction_util
+open Sk_util
 
 let pick_instr params j =
   let t_j = mk_t j in

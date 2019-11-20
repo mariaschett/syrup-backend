@@ -1,7 +1,7 @@
 open Core
 open Z3util
 open Consts
-open Instruction_util
+open Sk_util
 
 type t = {
   name : string;

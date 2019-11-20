@@ -3,7 +3,7 @@ open OUnit2
 open Opti
 open Z3util
 open Test_util
-open Instruction_util
+open Sk_util
 
 let utlz = [
     "Initial stack is all utilized">:: (fun _ ->
