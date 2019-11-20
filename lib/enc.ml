@@ -49,15 +49,8 @@ let enc_block_192 params =
 
 let enc_block_ex1 params =
   let s_0 = mk_s 0 (* =^= 146 *) in
-  let source_sk = sk_init params.k 0 []
-  in
-  let c_t =
-    let xT_0 = mk_x 0 params.n in
-    let uT_0 = mk_u 0 params.n in
-    let open Z3Ops in
-    (s_0 == num 146) && (s_0 == xT_0) && uT_0
-  in
-  let target = top
-  in
+  let source_sk = sk_init params.k 0 [] in
+  let target_sk = sk_init params.k (params.n-1) [s_0] in
+  let cstrs = let open Z3Ops in s_0 == num 146 in
   let open Z3Ops in
-  foralls params.ss (target ==> (source_sk && c_t && (enc_block params)))
+  foralls params.ss (source_sk && target_sk && cstrs && (enc_block params))
