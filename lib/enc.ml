@@ -53,4 +53,4 @@ let enc_block_ex1 params =
   let target_sk = sk_init params.k (params.n-1) [s_0] in
   let cstrs = let open Z3Ops in s_0 == num 146 in
   let open Z3Ops in
-  foralls params.ss (source_sk && target_sk && cstrs && (enc_block params))
+  foralls params.ss (source_sk && target_sk && cstrs && enc_block params)
