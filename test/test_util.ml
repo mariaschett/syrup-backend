@@ -17,10 +17,6 @@ let sk_init k j vals =
     (List.map (List.range l k) ~f:(fun i -> (Consts.mk_u i j == btm)))
   )
 
-let sk_utlz k j utzd =
-  let open Z3Ops in
-  conj (List.map2_exn (us k j) utzd ~f:(fun u uz -> u == uz))
-
 let init = [
     "Initializing stack initializes xs">:: (fun _ ->
         let k = 4 and j = 2 in
