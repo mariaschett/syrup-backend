@@ -54,3 +54,12 @@ let enc_block_ex1 params =
   let cstrs = let open Z3Ops in s_0 == num 146 in
   let open Z3Ops in
   foralls params.ss (source_sk && target_sk && cstrs && enc_block params)
+
+let enc_block_ex2 params =
+  let s_0 = Consts.mk_s 0 in
+  let sk_x = Z3util.intconst ("sk_x") in
+  let source_sk = sk_init params.k 0 [s_0] in
+  let target_sk = sk_init params.k (params.n-1) [s_0; s_0] in
+  let cstrs = let open Z3Ops in s_0 == sk_x in
+  let open Z3Ops in
+  foralls params.ss ((cstrs && enc_block params && source_sk) ==> target_sk)

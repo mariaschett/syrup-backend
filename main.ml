@@ -18,6 +18,10 @@ let params_block_192 =
 
 let params_block_ex1 = Params.mk predef ~k:3 ~n:2 ~forall:[]
 
+let params_block_ex2 =
+  let s_0 = Consts.mk_s 0 in
+  Params.mk predef ~k:3 ~n:3 ~forall:[s_0]
+
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
   (* hack get model *)
@@ -46,8 +50,10 @@ let () =
       fun () ->
         let block_192 = Enc.enc_block_192 params_block_192  in
         let block_ex1 = Enc.enc_block_ex1 params_block_ex1 in
+        let block_ex2 = Enc.enc_block_ex2 params_block_ex2 in
         set_options p_model p_smt;
         write_smt_and_map "block_192" block_192 params_block_192;
         write_smt_and_map "block_ex1" block_ex1 params_block_ex1;
+        write_smt_and_map "block_ex2" block_ex2 params_block_ex2;
     ]
   |> Command.run ~version:"0.0"
