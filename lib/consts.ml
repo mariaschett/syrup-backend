@@ -23,8 +23,8 @@ let mk_a (j : pc) = Z3util.intconst ("a_" ^ [%show: pc] j)
 (* template t to assign instructions *)
 let mk_t (j : pc) = Z3util.intconst ("t_" ^ [%show: pc] j)
 
-(* words on the final stack *)
-let mk_s (j : pc) = Z3util.intconst ("s_" ^ [%show: int] j)
+(* words on the source or target stack *)
+let mk_s (i : si) = Z3util.intconst ("s_" ^ [%show: si] i)
 
 let xs l j = List.init l ~f:(fun i -> mk_x i j)
 let x's l j = List.init l ~f:(fun i -> mk_x' i j)
