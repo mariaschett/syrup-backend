@@ -93,7 +93,7 @@ let mk_bin_op name enc_sk =
 
 let enc_block_192 j =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+  let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x_1 = mk_x 1 j in
-  let open Z3Ops in x_0 == s_2 && x_1 == num 1 && x'_0 == s_1
+  let open Z3Ops in x_0 == sk_x && x_1 == num 1 && x'_0 == s_1
