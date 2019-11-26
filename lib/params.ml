@@ -11,7 +11,7 @@ type params = {
 }
 
 let mk ~k:k ~n:n ~forall:ss instrs =
-  let max_wsz = Z.pow (Z.of_int 2) 256 in
+  let max_wsz = Z.pow (Z.of_int 2) 10 in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, Z.add max_wsz (Z.of_int i))) in
   { instrs = instrs; map = map; k = k; n = n; ss = ss; max_wsz = max_wsz }
 
