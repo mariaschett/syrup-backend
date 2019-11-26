@@ -36,24 +36,13 @@ let enc_block params =
 
 let enc_block_192 params =
   let s_0 = mk_s 0 (* =^= 146 *) in
-  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
+  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
   let source_sk = sk_init params.k 0 [s_2] in
-  let c_t =
-    let uT_0 = mk_u 0 params.n and uT_1 = mk_u 1 params.n in
-    let xT_0 = mk_x 0 params.n in
-    let open Z3Ops in
-    (s_0 == num 146) && s_0 == xT_0 && uT_0 && uT_1
-  in
-  let
-    target =
-    let xT_1 = mk_x 1 params.n in
-    let x_0_0 = mk_x 0 0 in
-    let open Z3Ops in
-    s_1 == xT_1 && (x_0_0 == s_2)
-  in
+  let target_sk = sk_init params.k (params.n-1) [s_1; s_0] in
+  let cstrs = let open Z3Ops in s_0 == num 146 in
   let open Z3Ops in
-  foralls params.ss (target ==> source_sk && c_t && (enc_block params))
+  source_sk && target_sk && cstrs && enc_block params
 
 let enc_block_ex1 params =
   let s_0 = mk_s 0 (* =^= 146 *) in
@@ -61,7 +50,7 @@ let enc_block_ex1 params =
   let target_sk = sk_init params.k (params.n-1) [s_0] in
   let cstrs = let open Z3Ops in s_0 == num 146 in
   let open Z3Ops in
-  foralls params.ss (source_sk && target_sk && cstrs && enc_block params)
+  source_sk && target_sk && cstrs && enc_block params
 
 let enc_block_ex2 params =
   let s_0 = Consts.mk_s 0 in
@@ -70,4 +59,4 @@ let enc_block_ex2 params =
   let target_sk = sk_init params.k (params.n-1) [s_0; s_0] in
   let cstrs = let open Z3Ops in s_0 == sk_x in
   let open Z3Ops in
-  foralls params.ss ((cstrs && enc_block params && source_sk) ==> target_sk)
+  source_sk && target_sk && cstrs && enc_block params
