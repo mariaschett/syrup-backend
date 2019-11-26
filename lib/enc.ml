@@ -17,7 +17,7 @@ let nop_propagate params =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
   let ns = List.range ~start:`inclusive ~stop:`exclusive 0 (params.n - 1) in
-  let nop = Z3util.bignum (Params.nop_enc_name params) in
+  let nop = Z3util.num (Params.nop_enc_name params) in
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 

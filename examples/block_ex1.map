@@ -1,1 +1,1 @@
-PUSH : 1024; POP : 1025; SWAP : 1026; DUP : 1027; NOP : 1028; 
+PUSH : 0; POP : 1; SWAP : 2; DUP : 3; NOP : 4; 
