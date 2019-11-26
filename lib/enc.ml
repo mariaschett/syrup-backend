@@ -36,8 +36,8 @@ let enc_block params =
 
 let enc_block_192 params =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let source_sk = sk_init params.k 0 [s_2] in
+  let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+  let source_sk = sk_init params.k 0 [sk_x] in
   let target_sk = sk_init params.k (params.n-1) [s_1; num 146] in
   let fresh_num i = bignum (Z.add params.max_wsz (Z.of_int i)) in
   let all_vars =
