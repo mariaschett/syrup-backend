@@ -41,8 +41,11 @@ let enc_block_192 params =
   let source_sk = sk_init params.k 0 [s_2] in
   let target_sk = sk_init params.k (params.n-1) [s_1; s_0] in
   let cstrs = let open Z3Ops in s_0 == num 146 in
+  let fresh_num i = bignum (Z.add params.max_wsz (Z.of_int i)) in
+  let all_vars =
+    conj (List.mapi params.ss ~f:(fun i s -> s <==> fresh_num i)) in
   let open Z3Ops in
-  source_sk && target_sk && cstrs && enc_block params
+  source_sk && target_sk && cstrs && enc_block params && all_vars
 
 let enc_block_ex1 params =
   let s_0 = mk_s 0 (* =^= 146 *) in
@@ -58,5 +61,8 @@ let enc_block_ex2 params =
   let source_sk = sk_init params.k 0 [s_0] in
   let target_sk = sk_init params.k (params.n-1) [s_0; s_0] in
   let cstrs = let open Z3Ops in s_0 == sk_x in
+  let fresh_num i = bignum (Z.add params.max_wsz (Z.of_int i)) in
+  let all_vars =
+    conj (List.mapi params.ss ~f:(fun i s -> s <==> fresh_num i)) in
   let open Z3Ops in
-  source_sk && target_sk && cstrs && enc_block params
+  source_sk && target_sk && cstrs && enc_block params && all_vars

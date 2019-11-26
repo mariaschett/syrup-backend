@@ -2,6 +2,7 @@ open Core
 open Opti
 open Z3util
 open Instruction
+open Consts
 
 type output_options =
   { pmodel : bool
@@ -11,12 +12,16 @@ type output_options =
 let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
 let params_block_192 =
+  let s_1 = mk_s 1 (* =^= ADD_1 *) in
+  let s_2 = Z3util.intconst ("sk_x") in
   let mk_add_1 = mk_bin_op "ADD_1" Instruction.enc_block_192 in
-  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4
+  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~ss:[s_1; s_2]
 
-let params_block_ex1 = Params.mk predef ~k:3 ~n:2
+let params_block_ex1 = Params.mk predef ~k:3 ~n:2 ~ss:[]
 
-let params_block_ex2 = Params.mk predef ~k:3 ~n:3
+let params_block_ex2 =
+  let s_0 = Z3util.intconst ("sk_x") in
+  Params.mk predef ~k:3 ~n:3 ~ss:[s_0]
 
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in

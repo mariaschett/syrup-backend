@@ -6,13 +6,14 @@ type params = {
   map : (Instruction.t * int) list;
   k : int;
   n : int;
+  ss : Z3.Expr.expr list;
   max_wsz : Z.t;
 }
 
-let mk ~k:k ~n:n instrs =
+let mk ~k:k ~n:n ~ss:ss instrs =
   let max_wsz = Z.pow (Z.of_int 2) 10 in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
-  { instrs = instrs; map = map; k = k; n = n; max_wsz = max_wsz }
+  { instrs = instrs; map = map; k = k; n = n; ss = ss; max_wsz = max_wsz }
 
 let enc_instr_name params iota =
   List.Assoc.find_exn (params.map) iota ~equal:(fun i1 i2 -> i1.name = i2.name) |> Z3util.num
