@@ -382,7 +382,9 @@ let nop = let enc_nop = (Instruction.mk_NOP).effect in
       );
   ]
 
-let block_192_add_1 = let enc_add_1 = (Instruction.mk_block_192).effect in
+let block_192_add_1 =
+  let mk_block_192 = Instruction.mk_bin_op "ADD_1" Instruction.enc_block_192 in
+  let enc_add_1 = mk_block_192.effect in
   [
     "forwards: ADD_1 puts s_1 on stack">:: (fun _ ->
         let k = 4 and j = 0 in

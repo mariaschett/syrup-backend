@@ -10,7 +10,9 @@ type output_options =
 
 let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
-let params_block_192 = Params.mk (predef @ [mk_block_192]) ~k:3 ~n:4
+let params_block_192 =
+  let mk_add_1 = mk_bin_op "ADD_1" Instruction.enc_block_192 in
+  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4
 
 let params_block_ex1 = Params.mk predef ~k:3 ~n:2
 

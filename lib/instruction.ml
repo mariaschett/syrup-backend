@@ -80,7 +80,9 @@ let mk_NOP =
   let diff = alpha - delta in
   mk name alpha delta (enc_nop diff alpha)
 
-let enc_block_192 diff alpha k j =
+let enc_block_192 k j =
+  let alpha = 1 and delta = 2 in
+  let diff = alpha - delta in
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
   let s_2 = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
@@ -90,8 +92,6 @@ let enc_block_192 diff alpha k j =
   u_0 && u_1 && (x_0 == s_2 && x_1 == (num 1) && x'_0 == s_1) &&
       enc_prsv k j diff alpha && enc_sk_utlz k j diff
 
-let mk_block_192 =
-  let name = "ADD_1" in
+let mk_bin_op name enc =
   let alpha = 1 and delta = 2 in
-  let diff = alpha - delta in
-  mk name alpha delta (enc_block_192 diff alpha)
+  mk name alpha delta enc
