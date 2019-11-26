@@ -21,10 +21,18 @@ let nop_propagate params =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
 
+let bounds_push_args params =
+  let a j = mk_a j in
+  let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
+  let open Z3Ops in
+  conj (List.map ns ~f:(fun j -> num 0 <= a j && a j < bignum params.max_wsz))
+
 let enc_block params =
   let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
   let open Z3Ops in
-  conj (List.map ns ~f:(pick_instr params)) && nop_propagate params
+  conj (List.map ns ~f:(pick_instr params))
+  && nop_propagate params
+  && bounds_push_args params
 
 let enc_block_192 params =
   let s_0 = mk_s 0 (* =^= 146 *) in

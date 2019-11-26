@@ -25,6 +25,7 @@ let bv_sort = BitVector.mk_sort !ctxt
 let bool_sort = Boolean.mk_sort !ctxt
 
 let num n = Expr.mk_numeral_int !ctxt n int_sort
+let bignum b = Expr.mk_numeral_string !ctxt (Z.to_string b) int_sort
 let one = num 1
 let bvnum n size = Expr.mk_numeral_int !ctxt n (bv_sort size)
 let bvconst = BitVector.mk_const_s !ctxt
