@@ -13,22 +13,22 @@ let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
 let params_block_192 =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let mk_add_1 = mk_bin_op "ADD_1" (Instruction.enc_userdef ~in_ws:[sk_x; num 1] ~out_ws:[s_1]) in
-  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[sk_x] ~tgt_ws:[num 146; s_1] ~ss:[s_1; sk_x]
+  let s_0 = mk_s 0 (* =^= input variable on stack *) in
+  let mk_add_1 = mk_bin_op "ADD_1" (Instruction.enc_userdef ~in_ws:[s_0; num 1] ~out_ws:[s_1]) in
+  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[s_0] ~tgt_ws:[num 146; s_1] ~ss:[s_1; s_0]
 
 let params_block_ex1 =
   Params.mk predef ~k:3 ~n:2 ~src_ws:[] ~tgt_ws:[num 146] ~ss:[]
 
 let params_block_ex2 =
-  let sk_x = Z3util.intconst ("sk_x") in
-  Params.mk predef ~k:3 ~n:3 ~src_ws:[sk_x] ~tgt_ws:[sk_x; sk_x] ~ss:[sk_x]
+  let s_0 = mk_s 0 (* =^= input variable on stack *) in
+  Params.mk predef ~k:3 ~n:3 ~src_ws:[s_0] ~tgt_ws:[s_0; s_0] ~ss:[s_0]
 
 let params_block_192_rev =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let mk_add_1 = mk_bin_op "ADD_1" (Instruction.enc_userdef ~in_ws:[num 1; sk_x] ~out_ws:[s_1]) in
-  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[sk_x] ~tgt_ws:[num 146; s_1] ~ss:[s_1; sk_x]
+  let s_0 = Z3util.intconst ("s_0") (* =^= input variable on stack *) in
+  let mk_add_1 = mk_bin_op "ADD_1" (Instruction.enc_userdef ~in_ws:[num 1; s_0] ~out_ws:[s_1]) in
+  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[s_0] ~tgt_ws:[num 146; s_1] ~ss:[s_1; s_0]
 
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
