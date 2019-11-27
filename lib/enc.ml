@@ -33,26 +33,11 @@ let for_all_vars params =
   conj (List.mapi params.ss ~f:(fun i s -> s == fresh_num i))
 
 let enc_block params =
+  let source_sk = sk_init params.k 0 params.src_ws in
+  let target_sk = sk_init params.k params.n params.tgt_ws in
   let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
   let open Z3Ops in
+  source_sk && target_sk && for_all_vars params &&
   conj (List.map ns ~f:(pick_instr params))
   && nop_propagate params
   && bounds_push_args params
-
-let enc_block_192 params =
-  let source_sk = sk_init params.k 0 params.src_ws in
-  let target_sk = sk_init params.k params.n params.tgt_ws in
-  let open Z3Ops in
-  source_sk && target_sk && enc_block params && for_all_vars params
-
-let enc_block_ex1 params =
-  let source_sk = sk_init params.k 0 params.src_ws in
-  let target_sk = sk_init params.k params.n params.tgt_ws in
-  let open Z3Ops in
-  source_sk && target_sk && enc_block params && for_all_vars params
-
-let enc_block_ex2 params =
-  let source_sk = sk_init params.k 0 params.src_ws in
-  let target_sk = sk_init params.k params.n params.tgt_ws in
-  let open Z3Ops in
-  source_sk && target_sk && enc_block params && for_all_vars params

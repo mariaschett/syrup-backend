@@ -50,12 +50,14 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       in
       fun () ->
-        let block_192 = Enc.enc_block_192 params_block_192  in
-        let block_ex1 = Enc.enc_block_ex1 params_block_ex1 in
-        let block_ex2 = Enc.enc_block_ex2 params_block_ex2 in
+        let all =
+          [("block_192", params_block_192);
+           ("block_ex1", params_block_ex1);
+           ("block_ex2", params_block_ex2)] in
         set_options p_model p_smt;
-        write_smt_and_map "block_192" block_192 params_block_192;
-        write_smt_and_map "block_ex1" block_ex1 params_block_ex1;
-        write_smt_and_map "block_ex2" block_ex2 params_block_ex2;
+        List.fold all ~init:() ~f:(fun _ (name, params) ->
+            let enc = Enc.enc_block params in
+            write_smt_and_map name enc params)
+
     ]
   |> Command.run ~version:"0.0"
