@@ -42,20 +42,20 @@ let for_all_vars params ss =
 let enc_block_192 params =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
   let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
-  let source_sk = sk_init params.k 0 [sk_x] in
-  let target_sk = sk_init params.k params.n [num 146; s_1] in
+  let source_sk = sk_init params.k 0 params.src_ws in
+  let target_sk = sk_init params.k params.n params.tgt_ws in
   let open Z3Ops in
   source_sk && target_sk && enc_block params && (for_all_vars params [s_1; sk_x])
 
 let enc_block_ex1 params =
-  let source_sk = sk_init params.k 0 [] in
-  let target_sk = sk_init params.k (params.n-1) [num 146] in
+  let source_sk = sk_init params.k 0 params.src_ws in
+  let target_sk = sk_init params.k params.n params.tgt_ws in
   let open Z3Ops in
   source_sk && target_sk && enc_block params
 
 let enc_block_ex2 params =
   let sk_x = Z3util.intconst ("sk_x") in
-  let source_sk = sk_init params.k 0 [sk_x] in
-  let target_sk = sk_init params.k (params.n-1) [sk_x; sk_x] in
+  let source_sk = sk_init params.k 0 params.src_ws in
+  let target_sk = sk_init params.k params.n params.tgt_ws in
   let open Z3Ops in
   source_sk && target_sk && enc_block params && (for_all_vars params [sk_x])
