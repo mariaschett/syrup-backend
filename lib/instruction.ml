@@ -83,10 +83,14 @@ let mk_NOP =
 let mk_bin_op id enc_sk =
   let alpha = 1 and delta = 2 in
   let diff = alpha - delta in
+  let in_utlzd j = conj (List.init delta ~f:(fun i -> mk_u i j)) in
+  let out_utlzd k j =
+    if alpha <= delta
+    then top
+    else conj (List.init (alpha-delta) ~f:(fun i -> mk_u (k-1-i) j)) in
   let enc k j =
-    let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
     let open Z3Ops in
-    u_0 && u_1 && enc_sk j &&
+    in_utlzd j && out_utlzd k j && enc_sk j &&
     enc_prsv k j diff alpha && enc_sk_utlz k j diff
   in
   mk id alpha delta enc
@@ -94,5 +98,5 @@ let mk_bin_op id enc_sk =
 let enc_userdef ~in_ws:in_ws ~out_ws:out_ws j =
   let x i = mk_x i j and x' i = mk_x' i j in
   let open Z3Ops in
-  conj (List.mapi in_ws ~f:(fun i w ->  x i == w)) &&
+  conj (List.mapi in_ws ~f:(fun i w -> x i == w)) &&
   conj (List.mapi out_ws ~f:(fun i w -> x' i == w))
