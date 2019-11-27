@@ -86,8 +86,8 @@ let enc_userdef ~in_ws:in_ws ~out_ws:out_ws j =
   conj (List.mapi in_ws ~f:(fun i w -> x i == w)) &&
   conj (List.mapi out_ws ~f:(fun i w -> x' i == w))
 
-let mk_bin_op id ~in_ws ~out_ws =
-  let alpha = 1 and delta = 2 in
+let mk_userdef id ~in_ws ~out_ws =
+  let delta = List.length in_ws and alpha = List.length out_ws in
   let diff = alpha - delta in
   let in_utlzd j = conj (List.init delta ~f:(fun i -> mk_u i j)) in
   let out_utlzd k j =

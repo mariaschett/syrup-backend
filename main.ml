@@ -14,7 +14,7 @@ let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 let params_block_192 =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
   let s_0 = mk_s 0 (* =^= input variable on stack *) in
-  let mk_add_1 = mk_bin_op "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] in
+  let mk_add_1 = mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] in
   Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[s_0] ~tgt_ws:[num 146; s_1] ~ss:[s_1; s_0]
 
 let params_block_ex1 =
@@ -27,7 +27,7 @@ let params_block_ex2 =
 let params_block_192_rev =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
   let s_0 = Z3util.intconst ("s_0") (* =^= input variable on stack *) in
-  let mk_add_1 = mk_bin_op "ADD_1" ~in_ws:[num 1; s_0] ~out_ws:[s_1] in
+  let mk_add_1 = mk_userdef "ADD_1" ~in_ws:[num 1; s_0] ~out_ws:[s_1] in
   Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[s_0] ~tgt_ws:[num 146; s_1] ~ss:[s_1; s_0]
 
 let show_smt ex =
