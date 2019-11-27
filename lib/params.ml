@@ -9,9 +9,10 @@ type params = {
   max_wsz : Z.t;
   src_ws : Z3.Expr.expr list; (* words on source stack, top of stack at postion 0 *)
   tgt_ws : Z3.Expr.expr list;
+  ss : Z3.Expr.expr list; (* "forall quantified" variables *)
 }
 
-let mk ~k:k ~n:n ~src_ws:src_ws ~tgt_ws:tgt_ws instrs =
+let mk ~k:k ~n:n ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs =
   let max_wsz = Z.pow (Z.of_int 2) 10 in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
   { instrs = instrs;
@@ -21,6 +22,7 @@ let mk ~k:k ~n:n ~src_ws:src_ws ~tgt_ws:tgt_ws instrs =
     max_wsz = max_wsz;
     src_ws = src_ws;
     tgt_ws = tgt_ws;
+    ss = ss;
   }
 
 let enc_instr_name params iota =
