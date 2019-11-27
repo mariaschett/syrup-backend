@@ -26,12 +26,12 @@ let mk ~k:k ~n:n ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs =
   }
 
 let enc_instr_name params iota =
-  List.Assoc.find_exn (params.map) iota ~equal:(fun i1 i2 -> i1.name = i2.name) |> Z3util.num
+  List.Assoc.find_exn (params.map) iota ~equal:(fun i1 i2 -> i1.id = i2.id) |> Z3util.num
 
 let show_map params =
-  let show_pair (iota, i) = iota.name ^ " : " ^ [%show: int] i ^ "; " in
+  let show_pair (iota, i) = iota.id ^ " : " ^ [%show: int] i ^ "; " in
   List.fold params.map ~init:"" ~f:(fun m im -> m ^ (show_pair im))
 
 let nop_enc_name params =
-  let (_, i) = List.find_exn (params.map) ~f:(fun (iota, _) -> iota.name = "NOP")
+  let (_, i) = List.find_exn (params.map) ~f:(fun (iota, _) -> iota.id = "NOP")
   in i

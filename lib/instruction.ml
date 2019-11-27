@@ -4,14 +4,14 @@ open Consts
 open Sk_util
 
 type t = {
-  name : string;
+  id : string;
   alpha : int;
   delta : int;
   effect : int -> int -> Z3.Expr.expr;
 } [@@deriving show {with_path = false}]
 
-let mk name alpha delta effect = {
-    name = name;
+let mk id alpha delta effect = {
+    id = id;
     alpha = alpha;
     delta = delta;
     effect = effect;
@@ -26,10 +26,10 @@ let enc_push diff alpha k j  =
   (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
 let mk_PUSH =
-  let name = "PUSH" in
+  let id = "PUSH" in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  mk name alpha delta (enc_push diff alpha)
+  mk id alpha delta (enc_push diff alpha)
 
 let enc_pop diff alpha k j =
   let u_0 = mk_u 0 j in
@@ -37,10 +37,10 @@ let enc_pop diff alpha k j =
   u_0 && (enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
 let mk_POP =
-  let name = "POP" in
+  let id = "POP" in
   let alpha = 0 and delta = 1 in
   let diff = alpha - delta in
-  mk name alpha delta (enc_pop diff alpha)
+  mk id alpha delta (enc_pop diff alpha)
 
 let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -51,10 +51,10 @@ let enc_swap diff alpha k j =
   ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j diff alpha && enc_sk_utlz k j diff
 
 let mk_SWAP =
-  let name = "SWAP" in
+  let id = "SWAP" in
   let alpha = 2 and delta = 2 in
   let diff = alpha - delta in
-  mk name alpha delta (enc_swap diff alpha)
+  mk id alpha delta (enc_swap diff alpha)
 
 let enc_dup diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -65,22 +65,22 @@ let enc_dup diff alpha k j =
   ((x'_0 == x_0) && (x'_1 == x_0) && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
 let mk_DUP =
-  let name = "DUP" in
+  let id = "DUP" in
   let alpha = 2 and delta = 1 in
   let diff = alpha - delta in
-  mk name alpha delta (enc_dup diff alpha)
+  mk id alpha delta (enc_dup diff alpha)
 
 let enc_nop diff alpha k j =
   let open Z3Ops in
   enc_prsv k j diff alpha  && enc_sk_utlz k j diff
 
 let mk_NOP =
-  let name = "NOP" in
+  let id = "NOP" in
   let alpha = 0 and delta = 0 in
   let diff = alpha - delta in
-  mk name alpha delta (enc_nop diff alpha)
+  mk id alpha delta (enc_nop diff alpha)
 
-let mk_bin_op name enc_sk =
+let mk_bin_op id enc_sk =
   let alpha = 1 and delta = 2 in
   let diff = alpha - delta in
   let enc k j =
@@ -89,7 +89,7 @@ let mk_bin_op name enc_sk =
     u_0 && u_1 && enc_sk j &&
     enc_prsv k j diff alpha && enc_sk_utlz k j diff
   in
-  mk name alpha delta enc
+  mk id alpha delta enc
 
 let enc_block_192 j =
   let s_1 = mk_s 1 (* =^= ADD_1 *) in
