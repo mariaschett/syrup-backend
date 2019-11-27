@@ -24,6 +24,12 @@ let params_block_ex2 =
   let sk_x = Z3util.intconst ("sk_x") in
   Params.mk predef ~k:3 ~n:3 ~src_ws:[sk_x] ~tgt_ws:[sk_x; sk_x] ~ss:[sk_x]
 
+let params_block_192_rev =
+  let s_1 = mk_s 1 (* =^= ADD_1 *) in
+  let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+  let mk_add_1 = mk_bin_op "ADD_1" Instruction.enc_block_192 in
+  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[sk_x] ~tgt_ws:[num 146; s_1] ~ss:[s_1; sk_x]
+
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
   (* hack get model *)
@@ -52,6 +58,7 @@ let () =
       fun () ->
         let all =
           [("block_192", params_block_192);
+           ("block_192_rev", params_block_192_rev);
            ("block_ex1", params_block_ex1);
            ("block_ex2", params_block_ex2)] in
         set_options p_model p_smt;

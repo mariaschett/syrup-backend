@@ -97,3 +97,10 @@ let enc_block_192 j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
   let x_1 = mk_x 1 j in
   let open Z3Ops in x_0 == sk_x && x_1 == num 1 && x'_0 == s_1
+
+let enc_block_192_rev j =
+  let s_1 = mk_s 1 (* =^= ADD_1 *) in
+  let sk_x = Z3util.intconst ("sk_x") (* =^= input variable on stack *) in
+  let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
+  let x_1 = mk_x 1 j in
+  let open Z3Ops in x_1 == sk_x && x_0 == num 1 && x'_0 == s_1
