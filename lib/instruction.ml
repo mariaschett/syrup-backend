@@ -80,23 +80,27 @@ let mk_NOP =
   let diff = alpha - delta in
   mk id alpha delta (enc_nop diff alpha)
 
-let enc_userdef ~in_ws:in_ws ~out_ws:out_ws j =
+let effect_userdef ~in_ws:in_ws ~out_ws:out_ws j =
   let x i = mk_x i j and x' i = mk_x' i j in
   let open Z3Ops in
   conj (List.mapi in_ws ~f:(fun i w -> x i == w)) &&
   conj (List.mapi out_ws ~f:(fun i w -> x' i == w))
 
-let mk_userdef id ~in_ws ~out_ws =
-  let delta = List.length in_ws and alpha = List.length out_ws in
-  let diff = alpha - delta in
+let utlzd_userdef alpha delta k j =
   let in_utlzd j = conj (List.init delta ~f:(fun i -> mk_u i j)) in
   let out_utlzd k j =
     if alpha <= delta
     then top
     else conj (List.init (alpha-delta) ~f:(fun i -> mk_u (k-1-i) j)) in
+  let open Z3Ops in in_utlzd j && out_utlzd k j
+
+let mk_userdef id ~in_ws ~out_ws =
+  let delta = List.length in_ws and alpha = List.length out_ws in
+  let diff = alpha - delta in
   let enc k j =
     let open Z3Ops in
-    in_utlzd j && out_utlzd k j && (enc_userdef ~in_ws:in_ws ~out_ws:out_ws j) &&
+    utlzd_userdef alpha delta k j &&
+    (effect_userdef ~in_ws:in_ws ~out_ws:out_ws j) &&
     enc_prsv k j diff alpha && enc_sk_utlz k j diff
   in
   mk id alpha delta enc
