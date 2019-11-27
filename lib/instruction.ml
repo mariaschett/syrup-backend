@@ -80,7 +80,13 @@ let mk_NOP =
   let diff = alpha - delta in
   mk id alpha delta (enc_nop diff alpha)
 
-let mk_bin_op id enc_sk =
+let enc_userdef ~in_ws:in_ws ~out_ws:out_ws j =
+  let x i = mk_x i j and x' i = mk_x' i j in
+  let open Z3Ops in
+  conj (List.mapi in_ws ~f:(fun i w -> x i == w)) &&
+  conj (List.mapi out_ws ~f:(fun i w -> x' i == w))
+
+let mk_bin_op id ~in_ws ~out_ws =
   let alpha = 1 and delta = 2 in
   let diff = alpha - delta in
   let in_utlzd j = conj (List.init delta ~f:(fun i -> mk_u i j)) in
@@ -90,13 +96,7 @@ let mk_bin_op id enc_sk =
     else conj (List.init (alpha-delta) ~f:(fun i -> mk_u (k-1-i) j)) in
   let enc k j =
     let open Z3Ops in
-    in_utlzd j && out_utlzd k j && enc_sk j &&
+    in_utlzd j && out_utlzd k j && (enc_userdef ~in_ws:in_ws ~out_ws:out_ws j) &&
     enc_prsv k j diff alpha && enc_sk_utlz k j diff
   in
   mk id alpha delta enc
-
-let enc_userdef ~in_ws:in_ws ~out_ws:out_ws j =
-  let x i = mk_x i j and x' i = mk_x' i j in
-  let open Z3Ops in
-  conj (List.mapi in_ws ~f:(fun i w -> x i == w)) &&
-  conj (List.mapi out_ws ~f:(fun i w -> x' i == w))
