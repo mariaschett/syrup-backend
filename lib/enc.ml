@@ -27,17 +27,17 @@ let bounds_push_args params =
   let open Z3Ops in
   conj (List.map ns ~f:(fun j -> num 0 <= a j && a j < bignum params.max_wsz))
 
+let for_all_vars params =
+  let fresh_num i = bignum (Z.add params.max_wsz (Z.of_int i)) in
+  let open Z3Ops in
+  conj (List.mapi params.ss ~f:(fun i s -> s == fresh_num i))
+
 let enc_block params =
   let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
   let open Z3Ops in
   conj (List.map ns ~f:(pick_instr params))
   && nop_propagate params
   && bounds_push_args params
-
-let for_all_vars params =
-  let fresh_num i = bignum (Z.add params.max_wsz (Z.of_int i)) in
-  let open Z3Ops in
-  conj (List.mapi params.ss ~f:(fun i s -> s == fresh_num i))
 
 let enc_block_192 params =
   let source_sk = sk_init params.k 0 params.src_ws in
