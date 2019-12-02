@@ -1,12 +1,15 @@
 open Core
 open Opti
 open Z3util
+open Instruction
 open Inpt
 
 type output_options =
   { pmodel : bool
   ; psmt : bool
   }
+
+let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
 let add_1 = {
   id = "ADD_1";
@@ -78,10 +81,10 @@ let () =
       in
       fun () ->
         let all =
-          [("block_192", to_params (user_params_block_192 [add_1]));
-           ("block_192_rev", to_params (user_params_block_192 [add_1_rev]));
-           ("block_ex1", to_params user_params_ex_1);
-           ("block_ex2", to_params user_params_ex_2)] in
+          [("block_192", to_params predef (user_params_block_192 [add_1]));
+           ("block_192_rev", to_params predef (user_params_block_192 [add_1_rev]));
+           ("block_ex1", to_params predef user_params_ex_1);
+           ("block_ex2", to_params predef user_params_ex_2)] in
         set_options p_model p_smt;
         List.fold all ~init:() ~f:(fun _ (name, params) ->
             let enc = Enc.enc_block params in
