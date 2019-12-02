@@ -16,11 +16,7 @@ let show_smt ex =
   (* hack get model *)
   smt ^ "(get-model)"
 
-let read_inpt fn =
-  let ui = [%of_yojson: user_params] (Yojson.Safe.from_file fn) in
-  match ui with
-  | Ok ui -> Inpt.to_params predef ui
-  | Error msg -> failwith ("Error when parsing json: " ^ msg)
+let read_inpt fn = user_params_of_yojson_exn (Yojson.Safe.from_file fn)
 
 let write_smt_and_map fn ex params =
   let ex' = show_smt ex in

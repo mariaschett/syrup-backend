@@ -34,7 +34,7 @@ type user_params = {
   src_ws : user_w list;
   tgt_ws : user_w list;
   user_instrs : user_instr list;
-} [@@deriving yojson]
+} [@@deriving yojson { exn = true }]
 
 let mk_from_user_w = function
   | Val v -> num v
