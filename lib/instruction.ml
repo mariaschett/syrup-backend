@@ -10,12 +10,12 @@ type t = {
   effect : int -> int -> Z3.Expr.expr;
 } [@@deriving show {with_path = false}]
 
-let mk id alpha delta effect = {
-    id = id;
-    alpha = alpha;
-    delta = delta;
-    effect = effect;
-  }
+let mk ~id ~alpha ~delta ~effect = {
+  id = id;
+  alpha = alpha;
+  delta = delta;
+  effect = effect;
+}
 
 let enc_push diff alpha k j  =
   let x'_0 = mk_x' 0 j in
@@ -29,7 +29,7 @@ let mk_PUSH =
   let id = "PUSH" in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  mk id alpha delta (enc_push diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_push diff alpha)
 
 let enc_pop diff alpha k j =
   let u_0 = mk_u 0 j in
@@ -40,7 +40,7 @@ let mk_POP =
   let id = "POP" in
   let alpha = 0 and delta = 1 in
   let diff = alpha - delta in
-  mk id alpha delta (enc_pop diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_pop diff alpha)
 
 let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -54,7 +54,7 @@ let mk_SWAP =
   let id = "SWAP" in
   let alpha = 2 and delta = 2 in
   let diff = alpha - delta in
-  mk id alpha delta (enc_swap diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_swap diff alpha)
 
 let enc_dup diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -68,7 +68,7 @@ let mk_DUP =
   let id = "DUP" in
   let alpha = 2 and delta = 1 in
   let diff = alpha - delta in
-  mk id alpha delta (enc_dup diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_dup diff alpha)
 
 let enc_nop diff alpha k j =
   let open Z3Ops in
@@ -78,7 +78,7 @@ let mk_NOP =
   let id = "NOP" in
   let alpha = 0 and delta = 0 in
   let diff = alpha - delta in
-  mk id alpha delta (enc_nop diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_nop diff alpha)
 
 let effect_userdef ~in_ws:in_ws ~out_ws:out_ws j =
   let x i = mk_x i j and x' i = mk_x' i j in
@@ -103,4 +103,4 @@ let mk_userdef id ~in_ws ~out_ws =
     (effect_userdef ~in_ws:in_ws ~out_ws:out_ws j) &&
     enc_prsv k j diff alpha && enc_sk_utlz k j diff
   in
-  mk id alpha delta enc
+  mk ~id ~alpha ~delta ~effect:enc

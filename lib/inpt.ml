@@ -37,7 +37,7 @@ let mk_userdef_instr iota =
     conj (List.mapi iota.inpt_sk ~f:(fun i w -> mk_x i j == mk_from_user_w w)) &&
     conj (List.mapi iota.outpt_sk ~f:(fun i w -> mk_x' i j == mk_from_user_w w))
   in
-  Instruction.mk iota.id alpha delta effect
+  Instruction.mk ~id:iota.id ~alpha ~delta ~effect
 
 let to_params predef ui =
   let src_ws = List.map ui.src_ws ~f:mk_from_user_w in
