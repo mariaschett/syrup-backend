@@ -1,0 +1,8 @@
+{
+  "max_progr_len": 2,
+  "max_sk_sz": 3,
+  "vars": [],
+  "src_ws": [],
+  "tgt_ws": [ 146 ],
+  "user_instrs": []
+}

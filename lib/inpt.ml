@@ -4,8 +4,18 @@ open Consts
 
 (* word from user *)
 type user_w =
-  Val of int
-| Const of user_const [@@deriving yojson]
+  | Val of int
+  | Const of user_const
+
+let user_w_to_yojson = function
+  | Val i -> [%to_yojson: int] i
+  | Const c -> [%to_yojson: string] c
+
+let user_w_of_yojson w =
+ match w with
+  | `Int i -> Ok (Val i)
+  | `String s -> Ok (Const s)
+  | _ -> Error "Cannot parse word. Either variable (string) or value (int) required."
 
 (* user defined instruction *)
 type user_instr = {

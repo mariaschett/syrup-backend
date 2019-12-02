@@ -9,7 +9,7 @@
       "id": "ADD_1",
       "opcode": "00",
       "disasm": "ADD",
-      "inpt_sk": [ "s_0", 1 ],
+      "inpt_sk": [ 1, "s_0" ],
       "outpt_sk": [ "s_1" ],
       "gas": 3
     }
