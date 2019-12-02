@@ -90,7 +90,7 @@ let () =
       in
       fun () ->
         let all =
-          [("block_192", read_inpt "input/block_192.json");
+          [("block_192", to_params predef (user_params_block_192 [add_1]));
            ("block_192_rev", to_params predef (user_params_block_192 [add_1_rev]));
            ("block_ex1", to_params predef user_params_ex_1);
            ("block_ex2", to_params predef user_params_ex_2)] in
