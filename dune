@@ -1,6 +1,6 @@
 (executable (name main)
  (modules main)
- (libraries core z3 opti)
- (preprocess (pps ppx_jane ppx_deriving.std))
+ (libraries core z3 opti yojson ppx_deriving_yojson.runtime)
+ (preprocess (pps ppx_jane ppx_deriving.std ppx_deriving_yojson))
  (public_name opti)
 )

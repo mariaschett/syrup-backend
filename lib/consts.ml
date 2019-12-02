@@ -6,6 +6,9 @@ type pc = int [@@deriving show {with_path = false}]
 (* stack index *)
 type si = int [@@deriving show {with_path = false}]
 
+(* consts given by user *)
+type user_const = string [@@deriving show {with_path = false}, yojson]
+
 (* stack utilization u at stack index i after j instructions *)
 let mk_u (i : si) (j : pc) =
   Z3util.boolconst ("u_" ^ [%show: pc] i ^ "_" ^ [%show: si] j)
@@ -25,6 +28,8 @@ let mk_t (j : pc) = Z3util.intconst ("t_" ^ [%show: pc] j)
 
 (* words on the source or target stack *)
 let mk_s (i : si) = Z3util.intconst ("s_" ^ [%show: si] i)
+
+let mk_user_const (c : user_const) = Z3util.intconst c
 
 let xs l j = List.init l ~f:(fun i -> mk_x i j)
 let x's l j = List.init l ~f:(fun i -> mk_x' i j)

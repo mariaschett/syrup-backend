@@ -1,8 +1,8 @@
 open Core
 open Opti
 open Z3util
-open Consts
 open Instruction
+open Inpt
 
 type output_options =
   { pmodel : bool
@@ -11,24 +11,51 @@ type output_options =
 
 let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
-let params_block_192 =
-  let s_0 = mk_s 0 (* =^= input variable on stack *) in
-  let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let mk_add_1 = mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] in
-  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[s_0] ~tgt_ws:[num 146; s_1] ~ss:[s_1; s_0]
+let add_1 = {
+  id = "ADD_1";
+  opcode = "00";
+  disasm = "ADD";
+  input_stack = [Const "s_0"; Val 1];
+  output_stack = [Const "s_1"]
+}
 
-let params_block_ex1 =
-  Params.mk predef ~k:3 ~n:2 ~src_ws:[] ~tgt_ws:[num 146] ~ss:[]
+let add_1_rev = {
+  id = "ADD_1";
+  opcode = "00";
+  disasm = "ADD";
+  input_stack = [Val 1; Const "s_0"];
+  output_stack = [Const "s_1"]
+}
 
-let params_block_ex2 =
-  let s_0 = mk_s 0 (* =^= input variable on stack *) in
-  Params.mk predef ~k:3 ~n:3 ~src_ws:[s_0] ~tgt_ws:[s_0; s_0] ~ss:[s_0]
+let user_params_block_192 ui =
+  { n = 4;
+    k = 3;
+    ss = ["s_0"; "s_1"];
+    src_ws = [Const "s_0"];
+    tgt_ws = [Val 146; Const "s_1"];
+    user_instrs = ui
+  }
 
-let params_block_192_rev =
-  let s_0 = mk_s 0 (* =^= input variable on stack *) in
-  let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let mk_add_1 = mk_userdef "ADD_1" ~in_ws:[num 1; s_0] ~out_ws:[s_1] in
-  Params.mk (predef @ [mk_add_1]) ~k:3 ~n:4 ~src_ws:[s_0] ~tgt_ws:[num 146; s_1] ~ss:[s_1; s_0]
+let user_params_ex_1 =
+  { n = 2;
+    k = 3;
+    ss = [];
+    src_ws = [];
+    tgt_ws = [Val 146];
+    user_instrs = [];
+  }
+
+let user_params_ex_2 =
+  { n = 3;
+    k = 3;
+    ss = ["s_0"];
+    src_ws = [Const "s_0"];
+    tgt_ws = [Const "s_0"; Const "s_0"];
+    user_instrs = [];
+  }
+
+let params p = Params.mk (predef @ (get_user_instrs p))
+    ~k:(get_k p) ~n:4 ~src_ws:(get_src_ws p) ~tgt_ws:(get_tgt_ws p) ~ss:(get_ss p)
 
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
@@ -57,10 +84,10 @@ let () =
       in
       fun () ->
         let all =
-          [("block_192", params_block_192);
-           ("block_192_rev", params_block_192_rev);
-           ("block_ex1", params_block_ex1);
-           ("block_ex2", params_block_ex2)] in
+          [("block_192", params (user_params_block_192 [add_1]));
+           ("block_192_rev", params (user_params_block_192 [add_1_rev]));
+           ("block_ex1", params user_params_ex_1);
+           ("block_ex2", params user_params_ex_2)] in
         set_options p_model p_smt;
         List.fold all ~init:() ~f:(fun _ (name, params) ->
             let enc = Enc.enc_block params in
