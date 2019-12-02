@@ -1,16 +1,16 @@
 {
-    "n": 4,
-    "k": 3,
-    "ss": ["s_0", "s_1"],
+    "max_progr_len": 4,
+    "max_sk_sz": 3,
+    "vars": ["s_0", "s_1"],
     "tgt_ws": [146, "s_1"],
     "src_ws": ["s_0"],
-    "user_instr" : [
+    "user_instrs" : [
 	{
-	    "id": "ADD1",
+	    "id": "ADD(s_0, 1)",
             "opcode": "01",
 	    "disasm": "ADD",
-	    "input_stack": ["s_0", 1],
-	    "output_stack": ["s_1"],
+	    "inpt_sk": ["s_0", 1],
+	    "outpt_sk": ["s_1"],
 	    "gas" : 3
 	}
     ]
