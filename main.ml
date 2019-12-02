@@ -15,16 +15,16 @@ let add_1 = {
   id = "ADD_1";
   opcode = "00";
   disasm = "ADD";
-  input_stack = [Const "s_0"; Val 1];
-  output_stack = [Const "s_1"]
+  inpt_sk = [Const "s_0"; Val 1];
+  outpt_sk = [Const "s_1"]
 }
 
 let add_1_rev = {
   id = "ADD_1";
   opcode = "00";
   disasm = "ADD";
-  input_stack = [Val 1; Const "s_0"];
-  output_stack = [Const "s_1"]
+  inpt_sk = [Val 1; Const "s_0"];
+  outpt_sk = [Const "s_1"]
 }
 
 let user_params_block_192 ui =

@@ -12,14 +12,14 @@ type user_instr = {
   id : string;
   opcode : string;
   disasm : string;
-  input_stack : user_w list;
-  output_stack : user_w list;
+  inpt_sk : user_w list;
+  outpt_sk : user_w list;
 } [@@deriving yojson]
 
 type user_params = {
-  n : int;
-  k : int;
-  ss : user_const list;
+  n : int [@key "max_progr_len"];
+  k : int [@key "max_sk_sz"];
+  ss : user_const list [@key "vars"];
   src_ws : user_w list;
   tgt_ws : user_w list;
   user_instrs : user_instr list;
@@ -30,12 +30,12 @@ let mk_from_user_w = function
   | Const c -> mk_user_const c
 
 let mk_userdef_instr iota =
-  let alpha = List.length iota.input_stack in
-  let delta = List.length iota.output_stack in
+  let alpha = List.length iota.inpt_sk in
+  let delta = List.length iota.outpt_sk in
   let effect _ j =
     let open Z3Ops in
-    conj (List.mapi iota.input_stack ~f:(fun i w -> mk_x i j == mk_from_user_w w)) &&
-    conj (List.mapi iota.output_stack ~f:(fun i w -> mk_x' i j == mk_from_user_w w))
+    conj (List.mapi iota.inpt_sk ~f:(fun i w -> mk_x i j == mk_from_user_w w)) &&
+    conj (List.mapi iota.outpt_sk ~f:(fun i w -> mk_x' i j == mk_from_user_w w))
   in
   Instruction.mk iota.id alpha delta effect
 

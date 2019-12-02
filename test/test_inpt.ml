@@ -10,8 +10,8 @@ let ui =
     id = "ADD_1";
     opcode = "00";
     disasm = "ADD";
-    input_stack = [Const "s_0"; Val 1];
-    output_stack = [Const "s_1"]
+    inpt_sk = [Const "s_0"; Val 1];
+    outpt_sk = [Const "s_1"]
   }
   in
   { n = 4;
