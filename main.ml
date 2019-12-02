@@ -1,15 +1,12 @@
 open Core
 open Opti
 open Z3util
-open Instruction
 open Inpt
 
 type output_options =
   { pmodel : bool
   ; psmt : bool
   }
-
-let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
 let add_1 = {
   id = "ADD_1";
@@ -54,9 +51,6 @@ let user_params_ex_2 =
     user_instrs = [];
   }
 
-let params p = Params.mk (predef @ (get_user_instrs p))
-    ~k:(get_k p) ~n:4 ~src_ws:(get_src_ws p) ~tgt_ws:(get_tgt_ws p) ~ss:(get_ss p)
-
 let show_smt ex =
   let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
   (* hack get model *)
@@ -84,10 +78,10 @@ let () =
       in
       fun () ->
         let all =
-          [("block_192", params (user_params_block_192 [add_1]));
-           ("block_192_rev", params (user_params_block_192 [add_1_rev]));
-           ("block_ex1", params user_params_ex_1);
-           ("block_ex2", params user_params_ex_2)] in
+          [("block_192", to_params (user_params_block_192 [add_1]));
+           ("block_192_rev", to_params (user_params_block_192 [add_1_rev]));
+           ("block_ex1", to_params user_params_ex_1);
+           ("block_ex2", to_params user_params_ex_2)] in
         set_options p_model p_smt;
         List.fold all ~init:() ~f:(fun _ (name, params) ->
             let enc = Enc.enc_block params in

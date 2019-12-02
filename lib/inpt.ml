@@ -1,6 +1,7 @@
 open Core
 open Z3util
 open Consts
+open Instruction
 
 (* word from user *)
 type user_w =
@@ -39,14 +40,11 @@ let mk_userdef_instr iota =
   in
   Instruction.mk iota.id alpha delta effect
 
-let get_k p = p.k
+let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
-let get_n p = p.n
-
-let get_ss p = List.map p.ss ~f:Consts.mk_user_const
-
-let get_src_ws p = List.map p.src_ws ~f:mk_from_user_w
-
-let get_tgt_ws p = List.map p.tgt_ws ~f:mk_from_user_w
-
-let get_user_instrs p = List.map p.user_instrs ~f:mk_userdef_instr
+let to_params ui =
+  let src_ws = List.map ui.src_ws ~f:mk_from_user_w in
+  let tgt_ws = List.map ui.tgt_ws ~f:mk_from_user_w in
+  let ss =  List.map ui.ss ~f:Consts.mk_user_const in
+  let instrs = predef @ (List.map ui.user_instrs ~f:mk_userdef_instr) in
+  Params.mk ~n:ui.n ~k:ui.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
