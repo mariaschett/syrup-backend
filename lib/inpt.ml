@@ -14,6 +14,7 @@ type user_instr = {
   disasm : string;
   inpt_sk : user_w list;
   outpt_sk : user_w list;
+  gas : int;
 } [@@deriving yojson]
 
 type user_params = {
@@ -37,7 +38,7 @@ let mk_userdef_instr iota =
     conj (List.mapi iota.inpt_sk ~f:(fun i w -> mk_x i j == mk_from_user_w w)) &&
     conj (List.mapi iota.outpt_sk ~f:(fun i w -> mk_x' i j == mk_from_user_w w))
   in
-  Instruction.mk ~id:iota.id ~alpha ~delta ~effect
+  Instruction.mk ~id:iota.id ~alpha ~delta ~effect ~opcode:iota.opcode ~gas:iota.gas
 
 let to_params predef ui =
   let src_ws = List.map ui.src_ws ~f:mk_from_user_w in

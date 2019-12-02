@@ -5,16 +5,20 @@ open Sk_util
 
 type t = {
   id : string;
+  opcode : string;
   alpha : int;
   delta : int;
   effect : int -> int -> Z3.Expr.expr;
+  gas : int;
 } [@@deriving show {with_path = false}]
 
-let mk ~id ~alpha ~delta ~effect = {
+let mk ~id ~opcode ~alpha ~delta ~effect ~gas = {
   id = id;
+  opcode = opcode;
   alpha = alpha;
   delta = delta;
   effect = effect;
+  gas = gas;
 }
 
 let enc_push diff alpha k j  =
@@ -29,7 +33,8 @@ let mk_PUSH =
   let id = "PUSH" in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_push diff alpha)
+  (* opcode: PUSH with largest argument as overapproximation *)
+  mk ~id ~alpha ~delta ~effect:(enc_push diff alpha) ~opcode:"7f" ~gas:3
 
 let enc_pop diff alpha k j =
   let u_0 = mk_u 0 j in
@@ -40,7 +45,7 @@ let mk_POP =
   let id = "POP" in
   let alpha = 0 and delta = 1 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_pop diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_pop diff alpha) ~opcode:"50" ~gas:2
 
 let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -54,7 +59,8 @@ let mk_SWAP =
   let id = "SWAP" in
   let alpha = 2 and delta = 2 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_swap diff alpha)
+  (* opcode for SWAP I *)
+  mk ~id ~alpha ~delta ~effect:(enc_swap diff alpha) ~opcode:"90" ~gas:3
 
 let enc_dup diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -68,7 +74,8 @@ let mk_DUP =
   let id = "DUP" in
   let alpha = 2 and delta = 1 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_dup diff alpha)
+  (* opcdoe for DUP I *)
+  mk ~id ~alpha ~delta ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
 
 let enc_nop diff alpha k j =
   let open Z3Ops in
@@ -78,7 +85,7 @@ let mk_NOP =
   let id = "NOP" in
   let alpha = 0 and delta = 0 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_nop diff alpha)
+  mk ~id ~alpha ~delta ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
 
 let effect_userdef ~in_ws:in_ws ~out_ws:out_ws j =
   let x i = mk_x i j and x' i = mk_x' i j in

@@ -11,7 +11,8 @@ let ui =
     opcode = "00";
     disasm = "ADD";
     inpt_sk = [Const "s_0"; Val 1];
-    outpt_sk = [Const "s_1"]
+    outpt_sk = [Const "s_1"];
+    gas = 3;
   }
   in
   { n = 4;

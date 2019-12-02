@@ -16,7 +16,8 @@ let add_1 = {
   opcode = "00";
   disasm = "ADD";
   inpt_sk = [Const "s_0"; Val 1];
-  outpt_sk = [Const "s_1"]
+  outpt_sk = [Const "s_1"];
+  gas = 3;
 }
 
 let add_1_rev = {
@@ -24,7 +25,8 @@ let add_1_rev = {
   opcode = "00";
   disasm = "ADD";
   inpt_sk = [Val 1; Const "s_0"];
-  outpt_sk = [Const "s_1"]
+  outpt_sk = [Const "s_1"];
+  gas = 3;
 }
 
 let user_params_block_192 ui =
