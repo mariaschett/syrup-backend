@@ -59,6 +59,13 @@ let show_smt ex =
   (* hack get model *)
   smt ^ "(get-model)"
 
+let read_inpt fn =
+  let ui = [%of_yojson: user_params] (Yojson.Safe.from_file fn) in
+  match ui with
+  | Ok ui -> Inpt.to_params predef ui
+  | Error msg -> failwith ("Error when parsing json: " ^ msg)
+
+
 let write_smt_and_map fn ex params =
   let ex' = show_smt ex in
   Out_channel.write_all ("examples/"^fn^".smt") ~data:ex';
@@ -81,7 +88,7 @@ let () =
       in
       fun () ->
         let all =
-          [("block_192", to_params predef (user_params_block_192 [add_1]));
+          [("block_192", read_inpt "input/block_192.json");
            ("block_192_rev", to_params predef (user_params_block_192 [add_1_rev]));
            ("block_ex1", to_params predef user_params_ex_1);
            ("block_ex2", to_params predef user_params_ex_2)] in

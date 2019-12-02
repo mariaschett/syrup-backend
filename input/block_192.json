@@ -1,0 +1,16 @@
+{
+    "n": 4,
+    "k": 3,
+    "ss": ["s_0", "s_1"],
+    "tgt_ws": [146, "s_1"],
+    "src_ws": ["s_0"],
+    "user_instr" : [
+	{
+	    "id": "ADD1",
+            "opcode": "01",
+	    "disasm": "ADD",
+	    "input_stack": ["s_0", 1],
+	    "output_stack": ["s_1"]
+	}
+    ]
+}
