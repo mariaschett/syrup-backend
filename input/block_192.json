@@ -10,7 +10,8 @@
             "opcode": "01",
 	    "disasm": "ADD",
 	    "input_stack": ["s_0", 1],
-	    "output_stack": ["s_1"]
+	    "output_stack": ["s_1"],
+	    "gas" : 3
 	}
     ]
 }
