@@ -113,5 +113,6 @@
        (< a_0 1024)
        (<= 0 a_1)
        (< a_1 1024)))))
+(assert-soft (not (= 4 t_0)) :weight 2 :id k!0)
 (check-sat)
 (get-model)

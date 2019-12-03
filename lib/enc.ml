@@ -41,3 +41,8 @@ let enc_block params =
   conj (List.map ns ~f:(pick_instr params))
   && nop_propagate params
   && bounds_push_args params
+
+let weight params j =
+  let nop = Z3util.num (Params.nop_enc_name params) in
+  let open Z3Ops in
+  Z3.Optimize.add_soft !octxt (~! (nop == mk_t j)) "2" (Z3.Symbol.mk_int !ctxt 0)
