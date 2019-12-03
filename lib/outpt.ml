@@ -6,7 +6,7 @@ let show_smt ex =
   (* hack get model *)
   smt ^ "(get-model)"
 
-let write_smt_and_map fn ex params =
+let write_smt_and_map bn ex params =
   let ex' = show_smt ex in
-  Out_channel.write_all ("examples/"^fn^".smt") ~data:ex';
-  Out_channel.write_all ("examples/"^fn^".map") ~data:(Params.show_map params)
+  Out_channel.write_all ("examples/"^bn^".smt") ~data:ex';
+  Out_channel.write_all ("examples/"^bn^".map") ~data:(Params.show_map params)

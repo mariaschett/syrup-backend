@@ -57,7 +57,7 @@ let to_params predef ui =
   let instrs = predef @ (List.map ui.user_instrs ~f:mk_userdef_instr) in
   Params.mk ~n:ui.n ~k:ui.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
 
-let read_inpt path =
-  let user_params = user_params_of_yojson_exn (Yojson.Safe.from_file path) in
-  let name = Filename.chop_extension (Filename.basename path) in
-  (name, user_params)
+let read_inpt fn =
+  let user_params = user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
+  let bn = Filename.chop_extension (Filename.basename fn) in
+  (bn, user_params)

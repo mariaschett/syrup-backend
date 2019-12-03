@@ -33,11 +33,11 @@ let () =
            ("input/block_ex1.json");
            ("input/block_ex2.json")] in
         set_options p_model p_smt;
-        List.fold all ~init:() ~f:(fun _ path ->
-            let (name, up) = read_inpt path in
+        List.fold all ~init:() ~f:(fun _ fn ->
+            let (bn, up) = read_inpt fn in
             let params = to_params predef up in
             let enc = Enc.enc_block params in
-            write_smt_and_map name enc params)
+            write_smt_and_map bn enc params)
 
     ]
   |> Command.run ~version:"0.0"
