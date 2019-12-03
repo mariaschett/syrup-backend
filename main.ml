@@ -28,12 +28,13 @@ let () =
       in
       fun () ->
         let all =
-          [("block_192", read_inpt "input/block_192.json");
-           ("block_192_rev", read_inpt "input/block_192_rev.json");
-           ("block_ex1", read_inpt "input/block_ex1.json");
-           ("block_ex2", read_inpt "input/block_ex2.json")] in
+          [("input/block_192.json");
+           ("input/block_192_rev.json");
+           ("input/block_ex1.json");
+           ("input/block_ex2.json")] in
         set_options p_model p_smt;
-        List.fold all ~init:() ~f:(fun _ (name, up) ->
+        List.fold all ~init:() ~f:(fun _ path ->
+            let (name, up) = read_inpt path in
             let params = to_params predef up in
             let enc = Enc.enc_block params in
             write_smt_and_map name enc params)
