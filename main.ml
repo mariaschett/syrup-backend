@@ -25,19 +25,15 @@ let () =
           ~doc:"print model found by solver"
       and p_smt = flag "print-smt" no_arg
           ~doc:"print constraint given to solver in SMT-LIB format"
+      and
+        fn = anon ("USER_PARAMS" %: string)
       in
       fun () ->
-        let all =
-          [("input/block_192.json");
-           ("input/block_192_rev.json");
-           ("input/block_ex1.json");
-           ("input/block_ex2.json")] in
         set_options p_model p_smt;
-        List.fold all ~init:() ~f:(fun _ fn ->
-            let (bn, up) = read_inpt fn in
-            let params = to_params predef up in
-            let enc = Enc.enc_block params in
-            write_smt_and_map ("examples/"^bn) enc params)
+        let (bn, up) = read_inpt fn in
+        let params = to_params predef up in
+        let enc = Enc.enc_block params in
+        write_smt_and_map ("examples/"^bn) enc params
 
     ]
   |> Command.run ~version:"0.0"

@@ -5,7 +5,13 @@ build :
 
 run : build
 	LD_LIBRARY_PATH=$(Z3DIR) \
-	dune exec ./main.exe
+	dune exec ./main.exe input/block_192.json
+	LD_LIBRARY_PATH=$(Z3DIR) \
+	dune exec ./main.exe input/block_192_rev.json
+	LD_LIBRARY_PATH=$(Z3DIR) \
+	dune exec ./main.exe input/block_ex1.json
+	LD_LIBRARY_PATH=$(Z3DIR) \
+	dune exec ./main.exe input/block_ex2.json
 
 test : build
 	LD_LIBRARY_PATH=$(Z3DIR) \
@@ -19,3 +25,5 @@ clean :
 	dune clean
 
 .PHONY : build run test test_% utop clean
+
+
