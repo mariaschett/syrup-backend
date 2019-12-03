@@ -37,7 +37,7 @@ let () =
             let (bn, up) = read_inpt fn in
             let params = to_params predef up in
             let enc = Enc.enc_block params in
-            write_smt_and_map bn enc params)
+            write_smt_and_map ("examples/"^bn) enc params)
 
     ]
   |> Command.run ~version:"0.0"
