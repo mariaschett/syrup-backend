@@ -56,3 +56,5 @@ let to_params predef ui =
   let ss =  List.map ui.ss ~f:Consts.mk_user_const in
   let instrs = predef @ (List.map ui.user_instrs ~f:mk_userdef_instr) in
   Params.mk ~n:ui.n ~k:ui.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
+
+let read_inpt fn = user_params_of_yojson_exn (Yojson.Safe.from_file fn)

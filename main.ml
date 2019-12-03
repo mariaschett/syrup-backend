@@ -16,8 +16,6 @@ let show_smt ex =
   (* hack get model *)
   smt ^ "(get-model)"
 
-let read_inpt fn = user_params_of_yojson_exn (Yojson.Safe.from_file fn)
-
 let write_smt_and_map fn ex params =
   let ex' = show_smt ex in
   Out_channel.write_all ("examples/"^fn^".smt") ~data:ex';
