@@ -1,10 +1,11 @@
 open Core
 open Z3util
 
-let show_smt ex =
-  let smt = Z3.SMT.benchmark_to_smtstring !ctxt "" "" "unknown" "" [] ex in
+let show_smt enc =
+  let _ = Z3.Optimize.add !octxt [enc] in
   (* hack get model *)
-  smt ^ "(get-model)"
+  (Z3.Optimize.to_string !octxt) ^  "(get-model)"
+
 
 let write_smt_and_map fn ex params =
   let ex' = show_smt ex in

@@ -19,6 +19,7 @@ exception Z3_Timeout
 
 (* make context global for now -- if turns out badly wrap in a state monad *)
 let ctxt = ref (mk_context [])
+let octxt = ref (Z3.Optimize.mk_opt !ctxt)
 
 let int_sort = Arithmetic.Integer.mk_sort !ctxt
 let bv_sort = BitVector.mk_sort !ctxt
