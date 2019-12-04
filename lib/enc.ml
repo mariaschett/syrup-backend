@@ -43,9 +43,18 @@ let enc_block params =
   && nop_propagate params
   && bounds_push_args params
 
-let weight params j =
-  let gas_constr = Z3.Symbol.mk_string !ctxt "gas" in
-  let nop = find_instr params ~id:"NOP" in
-  let nop_to_int = Z3util.num (instr_to_int params nop) in
+let pick_from params instrs j =
+  let enc_to_int iota = num (instr_to_int params iota) in
   let open Z3Ops in
-  Z3.Optimize.add_soft !octxt (~! (nop_to_int == mk_t j)) "2" gas_constr
+  disj (List.map instrs ~f:(fun iota -> enc_to_int iota == mk_t j))
+
+let weight params j =
+  let gs = group_instr_gas params in
+  List.fold gs ~init:(0, [])
+    ~f:(fun (prev_gas, cheaper_instrs) (gas, instrs)  ->
+        let _ =
+          let weight = [%show: int] (gas - prev_gas) in
+          Z3util.add_soft_gas (~! (pick_from params cheaper_instrs j)) weight
+        in
+        (gas, (cheaper_instrs @ instrs))
+      )

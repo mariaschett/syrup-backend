@@ -21,6 +21,10 @@ exception Z3_Timeout
 let ctxt = ref (mk_context [])
 let octxt = ref (Z3.Optimize.mk_opt !ctxt)
 
+let add_soft_gas constr weight =
+  let gas_constr = Z3.Symbol.mk_string !ctxt "gas" in
+  Z3.Optimize.add_soft !octxt constr weight gas_constr
+
 let int_sort = Arithmetic.Integer.mk_sort !ctxt
 let bv_sort = BitVector.mk_sort !ctxt
 let bool_sort = Boolean.mk_sort !ctxt
