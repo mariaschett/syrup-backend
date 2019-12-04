@@ -10,4 +10,4 @@ let show_smt enc =
 let write_smt_and_map fn ex params =
   let ex' = show_smt ex in
   Out_channel.write_all (fn^".smt") ~data:ex';
-  Out_channel.write_all (fn^".map") ~data:(Params.show_map params)
+  Out_channel.write_all (fn^".map") ~data:(Params.show_instr_to_int params)

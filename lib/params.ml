@@ -25,14 +25,12 @@ let mk ~k ~n ~src_ws ~tgt_ws ~ss instrs =
     ss = ss;
   }
 
-let enc_instr_name params iota =
-  List.Assoc.find_exn (params.instr_int_map) iota ~equal:(fun i1 i2 -> i1.id = i2.id) |> Z3util.num
+let find_instr params ~id =
+  List.find_exn params.instrs ~f:(fun iota -> iota.id = id)
 
-let show_map params =
+let instr_to_int params iota =
+  List.Assoc.find_exn (params.instr_int_map) iota ~equal:(fun i1 i2 -> i1.id = i2.id)
+
+let show_instr_to_int params =
   let show_pair (iota, i) = iota.id ^ " : " ^ [%show: int] i ^ "; " in
   List.fold params.instr_int_map ~init:"" ~f:(fun m im -> m ^ (show_pair im))
-
-let enc_instr params id =
-  List.find_exn (params.instr_int_map) ~f:(fun (iota, _) -> iota.id = id) |> Tuple.T2.get2
-
-let nop_enc_name params = enc_instr params "NOP"

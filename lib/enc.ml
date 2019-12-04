@@ -8,7 +8,7 @@ open Sk_util
 let pick_instr params j =
   let t_j = mk_t j in
   let instrs = params.instrs in
-  let instr iota = Params.enc_instr_name params iota in
+  let instr iota = num (Params.instr_to_int params iota) in
   let open Z3Ops in
   conj (List.map instrs ~f:(fun iota -> (instr iota == t_j) ==> (iota.effect params.k j))) &&
   disj (List.map instrs ~f:(fun iota -> (instr iota == t_j)))
@@ -17,9 +17,10 @@ let nop_propagate params =
   let t j = mk_t j in
   let t' j = mk_t (j+1) in
   let ns = List.range ~start:`inclusive ~stop:`exclusive 0 (params.n - 1) in
-  let nop = Z3util.num (Params.nop_enc_name params) in
+  let nop = find_instr params ~id:"NOP" in
+  let nop_to_int = Z3util.num (instr_to_int params nop) in
   let open Z3Ops in
-  conj (List.map ns ~f:(fun j -> (t j == nop) ==> (t' j == nop)))
+  conj (List.map ns ~f:(fun j -> (t j == nop_to_int) ==> (t' j == nop_to_int)))
 
 let bounds_push_args params =
   let a j = mk_a j in
@@ -44,6 +45,7 @@ let enc_block params =
 
 let weight params j =
   let gas_constr = Z3.Symbol.mk_string !ctxt "gas" in
-  let nop = Z3util.num (Params.nop_enc_name params) in
+  let nop = find_instr params ~id:"NOP" in
+  let nop_to_int = Z3util.num (instr_to_int params nop) in
   let open Z3Ops in
-  Z3.Optimize.add_soft !octxt (~! (nop == mk_t j)) "2" gas_constr
+  Z3.Optimize.add_soft !octxt (~! (nop_to_int == mk_t j)) "2" gas_constr
