@@ -32,6 +32,7 @@ let show_map params =
   let show_pair (iota, i) = iota.id ^ " : " ^ [%show: int] i ^ "; " in
   List.fold params.map ~init:"" ~f:(fun m im -> m ^ (show_pair im))
 
-let nop_enc_name params =
-  let (_, i) = List.find_exn (params.map) ~f:(fun (iota, _) -> iota.id = "NOP")
-  in i
+let enc_instr params id =
+  List.find_exn (params.map) ~f:(fun (iota, _) -> iota.id = id) |> Tuple.T2.get2
+
+let nop_enc_name params = enc_instr params "NOP"
