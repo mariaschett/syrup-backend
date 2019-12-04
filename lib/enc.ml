@@ -48,13 +48,16 @@ let pick_from params instrs j =
   let open Z3Ops in
   disj (List.map instrs ~f:(fun iota -> enc_to_int iota == mk_t j))
 
-let weight params j =
-  let gs = group_instr_gas params in
-  List.fold gs ~init:(0, [])
-    ~f:(fun (prev_gas, cheaper_instrs) (gas, instrs)  ->
-        let _ =
-          let weight = [%show: int] (gas - prev_gas) in
-          Z3util.add_soft_gas (~! (pick_from params cheaper_instrs j)) weight
-        in
-        (gas, (cheaper_instrs @ instrs))
-      )
+let enc_weight params =
+  let weight_at params j =
+    List.fold (group_instr_gas params) ~init:(0, [])
+      ~f:(fun (prev_gas, cheaper_instrs) (gas, instrs)  ->
+          let _ =
+            let weight = [%show: int] (gas - prev_gas) in
+            Z3util.add_soft_gas (~! (pick_from params cheaper_instrs j)) weight
+          in
+          (gas, (cheaper_instrs @ instrs))
+        )
+  in
+  let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
+  List.map ns ~f:(weight_at params)

@@ -32,7 +32,7 @@ let () =
         set_options p_model p_smt;
         let (bn, up) = read_inpt fn in
         let params = to_params predef up in
-        let _ = Enc.weight params 0 in
+        let _ = Enc.enc_weight params in
         let enc = Enc.enc_block params in
         write_smt_and_map ("examples/"^bn) enc params
 
