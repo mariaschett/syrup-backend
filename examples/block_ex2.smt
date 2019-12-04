@@ -167,6 +167,6 @@
        (< a_1 1024)
        (<= 0 a_2)
        (< a_2 1024)))))
-(assert-soft (not (= 4 t_0)) :weight 2 :id k!0)
+(assert-soft (not (= 4 t_0)) :weight 2 :id gas)
 (check-sat)
 (get-model)

@@ -43,6 +43,7 @@ let enc_block params =
   && bounds_push_args params
 
 let weight params j =
+  let gas_constr = Z3.Symbol.mk_string !ctxt "gas" in
   let nop = Z3util.num (Params.nop_enc_name params) in
   let open Z3Ops in
-  Z3.Optimize.add_soft !octxt (~! (nop == mk_t j)) "2" (Z3.Symbol.mk_int !ctxt 0)
+  Z3.Optimize.add_soft !octxt (~! (nop == mk_t j)) "2" gas_constr
