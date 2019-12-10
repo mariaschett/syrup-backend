@@ -1,0 +1,32 @@
+(define-fun t_0 () Int
+  0)
+(define-fun t_1 () Int
+  4)
+(define-fun u_2_1 () Bool
+  false)
+(define-fun u_1_1 () Bool
+  false)
+(define-fun a_0 () Int
+  146)
+(define-fun x_0_1 () Int
+  146)
+(define-fun u_0_1 () Bool
+  true)
+(define-fun a_1 () Int
+  146)
+(define-fun x_1_1 () Int
+  146)
+(define-fun u_2_2 () Bool
+  false)
+(define-fun u_1_2 () Bool
+  false)
+(define-fun u_0_2 () Bool
+  true)
+(define-fun x_0_2 () Int
+  146)
+(define-fun u_2_0 () Bool
+  false)
+(define-fun u_1_0 () Bool
+  false)
+(define-fun u_0_0 () Bool
+  false)

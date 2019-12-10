@@ -34,7 +34,8 @@ let () =
         let params = to_params predef up in
         let _ = Enc.enc_weight params in
         let enc = Enc.enc_block params in
-        write_smt_and_map ("examples/"^bn) enc params
+        write_smt_and_map ("examples/"^bn) enc params;
+        write_model ("examples/"^bn) enc
 
     ]
   |> Command.run ~version:"0.0"
