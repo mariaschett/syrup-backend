@@ -21,6 +21,9 @@ let mk ~id ~opcode ~alpha ~delta ~effect ~gas = {
   gas = gas;
 }
 
+let show_disasm ?arg:(arg=None) iota =
+  iota.id ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
+
 let enc_push diff alpha k j  =
   let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in
@@ -35,6 +38,8 @@ let mk_PUSH =
   let diff = alpha - delta in
   (* opcode: PUSH with largest argument as overapproximation *)
   mk ~id ~alpha ~delta ~effect:(enc_push diff alpha) ~opcode:"7f" ~gas:3
+
+let is_PUSH iota = iota.id = "PUSH"
 
 let enc_pop diff alpha k j =
   let u_0 = mk_u 0 j in

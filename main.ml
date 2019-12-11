@@ -3,6 +3,7 @@ open Opti
 open Instruction
 open Inpt
 open Outpt
+open Z3util
 
 type output_options =
   { pmodel : bool
@@ -32,10 +33,14 @@ let () =
         set_options p_model p_smt;
         let (bn, up) = read_inpt fn in
         let params = to_params predef up in
-        let _ = Enc.enc_weight params in
         let enc = Enc.enc_block params in
-        write_smt_and_map ("examples/"^bn) enc params;
-        write_model ("examples/"^bn) enc
+        let _ = Enc.enc_weight params in
+        let _ = Z3.Optimize.add !octxt [enc] in
+        write_smt_and_map ("examples/"^bn) params;
+        let _ = Z3.Optimize.check !octxt in
+        let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
+        write_model ("examples/"^bn) mdl;
+        write_disasm ("examples/"^bn) mdl params
 
     ]
   |> Command.run ~version:"0.0"

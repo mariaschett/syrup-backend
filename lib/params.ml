@@ -28,6 +28,9 @@ let mk ~k ~n ~src_ws ~tgt_ws ~ss instrs =
 let find_instr params ~id =
   List.find_exn params.instrs ~f:(fun iota -> iota.id = id)
 
+let instr_of_int params i =
+  List.Assoc.find_exn (List.Assoc.inverse (params.instr_int_map)) i ~equal:(=)
+
 let instr_to_int params iota =
   List.Assoc.find_exn (params.instr_int_map) iota ~equal:(fun i1 i2 -> i1.id = i2.id)
 

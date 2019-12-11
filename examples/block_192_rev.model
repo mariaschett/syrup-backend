@@ -1,55 +1,59 @@
+(define-fun t_0 () Int
+  3)
+(define-fun t_1 () Int
+  0)
+(define-fun t_2 () Int
+  5)
+(define-fun t_3 () Int
+  0)
 (define-fun x_2_2 () Int
-  146)
+  1024)
 (define-fun x_0_2 () Int
-  1025)
+  1)
 (define-fun u_1_3 () Bool
-  true)
+  false)
 (define-fun x_1_1 () Int
   1024)
 (define-fun a_2 () Int
-  0)
+  146)
 (define-fun x_2_3 () Int
-  146)
+  5)
 (define-fun x_1_3 () Int
-  1025)
+  4)
+(define-fun x_2_0 () Int
+  3)
 (define-fun a_1 () Int
-  0)
-(define-fun x_0_3 () Int
-  146)
-(define-fun t_0 () Int
-  0)
+  1)
 (define-fun u_1_2 () Bool
   true)
-(define-fun x_1_2 () Int
-  146)
 (define-fun u_1_1 () Bool
   true)
+(define-fun x_1_2 () Int
+  1024)
+(define-fun x_1_0 () Int
+  2)
+(define-fun x_0_3 () Int
+  1025)
 (define-fun a_3 () Int
-  0)
-(define-fun t_3 () Int
-  4)
+  146)
 (define-fun u_2_3 () Bool
   false)
+(define-fun u_0_3 () Bool
+  true)
 (define-fun u_2_1 () Bool
   false)
 (define-fun a_0 () Int
   1)
 (define-fun u_0_1 () Bool
   true)
-(define-fun t_2 () Int
-  2)
 (define-fun x_2_1 () Int
-  146)
+  0)
 (define-fun u_0_2 () Bool
   true)
-(define-fun t_1 () Int
-  5)
 (define-fun u_2_2 () Bool
-  false)
-(define-fun x_0_1 () Int
-  1)
-(define-fun u_0_3 () Bool
   true)
+(define-fun x_0_1 () Int
+  1024)
 (define-fun s_1 () Int
   1025)
 (define-fun s_0 () Int

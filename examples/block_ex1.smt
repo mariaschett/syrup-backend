@@ -119,3 +119,4 @@
 (assert-soft (not (or (= 4 t_1) (= 1 t_1))) :weight 1 :id gas)
 (check-sat)
 (get-model)
+(get-objectives)
