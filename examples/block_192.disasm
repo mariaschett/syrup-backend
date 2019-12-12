@@ -1,1 +1,1 @@
-["ADD_1"; "SWAP"; "SWAP"; "SWAP"]
+["ADD_1"; "POP"; "NOP"; "NOP"]

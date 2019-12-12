@@ -1,27 +1,27 @@
 (define-fun t_0 () Int
   3)
 (define-fun t_1 () Int
-  2)
-(define-fun t_2 () Int
-  2)
-(define-fun x_2_2 () Int
   4)
+(define-fun t_2 () Int
+  4)
+(define-fun x_2_2 () Int
+  1024)
 (define-fun x_0_2 () Int
   1024)
 (define-fun x_1_1 () Int
   1024)
 (define-fun a_2 () Int
   0)
-(define-fun x_2_0 () Int
-  3)
 (define-fun a_1 () Int
   0)
+(define-fun x_2_0 () Int
+  3)
+(define-fun x_1_2 () Int
+  1024)
 (define-fun u_1_2 () Bool
   true)
 (define-fun u_1_1 () Bool
   true)
-(define-fun x_1_2 () Int
-  1024)
 (define-fun x_1_0 () Int
   2)
 (define-fun u_2_1 () Bool

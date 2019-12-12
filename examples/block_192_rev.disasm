@@ -1,1 +1,1 @@
-["DUP"; "PUSH 1"; "ADD_1"; "PUSH 146"]
+["POP"; "ADD_1"; "POP"; "NOP"]

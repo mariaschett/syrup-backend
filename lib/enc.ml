@@ -54,7 +54,7 @@ let enc_weight params =
       ~f:(fun (prev_gas, cheaper_instrs) (gas, instrs)  ->
           let _ =
             let weight = [%show: int] (gas - prev_gas) in
-            Z3util.add_soft_gas (~! (pick_from params cheaper_instrs j)) weight
+            Z3util.add_soft_gas  (pick_from params cheaper_instrs j) weight
           in
           (gas, (cheaper_instrs @ instrs))
         )
