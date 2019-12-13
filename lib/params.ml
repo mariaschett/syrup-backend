@@ -12,17 +12,19 @@ type params = {
   ss : Z3.Expr.expr list; (* "forall quantified" variables *)
 }
 
-let mk ~k ~n ~src_ws ~tgt_ws ~ss instrs =
+let mk predef user_params =
+  let open User_params in
   let max_wsz = Z.pow (Z.of_int 2) 10 in
+  let instrs =  predef @ (List.map user_params.user_instrs ~f:User_params.mk_user_instr) in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
   { instrs = instrs;
     instr_int_map = map;
-    k = k;
-    n = n;
+    k = user_params.k;
+    n = user_params.n;
     max_wsz = max_wsz;
-    src_ws = src_ws;
-    tgt_ws = tgt_ws;
-    ss = ss;
+    src_ws = User_params.mk_ws user_params.src_ws;
+    tgt_ws = User_params.mk_ws user_params.tgt_ws;
+    ss = List.map user_params.ss ~f:Consts.mk_user_const;
   }
 
 let find_instr params ~id =

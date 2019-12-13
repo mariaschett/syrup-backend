@@ -1,5 +1,5 @@
 (executables
- (names test_sk_util test_instr test_inpt)
+ (names test_sk_util test_instr test_params)
  (libraries core opti oUnit z3)
  (preprocess (pps ppx_deriving.std))
 )
@@ -18,6 +18,6 @@
 
 (alias
  (name runtest)
- (deps (:x test_inpt.exe))
+ (deps (:x test_params.exe))
  (action (run %{x}))
 )
