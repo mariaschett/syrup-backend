@@ -42,7 +42,7 @@ let () =
         let _ = Z3.Optimize.check !octxt in
         let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
         write_model ("examples/"^bn) mdl;
-        write_disasm ("examples/"^bn) mdl params
+        Yojson.Safe.to_file ("examples/result_"^bn^".json") (Outpt.result_to_yojson (show_result mdl params))
 
     ]
   |> Command.run ~version:"0.0"

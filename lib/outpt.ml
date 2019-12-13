@@ -30,6 +30,14 @@ let show_disasm mdl params =
       Instruction.show_disasm iota ~arg:(arg iota i)
     )
 
-let write_disasm fn mdl params =
-  let data = show_disasm mdl params in
-  Out_channel.write_all (fn^".disasm") ~data:([%show: string list] data);
+type result = {
+  opcode : string;
+  disasm : string;
+  cost : int;
+} [@@deriving yojson]
+
+let show_result mdl params =
+  { opcode = "";
+    disasm = [%show: string list] (show_disasm mdl params);
+    cost = -1;
+  }
