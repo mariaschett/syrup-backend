@@ -118,6 +118,24 @@ let user_instrs = [
         (List.length ps.instrs)
     );
 
+  "Find predefined instruction PUSH">:: (fun _ ->
+    let ps = Params.mk predef ups_1 in
+    let iota = Params.find_instr ps ~id:"PUSH" in
+    assert_equal
+      ~cmp:[%eq: string] ~printer:[%show: string]
+      "PUSH"
+      iota.id
+    );
+
+  "Find userdefined instruction ADD_1">:: (fun _ ->
+    let ps = Params.mk predef ups_1 in
+    let iota = Params.find_instr ps ~id:"ADD_1" in
+    assert_equal
+      ~cmp:[%eq: string] ~printer:[%show: string]
+      "ADD_1"
+      iota.id
+  );
+
   "Contains instr with id ADD_1">:: (fun _ ->
       let ps = Params.mk predef ups_1 in
       assert_bool ""
@@ -139,7 +157,50 @@ let user_instrs = [
 
 ]
 
-let suite = "suite" >::: sk @ user_instrs
+let int_map = [
+
+  "Converting predefined instruction PUSH from int and back is idempotent">:: (fun _ ->
+      let ps = Params.mk predef ups_0 in
+      let iota = Params.find_instr ps ~id:"PUSH" in
+      let i = Params.instr_to_int ps iota in
+      assert_equal
+        ~cmp:[%eq: int] ~printer:[%show: int]
+        i
+        (Params.instr_to_int ps (Params.instr_of_int ps i))
+    );
+
+  "Converting int to predefined instruction PUSH and back is idempotent">:: (fun _ ->
+      let ps = Params.mk predef ups_0 in
+      let iota = Params.find_instr ps ~id:"PUSH" in
+      assert_equal
+        ~cmp:[%eq: string] ~printer:[%show: string]
+        iota.id
+        (Params.instr_of_int ps (Params.instr_to_int ps iota)).id
+    );
+
+  "Converting userdefined instruction ADD_1 from int and back is idempotent">:: (fun _ ->
+      let ps = Params.mk predef ups_1 in
+      let iota = Params.find_instr ps ~id:"ADD_1" in
+      let i = Params.instr_to_int ps iota in
+      assert_equal
+        ~cmp:[%eq: int] ~printer:[%show: int]
+        i
+        (Params.instr_to_int ps (Params.instr_of_int ps i))
+    );
+
+  "Converting int to userdefined instruction ADD_1 and back is idempotent">:: (fun _ ->
+      let ps = Params.mk predef ups_1 in
+      let iota = Params.find_instr ps ~id:"ADD_1" in
+      assert_equal
+        ~cmp:[%eq: string] ~printer:[%show: string]
+        iota.id
+        (Params.instr_of_int ps (Params.instr_to_int ps iota)).id
+    );
+]
+
+
+
+let suite = "suite" >::: sk @ user_instrs @ int_map
 
 let () =
   run_test_tt_main suite
