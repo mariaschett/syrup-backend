@@ -30,6 +30,6 @@ let show_disasm mdl params =
       Instruction.show_disasm iota ~arg:(arg iota i)
     )
 
-let write_disasm fn cnstrs params =
-  let data = show_disasm cnstrs params in
+let write_disasm fn mdl params =
+  let data = show_disasm mdl params in
   Out_channel.write_all (fn^".disasm") ~data:([%show: string list] data);
