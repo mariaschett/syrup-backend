@@ -10,8 +10,7 @@ let user_word_to_yojson = function
   | Val i -> [%to_yojson: int] i
   | Const c -> [%to_yojson: string] c
 
-let user_word_of_yojson w =
- match w with
+let user_word_of_yojson = function
   | `Int i -> Ok (Val i)
   | `String s -> Ok (Const s)
   | _ -> Error "Cannot parse word. Either variable (string) or value (int) required."
