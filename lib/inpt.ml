@@ -38,15 +38,10 @@ type user_params = {
   user_instrs : user_instr list;
 } [@@deriving yojson { exn = true }]
 
-let mk_userdef_instr iota =
-  let alpha = List.length iota.inpt_sk in
-  let delta = List.length iota.outpt_sk in
-  let effect _ j =
-    let open Z3Ops in
-    conj (List.mapi iota.inpt_sk ~f:(fun i w -> mk_x i j == enc_user_word w)) &&
-    conj (List.mapi iota.outpt_sk ~f:(fun i w -> mk_x' i j == enc_user_word w))
-  in
-  Instruction.mk ~id:iota.id ~alpha ~delta ~effect ~opcode:iota.opcode ~gas:iota.gas
+let mk_userdef_instr ui =
+  let in_ws= List.map ui.inpt_sk ~f:enc_user_word in
+  let out_ws = List.map ui.outpt_sk ~f:enc_user_word in
+  Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas ~in_ws ~out_ws
 
 let to_params predef ui =
   let src_ws = List.map ui.src_ws ~f:enc_user_word in
