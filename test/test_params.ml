@@ -198,9 +198,11 @@ let int_map = [
     );
 ]
 
+let gas_grouping =
+  [
+  ]
 
-
-let suite = "suite" >::: sk @ user_instrs @ int_map
+let suite = "suite" >::: sk @ user_instrs @ int_map @ gas_grouping
 
 let () =
   run_test_tt_main suite

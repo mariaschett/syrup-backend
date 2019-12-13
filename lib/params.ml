@@ -40,7 +40,7 @@ let show_instr_to_int params =
   let show_pair (iota, i) = iota.id ^ " : " ^ [%show: int] i ^ "; " in
   List.fold params.instr_int_map ~init:"" ~f:(fun m im -> m ^ (show_pair im))
 
-let group_instr_gas params =
+let group_instr_by_gas params =
   List.fold params.instrs ~init:Core.Int.Map.empty
     ~f:(fun m iota -> Map.add_multi m ~key:iota.gas ~data:iota)
   |> Int.Map.to_alist ~key_order:`Increasing

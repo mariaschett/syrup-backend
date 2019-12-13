@@ -50,7 +50,7 @@ let pick_from params instrs j =
 
 let enc_weight params =
   let weight_at params j =
-    List.fold (group_instr_gas params) ~init:(0, [])
+    List.fold (group_instr_by_gas params) ~init:(0, [])
       ~f:(fun (prev_gas, cheaper_instrs) (gas, instrs)  ->
           let _ =
             let weight = [%show: int] (gas - prev_gas) in
