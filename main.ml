@@ -32,8 +32,12 @@ let () =
       fun () ->
         set_options p_model p_smt;
         (* parse user parameters from json *)
-        let user_params = user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
-        let params = to_params predef user_params in
+        let ups = user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
+        (* create parameters for encoding *)
+        let params = Params.mk ~n:ups.n ~k:ups.k
+            ~src_ws:(mk_ws ups.src_ws) ~tgt_ws:(mk_ws ups.tgt_ws)
+            ~ss:(List.map ups.ss ~f:Consts.mk_user_const)
+            (predef @ (List.map ups.user_instrs ~f:mk_user_instr)) in
         let enc = Enc.enc_block params in
         let _ = Enc.enc_weight params in
         let _ = Z3.Optimize.add !octxt [enc] in

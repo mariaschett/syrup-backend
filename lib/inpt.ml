@@ -43,9 +43,4 @@ type user_params = {
   user_instrs : user_instr list;
 } [@@deriving yojson { exn = true }]
 
-let to_params predef up =
-  let src_ws = List.map up.src_ws ~f:enc_user_word in
-  let tgt_ws = List.map up.tgt_ws ~f:enc_user_word in
-  let ss =  List.map up.ss ~f:Consts.mk_user_const in
-  let instrs = predef @ (List.map up.user_instrs ~f:mk_user_instr) in
-  Params.mk ~n:up.n ~k:up.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
+let mk_ws = List.map ~f:enc_user_word
