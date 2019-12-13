@@ -8,7 +8,7 @@ let write_smt_and_map fn params =
     (* hack get model *)
     (Z3.Optimize.to_string !octxt) ^ "(get-model)\n(get-objectives)"
   in
-  Out_channel.write_all (fn^".smt") ~data:(show_smt);
+  Out_channel.write_all (fn^".smt2") ~data:(show_smt);
   Out_channel.write_all (fn^".map") ~data:(Params.show_instr_to_int params)
 
 let write_model fn mdl =
