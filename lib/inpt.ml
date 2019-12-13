@@ -34,7 +34,7 @@ type user_params = {
   user_instrs : user_instr list;
 } [@@deriving yojson { exn = true }]
 
-let mk_from_user_word = function
+let enc_user_word = function
   | Val v -> num v
   | Const c -> mk_user_const c
 
@@ -43,14 +43,14 @@ let mk_userdef_instr iota =
   let delta = List.length iota.outpt_sk in
   let effect _ j =
     let open Z3Ops in
-    conj (List.mapi iota.inpt_sk ~f:(fun i w -> mk_x i j == mk_from_user_word w)) &&
-    conj (List.mapi iota.outpt_sk ~f:(fun i w -> mk_x' i j == mk_from_user_word w))
+    conj (List.mapi iota.inpt_sk ~f:(fun i w -> mk_x i j == enc_user_word w)) &&
+    conj (List.mapi iota.outpt_sk ~f:(fun i w -> mk_x' i j == enc_user_word w))
   in
   Instruction.mk ~id:iota.id ~alpha ~delta ~effect ~opcode:iota.opcode ~gas:iota.gas
 
 let to_params predef ui =
-  let src_ws = List.map ui.src_ws ~f:mk_from_user_word in
-  let tgt_ws = List.map ui.tgt_ws ~f:mk_from_user_word in
+  let src_ws = List.map ui.src_ws ~f:enc_user_word in
+  let tgt_ws = List.map ui.tgt_ws ~f:enc_user_word in
   let ss =  List.map ui.ss ~f:Consts.mk_user_const in
   let instrs = predef @ (List.map ui.user_instrs ~f:mk_userdef_instr) in
   Params.mk ~n:ui.n ~k:ui.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
