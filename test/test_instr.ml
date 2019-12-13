@@ -383,8 +383,8 @@ let nop = let enc_nop = (Instruction.mk_NOP).effect in
   ]
 
 let block_192_add_1 =
-  let s_1 = mk_s 1 (* =^= ADD_1 *) in
-  let s_0 = mk_s 0 (* =^= input variable on stack *) in
+  let s_1 = mk_user_const "s_1" (* =^= ADD_1 *) in
+  let s_0 = mk_user_const "s_0" (* =^= input variable on stack *) in
   let mk_block_192 = Instruction.mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] ~gas:3 ~opcode:"01" in
   let enc_add_1 = mk_block_192.effect in
   [
@@ -393,7 +393,6 @@ let block_192_add_1 =
         let vals = [s_0; num 1;] in
         let c = sk_init k j vals in
         let c' = enc_add_1 k j in
-        let s_1 = Consts.mk_s 1 in
         let x'_0 = Consts.mk_x 0 j in
         let c_s_1 = let open Z3Ops in s_1 == num 42 && x'_0 == s_1 in
         let m = solve_model_exn [c; c'; c_s_1] in
@@ -440,11 +439,9 @@ let block_192_add_1 =
 
     "backwards: ADD_1 sk_x and 1 on the stack">:: (fun _ ->
         let k = 4 and j = 0 in
-        let s_1 = Consts.mk_s 1 in
         let vals = [s_1] in
         let c' = sk_init k (j+1) vals in
         let c = enc_add_1 k j in
-        let s_0 = Consts.mk_s 0 in
         let c_sk = let open Z3Ops in s_0 == num 42 in
         let m = solve_model_exn [c; c'; c_sk] in
         assert_equal
@@ -456,7 +453,6 @@ let block_192_add_1 =
 
     "backwards: ADD_1 modifies utilization of stack">:: (fun _ ->
         let k = 4 and j = 0 in
-        let s_1 = Consts.mk_s 1 in
         let vals = [s_1] in
         let c' = sk_init k (j+1) vals in
         let c = enc_add_1 k j in
@@ -470,7 +466,6 @@ let block_192_add_1 =
 
     "backwards: ADD_1 preserves stack">:: (fun _ ->
         let k = 4 and j = 0 in
-        let s_1 = Consts.mk_s 1 in
         let vals = [s_1; num 3] in
         let c' = sk_init k (j+1) vals in
         let c = enc_add_1 k j in
