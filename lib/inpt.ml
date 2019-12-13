@@ -15,6 +15,10 @@ let user_word_of_yojson = function
   | `String s -> Ok (Const s)
   | _ -> Error "Cannot parse word. Either variable (string) or value (int) required."
 
+let enc_user_word = function
+  | Val v -> num v
+  | Const c -> mk_user_const c
+
 (* user defined instruction *)
 type user_instr = {
   id : string;
@@ -33,10 +37,6 @@ type user_params = {
   tgt_ws : user_word list;
   user_instrs : user_instr list;
 } [@@deriving yojson { exn = true }]
-
-let enc_user_word = function
-  | Val v -> num v
-  | Const c -> mk_user_const c
 
 let mk_userdef_instr iota =
   let alpha = List.length iota.inpt_sk in
