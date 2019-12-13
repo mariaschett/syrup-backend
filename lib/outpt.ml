@@ -5,7 +5,8 @@ open Params
 
 let write_smt_and_map fn params =
   let show_smt =
-    (* hack get model *)
+    (* hack to add commands to set logic, and get model and objectives *)
+    "(set-logic QF_LIA)\n"^
     (Z3.Optimize.to_string !octxt) ^ "(get-model)\n(get-objectives)"
   in
   Out_channel.write_all (fn^".smt2") ~data:(show_smt);
