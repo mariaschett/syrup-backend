@@ -4,7 +4,7 @@ open Instruction
 open Inpt
 open Outpt
 open Z3util
-
+ 
 type output_options =
   { pmodel : bool
   ; psmt : bool
@@ -31,11 +31,13 @@ let () =
       in
       fun () ->
         set_options p_model p_smt;
-        let (bn, up) = read_inpt fn in
-        let params = to_params predef up in
+        (* parse user parameters from json *)
+        let user_params = user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
+        let params = to_params predef user_params in
         let enc = Enc.enc_block params in
         let _ = Enc.enc_weight params in
         let _ = Z3.Optimize.add !octxt [enc] in
+        let bn = Filename.chop_extension (Filename.basename fn) in
         write_smt_and_map ("examples/"^bn) params;
         let _ = Z3.Optimize.check !octxt in
         let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
