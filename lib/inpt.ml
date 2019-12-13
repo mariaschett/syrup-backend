@@ -29,6 +29,11 @@ type user_instr = {
   gas : int;
 } [@@deriving yojson]
 
+let mk_user_instr ui =
+  Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas
+    ~in_ws:(List.map ui.inpt_sk ~f:enc_user_word)
+    ~out_ws:(List.map ui.outpt_sk ~f:enc_user_word)
+
 type user_params = {
   n : int [@key "max_progr_len"];
   k : int [@key "max_sk_sz"];
@@ -38,14 +43,9 @@ type user_params = {
   user_instrs : user_instr list;
 } [@@deriving yojson { exn = true }]
 
-let mk_userdef_instr ui =
-  let in_ws= List.map ui.inpt_sk ~f:enc_user_word in
-  let out_ws = List.map ui.outpt_sk ~f:enc_user_word in
-  Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas ~in_ws ~out_ws
-
-let to_params predef ui =
-  let src_ws = List.map ui.src_ws ~f:enc_user_word in
-  let tgt_ws = List.map ui.tgt_ws ~f:enc_user_word in
-  let ss =  List.map ui.ss ~f:Consts.mk_user_const in
-  let instrs = predef @ (List.map ui.user_instrs ~f:mk_userdef_instr) in
-  Params.mk ~n:ui.n ~k:ui.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
+let to_params predef up =
+  let src_ws = List.map up.src_ws ~f:enc_user_word in
+  let tgt_ws = List.map up.tgt_ws ~f:enc_user_word in
+  let ss =  List.map up.ss ~f:Consts.mk_user_const in
+  let instrs = predef @ (List.map up.user_instrs ~f:mk_user_instr) in
+  Params.mk ~n:up.n ~k:up.k ~src_ws:src_ws ~tgt_ws:tgt_ws ~ss:ss instrs
