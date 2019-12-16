@@ -5,8 +5,6 @@ open Z3util
 open User_params
 open Instruction
 
-let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
-
 let enc =
   [
     "Program pushing 146 on the stack">:: (fun _ ->

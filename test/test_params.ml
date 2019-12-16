@@ -1,10 +1,7 @@
 open Core
 open OUnit2
 open Opti
-open Instruction
 open User_params
-
-let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
 let ups_0 = {
   n = 4;
@@ -18,7 +15,7 @@ let ups_0 = {
 let sk = [
 
   "Words on source stack are set correctly">:: (fun _ ->
-      let ps = Params.mk predef ups_0 in
+      let ps = Params.mk Instruction.predef ups_0 in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
@@ -27,7 +24,7 @@ let sk = [
     );
 
   "Empty source stack">:: (fun _ ->
-      let ps = Params.mk predef {ups_0 with src_ws = []} in
+      let ps = Params.mk Instruction.predef {ups_0 with src_ws = []} in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
@@ -36,7 +33,7 @@ let sk = [
     );
 
   "Words on target stack are set correctly">:: (fun _ ->
-      let ps = Params.mk predef ups_0 in
+      let ps = Params.mk Instruction.predef ups_0 in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
@@ -45,7 +42,7 @@ let sk = [
     );
 
   "Empty target stack">:: (fun _ ->
-      let ps = Params.mk predef {ups_0 with tgt_ws = []} in
+      let ps = Params.mk Instruction.predef {ups_0 with tgt_ws = []} in
       assert_equal
         ~cmp:[%eq: Z3.Expr.t list]
         ~printer:(List.to_string ~f:Z3.Expr.to_string)
@@ -95,32 +92,32 @@ let ups_2 =
 let user_instrs = [
 
   "No user_instrs">:: (fun _ ->
-      let ps = Params.mk predef ups_0 in
+      let ps = Params.mk Instruction.predef ups_0 in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
-        (List.length predef)
+        (List.length Instruction.predef)
         (List.length ps.instrs)
     );
 
   "One user_instrs">:: (fun _ ->
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
-        ((List.length predef) + 1)
+        ((List.length Instruction.predef) + 1)
         (List.length ps.instrs)
     );
 
   "Two user_instrs">:: (fun _ ->
-      let ps = Params.mk predef ups_2 in
+      let ps = Params.mk Instruction.predef ups_2 in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
-        ((List.length predef) + 2)
+        ((List.length Instruction.predef) + 2)
         (List.length ps.instrs)
     );
 
   "Find predefined instruction PUSH32">:: (fun _ ->
       let id = "PUSH32" in
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       let iota = Params.find_instr ps ~id:"PUSH32" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]
@@ -129,7 +126,7 @@ let user_instrs = [
     );
 
   "Find userdefined instruction ADD_1">:: (fun _ ->
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       let iota = Params.find_instr ps ~id:"ADD_1" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]
@@ -138,20 +135,20 @@ let user_instrs = [
     );
 
   "Contains instr with id ADD_1">:: (fun _ ->
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       assert_bool ""
         (List.exists ps.instrs ~f:(fun iota -> iota.id = "ADD_1"))
     );
 
   "Instruction with id ADD_1 has correct gas and opcode">:: (fun _ ->
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       let iota = List.find_exn ps.instrs ~f:(fun iota -> iota.id = "ADD_1") in
       assert_bool ""
         (iota.gas = add_1.gas && iota.opcode = add_1.opcode)
     );
 
   "Contains instr with id TIMESTAMP">:: (fun _ ->
-      let ps = Params.mk predef ups_2 in
+      let ps = Params.mk Instruction.predef ups_2 in
       assert_bool ""
         (List.exists ps.instrs ~f:(fun iota -> iota.id = "TIMESTAMP"))
     );
@@ -161,7 +158,7 @@ let user_instrs = [
 let int_map = [
 
   "Converting predefined instruction PUSH32 from int and back is idempotent">:: (fun _ ->
-      let ps = Params.mk predef ups_0 in
+      let ps = Params.mk Instruction.predef ups_0 in
       let iota = Params.find_instr ps ~id:"PUSH32" in
       let i = Params.instr_to_int ps iota in
       assert_equal
@@ -171,7 +168,7 @@ let int_map = [
     );
 
   "Converting int to predefined instruction PUSH32 and back is idempotent">:: (fun _ ->
-      let ps = Params.mk predef ups_0 in
+      let ps = Params.mk Instruction.predef ups_0 in
       let iota = Params.find_instr ps ~id:"PUSH32" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]
@@ -180,7 +177,7 @@ let int_map = [
     );
 
   "Converting userdefined instruction ADD_1 from int and back is idempotent">:: (fun _ ->
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       let iota = Params.find_instr ps ~id:"ADD_1" in
       let i = Params.instr_to_int ps iota in
       assert_equal
@@ -190,7 +187,7 @@ let int_map = [
     );
 
   "Converting int to userdefined instruction ADD_1 and back is idempotent">:: (fun _ ->
-      let ps = Params.mk predef ups_1 in
+      let ps = Params.mk Instruction.predef ups_1 in
       let iota = Params.find_instr ps ~id:"ADD_1" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]

@@ -1,6 +1,5 @@
 open Core
 open Opti
-open Instruction
 open Outpt
 open Z3util
  
@@ -8,8 +7,6 @@ type output_options =
   { pmodel : bool
   ; psmt : bool
   }
-
-let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
 
 let outputcfg =
   ref {pmodel = false; psmt = false;}
@@ -33,7 +30,7 @@ let () =
         (* parse user parameters from json *)
         let user_params = User_params.user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
         (* create parameters for encoding *)
-        let params = Params.mk predef user_params in
+        let params = Params.mk Instruction.predef user_params in
         let enc = Enc.enc_block params in
         let _ = Enc.enc_weight params in
         let _ = Z3.Optimize.add !octxt [enc] in

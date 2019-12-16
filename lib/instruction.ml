@@ -123,3 +123,5 @@ let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
     enc_prsv k j diff alpha && enc_sk_utlz k j diff
   in
   mk ~id ~alpha ~delta ~effect:enc ~opcode ~gas
+
+let predef = [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
