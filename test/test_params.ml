@@ -152,7 +152,6 @@ let user_instrs = [
       assert_bool ""
         (List.exists ps.instrs ~f:(fun iota -> iota.id = "TIMESTAMP"))
     );
-
 ]
 
 let int_map = [
@@ -200,7 +199,41 @@ let gas_grouping =
   [
   ]
 
-let suite = "suite" >::: sk @ user_instrs @ int_map @ gas_grouping
+let input = "{
+  \"max_progr_len\": 4,
+  \"max_sk_sz\": 3,
+  \"vars\": [ \"s(0)\", \"s(1)\" ],
+  \"src_ws\": [ \"s(0)\" ],
+  \"tgt_ws\": [ 146, \"s(1)\" ],
+  \"user_instrs\": [
+    {
+      \"id\": \"ADD_1\",
+      \"opcode\": \"00\",
+      \"disasm\": \"ADD\",
+      \"inpt_sk\": [ \"s(0)\", 1 ],
+      \"outpt_sk\": [ \"s(1)\" ],
+      \"gas\": 3
+    }
+  ]
+}
+"
+
+let from_string = [
+
+  "Read input from user params">:: (fun _ ->
+      let ups = User_params.user_params_of_yojson_exn (Yojson.Safe.from_string input) in
+      let ps = Params.mk Instruction.predef ups in
+      assert_equal
+        ~cmp:[%eq: Z3.Expr.t list]
+        ~printer:(List.to_string ~f:Z3.Expr.to_string)
+        [Consts.mk_user_const "s(0)"]
+        ps.src_ws
+    );
+
+
+]
+
+let suite = "suite" >::: sk @ user_instrs @ int_map @ gas_grouping @ from_string
 
 let () =
   run_test_tt_main suite
