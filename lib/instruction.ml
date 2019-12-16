@@ -24,6 +24,9 @@ let mk ~id ~opcode ~alpha ~delta ~effect ~gas = {
 let show_disasm ?arg:(arg=None) iota =
   iota.id ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
 
+let show_opcode ?arg:(arg=None) iota =
+  iota.opcode ^ (Option.value_map arg ~default:"" ~f:(fun i -> Z.format "x" i))
+
 let enc_push diff alpha k j  =
   let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in

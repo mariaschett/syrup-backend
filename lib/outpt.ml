@@ -46,6 +46,13 @@ let show_disasm mdl params =
       Instruction.show_disasm iota ~arg:(arg iota i)
     )
 
+let show_opcode mdl params =
+  let arg iota i = Option.some_if (Instruction.is_PUSH iota) (dec_arg mdl i) in
+  List.init params.n ~f:(fun i ->
+      let iota = dec_instr mdl params i in
+      Instruction.show_opcode iota ~arg:(arg iota i)
+    )
+
 let show_cost mdl = Z3.Expr.to_string (Z3util.eval_obj mdl)
 
 type result = {
@@ -55,7 +62,7 @@ type result = {
 } [@@deriving yojson]
 
 let show_result mdl params =
-  { opcode = "";
+  { opcode = [%show: string list] (show_opcode mdl params);
     disasm = [%show: string list] (show_disasm mdl params);
     cost = [%show: string] (show_cost mdl);
   }
