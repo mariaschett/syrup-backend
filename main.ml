@@ -37,13 +37,14 @@ let () =
         let enc = Enc.enc_block params in
         let _ = Enc.enc_weight params in
         let _ = Z3.Optimize.add !octxt [enc] in
-        let bn = Filename.chop_extension (Filename.basename fn) in
-        write_smt ("examples/"^bn);
-        write_map ("examples/"^bn) params;
+        (* let bn = Filename.chop_extension (Filename.basename fn) in *)
+        let path = (Filename.dirname fn) in
+        write_smt (path^"/encoding");
+        write_map (path^"/instruction") params;
         let _ = Z3.Optimize.check !octxt in
         let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
-        write_model ("examples/"^bn) mdl;
-        Yojson.Safe.to_file ("examples/result_"^bn^".json") (Outpt.result_to_yojson (show_result mdl params))
+        write_model (path^"/model") mdl;
+        Yojson.Safe.to_file (path^"/result.json") (Outpt.result_to_yojson (show_result mdl params))
 
     ]
   |> Command.run ~version:"0.0"

@@ -5,9 +5,9 @@ build :
 
 examples : build
 	LD_LIBRARY_PATH=$(Z3DIR) \
-	dune exec ./main.exe input/block_192.json
+	dune exec ./main.exe examples/block_192/input.json
 	LD_LIBRARY_PATH=$(Z3DIR) \
-	dune exec ./main.exe input/block_192_rev.json
+	dune exec ./main.exe examples/block_192_rev/input.json
 
 test : build
 	LD_LIBRARY_PATH=$(Z3DIR) \

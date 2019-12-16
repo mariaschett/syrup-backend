@@ -29,7 +29,7 @@ let write_map fn params =
   Out_channel.write_all (fn^".map") ~data:(Params.show_instr_to_int params)
 
 let write_model fn mdl =
-  Out_channel.write_all (fn^".model") ~data:(Z3.Model.to_string mdl)
+  Out_channel.write_all (fn^".smt2") ~data:(Z3.Model.to_string mdl)
 
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
