@@ -3,12 +3,13 @@ open OUnit2
 open Opti
 open Z3util
 open Consts
+open Instruction
 open Sk_util
 
 let push =
-  let enc_push = (Instruction.mk_PUSH).effect in [
+  let enc_push = (Instruction.mk_PUSH 1).effect in [
 
-    "forwards: PUSH word on stack">:: (fun _ ->
+    "forwards: PUSH1 word on stack">:: (fun _ ->
         let k = 4 and j = 0 in
         let vals = [num 1; num 2;] in
         let c = sk_init k j vals in
@@ -22,7 +23,7 @@ let push =
         (eval_const m (Consts.mk_a j))
       );
 
-    "forwards: PUSH preserves words">:: (fun _ ->
+    "forwards: PUSH1 preserves words">:: (fun _ ->
         let k = 4 and j = 0 in
         let vals = [num 1; num 2;] in
         let c = sk_init k j vals in
@@ -35,7 +36,7 @@ let push =
           (List.map [Consts.mk_x' 1 j; Consts.mk_x' 2 j] ~f:(eval_const m))
       );
 
-    "forwards: PUSH utilization of stack">:: (fun _ ->
+    "forwards: PUSH1 utilization of stack">:: (fun _ ->
         let k = 4 and j = 0 in
         let vals = [num 1; num 2;] in
         let c = sk_init k j vals in
@@ -48,7 +49,7 @@ let push =
           (List.map (u's k j) ~f:(eval_const m))
       );
 
-    "backwards: PUSH word on stack">:: (fun _ ->
+    "backwards: PUSH1 word on stack">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 42; num 2;] in
         let c' = sk_init k (j+1) vals in
@@ -61,7 +62,7 @@ let push =
           (eval_const m (Consts.mk_a j))
       );
 
-    "backwards: PUSH preserves words">:: (fun _ ->
+    "backwards: PUSH1 preserves words">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 42; num 2;] in
         let c' = sk_init k (j+1) vals in
@@ -74,7 +75,7 @@ let push =
           (List.map [Consts.mk_x 0 j] ~f:(eval_const m))
       );
 
-    "backwards: PUSH utilization of stack">:: (fun _ ->
+    "backwards: PUSH1 utilization of stack">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2;] in
         let c' = sk_init k (j+1) vals in
@@ -87,12 +88,48 @@ let push =
           (List.map (us k j) ~f:(eval_const m))
       );
 
-    "Cannot PUSH on fully utilized stack">:: (fun _ ->
+    "Cannot PUSH1 on fully utilized stack">:: (fun _ ->
         let k = 3 and j = 0 in
         let vals = [num 1; num 2; num 1;] in
         let c = sk_init k j vals in
         let c' = enc_push k j in
         assert_bool "" (is_unsat [c; c'] )
+      );
+
+    "PUSH1 too large word 2^8 is unsat">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let vals = [num 1; num 2;] in
+        let c = sk_init k j vals in
+        let c' = enc_push k j in
+        let c_word = Consts.mk_x 0 (j+1) <==> bignum (Z.pow (Z.of_int 2) 8) in
+        assert_bool "" (is_unsat [c; c'; c_word] )
+      );
+
+    "Hex of PUSH1">:: (fun _ ->
+        let iota = mk_PUSH 1 in
+        assert_equal
+          ~cmp:[%eq: string]
+          ~printer:[%show: string]
+          "60"
+          iota.opcode
+      );
+
+    "Hex of PUSH12">:: (fun _ ->
+        let iota = mk_PUSH 12 in
+        assert_equal
+          ~cmp:[%eq: string]
+          ~printer:[%show: string]
+          "6b"
+          iota.opcode
+      );
+
+        "Hex of PUSH32">:: (fun _ ->
+        let iota = mk_PUSH 32 in
+        assert_equal
+          ~cmp:[%eq: string]
+          ~printer:[%show: string]
+          "7f"
+          iota.opcode
       );
   ]
 
