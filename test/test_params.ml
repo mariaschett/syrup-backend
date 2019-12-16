@@ -118,23 +118,24 @@ let user_instrs = [
         (List.length ps.instrs)
     );
 
-  "Find predefined instruction PUSH">:: (fun _ ->
-    let ps = Params.mk predef ups_1 in
-    let iota = Params.find_instr ps ~id:"PUSH" in
-    assert_equal
-      ~cmp:[%eq: string] ~printer:[%show: string]
-      "PUSH"
-      iota.id
+  "Find predefined instruction PUSH32">:: (fun _ ->
+      let id = "PUSH32" in
+      let ps = Params.mk predef ups_1 in
+      let iota = Params.find_instr ps ~id:"PUSH32" in
+      assert_equal
+        ~cmp:[%eq: string] ~printer:[%show: string]
+        id
+        iota.id
     );
 
   "Find userdefined instruction ADD_1">:: (fun _ ->
-    let ps = Params.mk predef ups_1 in
-    let iota = Params.find_instr ps ~id:"ADD_1" in
-    assert_equal
-      ~cmp:[%eq: string] ~printer:[%show: string]
-      "ADD_1"
-      iota.id
-  );
+      let ps = Params.mk predef ups_1 in
+      let iota = Params.find_instr ps ~id:"ADD_1" in
+      assert_equal
+        ~cmp:[%eq: string] ~printer:[%show: string]
+        "ADD_1"
+        iota.id
+    );
 
   "Contains instr with id ADD_1">:: (fun _ ->
       let ps = Params.mk predef ups_1 in
@@ -159,9 +160,9 @@ let user_instrs = [
 
 let int_map = [
 
-  "Converting predefined instruction PUSH from int and back is idempotent">:: (fun _ ->
+  "Converting predefined instruction PUSH32 from int and back is idempotent">:: (fun _ ->
       let ps = Params.mk predef ups_0 in
-      let iota = Params.find_instr ps ~id:"PUSH" in
+      let iota = Params.find_instr ps ~id:"PUSH32" in
       let i = Params.instr_to_int ps iota in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
@@ -169,9 +170,9 @@ let int_map = [
         (Params.instr_to_int ps (Params.instr_of_int ps i))
     );
 
-  "Converting int to predefined instruction PUSH and back is idempotent">:: (fun _ ->
+  "Converting int to predefined instruction PUSH32 and back is idempotent">:: (fun _ ->
       let ps = Params.mk predef ups_0 in
-      let iota = Params.find_instr ps ~id:"PUSH" in
+      let iota = Params.find_instr ps ~id:"PUSH32" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]
         iota.id
