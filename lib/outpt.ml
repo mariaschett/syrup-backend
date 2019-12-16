@@ -3,13 +3,19 @@ open Z3util
 open Consts
 open Params
 
-let write_smt_and_map fn params =
+let write_smt fn =
   let show_smt =
-    (* hack to add commands to set logic, and get model and objectives *)
+    (* hack to set logic, there should be an API call *)
     "(set-logic QF_LIA)\n"^
-    (Z3.Optimize.to_string !octxt) ^ "(get-model)\n(get-objectives)"
+    (Z3.Optimize.to_string !octxt)
+    (* hack to get model, there should be an API call *)
+    ^ "(get-model)\n"
+    (* hack to get objectives, there should be an API call *)
+    ^ "(get-objectives)"
   in
-  Out_channel.write_all (fn^".smt2") ~data:(show_smt);
+  Out_channel.write_all (fn^".smt2") ~data:(show_smt)
+
+let write_map fn params =
   Out_channel.write_all (fn^".map") ~data:(Params.show_instr_to_int params)
 
 let write_model fn mdl =

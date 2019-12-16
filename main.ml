@@ -38,7 +38,8 @@ let () =
         let _ = Enc.enc_weight params in
         let _ = Z3.Optimize.add !octxt [enc] in
         let bn = Filename.chop_extension (Filename.basename fn) in
-        write_smt_and_map ("examples/"^bn) params;
+        write_smt ("examples/"^bn);
+        write_map ("examples/"^bn) params;
         let _ = Z3.Optimize.check !octxt in
         let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
         write_model ("examples/"^bn) mdl;
