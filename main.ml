@@ -39,7 +39,7 @@ let () =
         let _ = Z3.Optimize.add !octxt [enc] in
         let path = (Filename.dirname fn) in
         write_smt (path^"/encoding_z3") ~data:(show_z3_smt ());
-        write_smt (path^"/encoding_blcg") ~data:(show_blcg_smt ());
+        write_smt (path^"/encoding_bclt") ~data:(show_blcg_smt ());
         write_map (path^"/instruction") params;
         write_objectives (path^"/objectives");
         let _ = Z3.Optimize.check !octxt in
