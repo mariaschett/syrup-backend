@@ -163,6 +163,10 @@ let eval_const m k =
   Option.value_exn (Model.eval m k true)
     ~message:("could not eval " ^ Z3.Expr.to_string k)
 
+let eval_obj m =
+  let os = Z3.Optimize.get_objectives !octxt in
+  eval_const m (conj os)
+
 module Z3Ops = struct
   let (@@) = (<@@>)
   let (==>) x y = (<->>) x y
