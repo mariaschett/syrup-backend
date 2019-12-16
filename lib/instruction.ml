@@ -27,26 +27,27 @@ let show_disasm ?arg:(arg=None) iota =
 let show_opcode ?arg:(arg=None) iota =
   iota.opcode ^ (Option.value_map arg ~default:"" ~f:(fun i -> Z.format "x" i))
 
-let hex_add base x =
-  Z.format "x" (Z.add (Z.of_string_base 16 base) (Z.of_int x))
+let hex_add base idx =
+  Z.add (Z.of_string_base 16 base) (Z.of_int (idx-1)) |>
+  Z.format "x"
 
-let enc_push diff alpha lb ub k j  =
+let enc_push diff alpha idx k j  =
   let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in
   let a = mk_a j in
-  let a_lb = bignum (Z.pow (Z.of_int 2) lb) in
-  let a_ub = bignum (Z.pow (Z.of_int 2) ub) in
+  (* to choose the "optimal" sized PUSH *)
+  let lb = bignum (Z.pow (Z.of_int 2) ((idx - 1) * 8)) in
+  let ub = bignum (Z.pow (Z.of_int 2) (idx * 8)) in
   let open Z3Ops in
   ~! u_k &&
-  (a_lb <= a) && (a < a_ub) &&
+  (lb <= a) && (a < ub) &&
   (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
-let mk_PUSH x =
-  let id = "PUSH" ^ ([%show: int] x) in
+let mk_PUSH idx =
+  let id = "PUSH" ^ ([%show: int] idx) in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  let lb = (x-1) * 8 and ub = x * 8 in
-  mk ~id ~alpha ~delta ~effect:(enc_push diff alpha lb ub) ~opcode:(hex_add "60" (x-1)) ~gas:3
+  mk ~id ~alpha ~delta ~effect:(enc_push diff alpha idx) ~opcode:(hex_add "60" idx) ~gas:3
 
 let is_PUSH iota = String.is_substring iota.id ~substring:"PUSH"
 
