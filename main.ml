@@ -41,6 +41,7 @@ let () =
         write_smt (path^"/encoding_z3") ~data:(show_z3_smt ());
         write_smt (path^"/encoding_blcg") ~data:(show_blcg_smt ());
         write_map (path^"/instruction") params;
+        write_objectives (path^"/objectives");
         let _ = Z3.Optimize.check !octxt in
         let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
         write_model (path^"/model") mdl;

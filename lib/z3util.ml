@@ -25,6 +25,8 @@ let add_soft_gas constr weight =
   let gas_constr = Z3.Symbol.mk_string !ctxt "gas" in
   Z3.Optimize.add_soft !octxt constr weight gas_constr
 
+let show_objectives () = Z3.Optimize.get_objectives !octxt
+
 let int_sort = Arithmetic.Integer.mk_sort !ctxt
 let bv_sort = BitVector.mk_sort !ctxt
 let bool_sort = Boolean.mk_sort !ctxt
@@ -163,8 +165,7 @@ let eval_const m k =
   Option.value_exn (Model.eval m k true)
     ~message:("could not eval " ^ Z3.Expr.to_string k)
 
-let eval_obj m =
-  let os = Z3.Optimize.get_objectives !octxt in
+let eval_obj m os =
   eval_const m (conj os)
 
 module Z3Ops = struct

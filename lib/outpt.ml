@@ -30,6 +30,12 @@ let write_map fn params =
 let write_model fn mdl =
   Out_channel.write_all (fn^".smt2") ~data:(Z3.Model.to_string mdl)
 
+let show_objectives () = Z3util.show_objectives ()
+
+let write_objectives fn =
+  Out_channel.write_all (fn^".smt2")
+    ~data:(Z3.Expr.to_string (Z3util.conj (show_objectives ())))
+
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
   Z.of_string (Z3.Arithmetic.Integer.numeral_to_string a_i)
@@ -52,7 +58,7 @@ let show_opcode mdl params =
       Instruction.show_opcode iota ~arg:(arg iota i)
     )
 
-let show_cost mdl = Z3.Expr.to_string (Z3util.eval_obj mdl)
+let show_cost mdl = Z3.Expr.to_string (Z3util.eval_obj mdl (show_objectives ()))
 
 type result = {
   opcode : string;
