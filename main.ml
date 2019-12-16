@@ -39,7 +39,8 @@ let () =
         let _ = Z3.Optimize.add !octxt [enc] in
         (* let bn = Filename.chop_extension (Filename.basename fn) in *)
         let path = (Filename.dirname fn) in
-        write_smt (path^"/encoding");
+        write_smt (path^"/encoding_z3") ~data:(show_z3_smt ());
+        write_smt (path^"/encoding_blcg") ~data:(show_blcg_smt ());
         write_map (path^"/instruction") params;
         let _ = Z3.Optimize.check !octxt in
         let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in

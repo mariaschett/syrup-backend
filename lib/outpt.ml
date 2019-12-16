@@ -3,7 +3,7 @@ open Z3util
 open Consts
 open Params
 
-let show_smt () =
+let show_z3_smt () =
   (* hack to set logic, there should be an API call *)
   "(set-logic QF_LIA)\n"^
   (Z3.Optimize.to_string !octxt)
@@ -12,18 +12,17 @@ let show_smt () =
   (* hack to get objectives, there should be an API call *)
   ^ "(get-objectives)"
 
-let show_barcelogic_smt () =
+let show_blcg_smt () =
   let open String.Search_pattern in
   (* barcelogic requires different start of assert-soft *)
   let op = "assert-soft (" and op' = "assert-soft (! (" in
   (* barcelogic requires additional ) of assert-soft *)
   let cp =  "gas)" and  cp' = "gas))" in
-  let z3_smt = show_smt () in
-  let replacd_op = replace_all (create op) ~in_:z3_smt ~with_:op' in
+  let replacd_op = replace_all (create op) ~in_:(show_z3_smt ()) ~with_:op' in
   replace_all ~in_:replacd_op (create cp) ~with_:cp'
 
-let write_smt fn =
-  Out_channel.write_all (fn^".smt2") ~data:(show_smt ())
+let write_smt fn ~data =
+  Out_channel.write_all (fn^".smt2") ~data:data
 
 let write_map fn params =
   Out_channel.write_all (fn^".map") ~data:(Params.show_instr_to_int params)
