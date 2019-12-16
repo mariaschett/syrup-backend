@@ -45,7 +45,7 @@ let mk_PUSH x =
   let id = "PUSH" ^ ([%show: int] x) in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  let lb = 0 and ub = x * 8 in
+  let lb = (x-1) * 8 and ub = x * 8 in
   mk ~id ~alpha ~delta ~effect:(enc_push diff alpha lb ub) ~opcode:(hex_add "60" (x-1)) ~gas:3
 
 let is_PUSH iota = String.is_substring iota.id ~substring:"PUSH"
@@ -126,4 +126,6 @@ let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
   in
   mk ~id ~alpha ~delta ~effect:enc ~opcode ~gas
 
-let predef = [mk_PUSH 32; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
+let predef =
+  let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
+  pushs @ [mk_POP; mk_SWAP; mk_DUP; mk_NOP]

@@ -7,6 +7,7 @@ open Instruction
 
 let enc =
   [
+
     "Program pushing 146 on the stack">:: (fun _ ->
         let ups = {
           n = 2;
@@ -25,7 +26,7 @@ let enc =
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        ["PUSH32 146"; "NOP"]
+        ["PUSH1 146"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
 
