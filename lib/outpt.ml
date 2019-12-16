@@ -12,6 +12,16 @@ let show_smt () =
   (* hack to get objectives, there should be an API call *)
   ^ "(get-objectives)"
 
+let show_barcelogic_smt () =
+  let open String.Search_pattern in
+  (* barcelogic requires different start of assert-soft *)
+  let op = "assert-soft (" and op' = "assert-soft (! (" in
+  (* barcelogic requires additional ) of assert-soft *)
+  let cp =  "gas)" and  cp' = "gas))" in
+  let z3_smt = show_smt () in
+  let replacd_op = replace_all (create op) ~in_:z3_smt ~with_:op' in
+  replace_all ~in_:replacd_op (create cp) ~with_:cp'
+
 let write_smt fn =
   Out_channel.write_all (fn^".smt2") ~data:(show_smt ())
 
