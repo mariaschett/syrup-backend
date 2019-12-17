@@ -515,7 +515,28 @@ let block_192_add_1 =
       );
   ]
 
-let suite = "suite" >::: push @ pop @ swap @ dup @ nop @ block_192_add_1
+let callvalue = [
+  let s_0 = mk_user_const "s_0" in
+  let mk_callvalue = Instruction.mk_userdef "CALLVALUE_1" ~in_ws:[] ~out_ws:[s_0] ~gas:2 ~opcode:"34" in
+  let enc_callvalue = mk_callvalue.effect in
+
+  "forwards: put callvalue on the stack">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let vals = [] in
+        let c = sk_init k j vals in
+        let c' = enc_callvalue k j in
+        let x'_0 = Consts.mk_x' 0 j in
+        let c_sk = let open Z3Ops in s_0 == num 42 in
+        let m = solve_model_exn [c; c'; c_sk] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t]
+          ~printer:Z3.Expr.to_string
+          (num 42)
+          (eval_const m x'_0)
+      );
+]
+
+let suite = "suite" >::: push @ pop @ swap @ dup @ nop @ block_192_add_1 @ callvalue
 
 let () =
   run_test_tt_main suite
