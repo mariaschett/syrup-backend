@@ -51,6 +51,38 @@ let enc =
         ["DUP"; "NOP"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
+
+    "Program pushing CALLVALUE on the stack">:: (fun _ ->
+        let ups = {
+          n = 6;
+          k = 5;
+          ss = ["s(1)"; "s(2)"];
+          src_ws = [Const "s(1)"];
+          tgt_ws = [Const "s(1)"; Const "s(2)";];
+          user_instrs = [
+            {
+              id = "CALLVALUE_0";
+              opcode = "34";
+              disasm = "CALLVALUE";
+              inpt_sk = [];
+              outpt_sk = [Const "s(2)"];
+              gas = 2;}
+          ];
+        }
+        in
+        let params = Params.mk predef ups in
+        let enc = Enc.enc_block params in
+        let _ = Enc.enc_weight params in
+        let _ = Z3.Optimize.add !octxt [enc] in
+        let _ = Z3.Optimize.check !octxt in
+        let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
+        assert_equal
+        ~cmp:[%eq: string list]
+        ~printer:[%show: string list]
+        ["CALLVALUE"; "SWAP"; "NOP"; "NOP"; "NOP"; "NOP"]
+        (Outpt.show_disasm mdl params)
+      );
+
   ]
 
 let suite = "suite" >::: enc
