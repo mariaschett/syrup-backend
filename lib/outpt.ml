@@ -3,14 +3,17 @@ open Z3util
 open Consts
 open Params
 
-let show_z3_smt () =
+let show_smt () =
   (* hack to set logic, there should be an API call *)
-  "(set-logic QF_LIA)\n"^
-  (Z3.Optimize.to_string !octxt)
+  "(set-logic QF_LIA)\n" ^
+  (Z3.Optimize.to_string !octxt) ^
   (* hack to get model, there should be an API call *)
-  ^ "(get-model)\n"
+  "(get-model)\n"
+
+let show_z3_smt () =
+  show_smt () ^
   (* hack to get objectives, there should be an API call *)
-  ^ "(get-objectives)"
+  "(get-objectives)\n"
 
 let show_blcg_smt () =
   let open String.Search_pattern in
@@ -18,7 +21,7 @@ let show_blcg_smt () =
   let op = "assert-soft (" and op' = "assert-soft (! (" in
   (* barcelogic requires additional ) of assert-soft *)
   let cp =  "gas)" and  cp' = "gas))" in
-  let replacd_op = replace_all (create op) ~in_:(show_z3_smt ()) ~with_:op' in
+  let replacd_op = replace_all (create op) ~in_:(show_smt ()) ~with_:op' in
   replace_all ~in_:replacd_op (create cp) ~with_:cp'
 
 let write_smt fn ~data =
