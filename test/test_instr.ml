@@ -427,11 +427,11 @@ let block_192_add_1 =
   [
     "forwards: ADD_1 puts s_1 on stack">:: (fun _ ->
         let k = 4 and j = 0 in
-        let vals = [s_0; num 1;] in
+        let vals = [s_0; num 1] in
         let c = sk_init k j vals in
         let c' = enc_add_1 k j in
-        let x'_0 = Consts.mk_x 0 j in
-        let c_s_1 = let open Z3Ops in s_1 == num 42 && x'_0 == s_1 in
+        let x'_0 = Consts.mk_x' 0 j in
+        let c_s_1 = let open Z3Ops in s_1 == num 42 in
         let m = solve_model_exn [c; c'; c_s_1] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t]
