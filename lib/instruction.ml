@@ -17,32 +17,6 @@ let mk ~id ~opcode ~effect ~gas = {
   gas = gas;
 }
 
-let show_disasm ?arg:(arg=None) iota =
-  iota.id ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
-
-let show_opcode ?arg:(arg=None) iota =
-  iota.opcode ^ (Option.value_map arg ~default:"" ~f:(fun i -> Z.format "x" i))
-
-let hex_add base idx =
-  Z.add (Z.of_string_base 16 base) (Z.of_int (idx-1)) |>
-  Z.format "x"
-
-let enc_push diff alpha k j  =
-  let x'_0 = mk_x' 0 j in
-  let u_k = mk_u (k-1) j in
-  let a = mk_a j in
-  let open Z3Ops in
-  ~! u_k &&
-  (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
-
-let mk_PUSH =
-  let id = "PUSH" in
-  let alpha = 1 and delta = 0 in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_push diff alpha) ~opcode:"60" ~gas:3
-
-let is_PUSH iota = iota.id = "PUSH"
-
 let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
   let x i = mk_x i j and x' i = mk_x' i j in
   let u i = mk_u i j and u_l i = mk_u (k-1-i) j in
@@ -60,6 +34,22 @@ let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
   mk ~id ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
 
 (* predefined instructions *)
+
+let enc_push diff alpha k j  =
+  let x'_0 = mk_x' 0 j in
+  let u_k = mk_u (k-1) j in
+  let a = mk_a j in
+  let open Z3Ops in
+  ~! u_k &&
+  (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
+
+let mk_PUSH =
+  let id = "PUSH" in
+  let alpha = 1 and delta = 0 in
+  let diff = alpha - delta in
+  mk ~id ~effect:(enc_push diff alpha) ~opcode:"60" ~gas:3
+
+let is_PUSH iota = iota.id = "PUSH"
 
 let mk_POP =
   mk ~id:"POP" ~opcode:"50" ~gas:2
@@ -100,3 +90,15 @@ let mk_NOP =
 
 let predef =
   [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
+
+(* show instruction *)
+
+let show_disasm ?arg:(arg=None) iota =
+  iota.id ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
+
+let show_opcode ?arg:(arg=None) iota =
+  iota.opcode ^ (Option.value_map arg ~default:"" ~f:(fun i -> Z.format "x" i))
+
+let hex_add base idx =
+  Z.add (Z.of_string_base 16 base) (Z.of_int (idx-1)) |>
+  Z.format "x"
