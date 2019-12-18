@@ -191,8 +191,9 @@ let get_objectives enc enc_weights =
   in Z3.Optimize.pop !octxt;
   s
 
-let eval_obj m os =
-  eval_const m os
+let solve_objectives mdl obj =
+  let r = eval_const mdl obj in
+  Int.of_string (Z3.Arithmetic.Integer.numeral_to_string r)
 
 module Z3Ops = struct
   let (@@) = (<@@>)

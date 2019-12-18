@@ -57,9 +57,6 @@ let show_opcode mdl params =
       Instruction.show_opcode iota ~arg:(arg iota i)
     )
 
-let show_cost mdl obj =
-  Z3.Expr.to_string (Z3util.eval_obj mdl obj)
-
 type result = {
   opcode : string;
   disasm : string;
@@ -69,5 +66,5 @@ type result = {
 let show_result mdl obj params =
   { opcode = [%show: string list] (show_opcode mdl params);
     disasm = [%show: string list] (show_disasm mdl params);
-    cost = [%show: string] (show_cost mdl obj);
+    cost = [%show: int] (Z3util.solve_objectives mdl obj);
   }
