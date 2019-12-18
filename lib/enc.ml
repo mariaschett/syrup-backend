@@ -48,16 +48,19 @@ let pick_from params instrs j =
   let open Z3Ops in
   disj (List.map instrs ~f:(fun iota -> enc_to_int iota == mk_t j))
 
+let enc_weight_at params j =
+  List.fold (group_instr_by_gas params)
+    ~init:((0, []), [])
+    ~f:(fun ((prev_gas, all_prev_instrs), constrs) (curr_gas, instrs)  ->
+        let weight = curr_gas - prev_gas in
+        let constrs' = (pick_from params all_prev_instrs j, weight) :: constrs in
+        let acc = (curr_gas, all_prev_instrs @ instrs) in
+        (acc, constrs')
+      )
+  |> Tuple.T2.get2
+
+let add_soft_constraints cs =
+  List.map cs ~f:(fun (constr, weight) -> Z3util.add_soft_gas constr ([%show: int] weight))
+
 let enc_weight params =
-  let weight_at params j =
-    List.fold (group_instr_by_gas params) ~init:(0, [])
-      ~f:(fun (prev_gas, cheaper_instrs) (gas, instrs)  ->
-          let _ =
-            let weight = [%show: int] (gas - prev_gas) in
-            Z3util.add_soft_gas  (pick_from params cheaper_instrs j) weight
-          in
-          (gas, (cheaper_instrs @ instrs))
-        )
-  in
-  let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
-  List.map ns ~f:(weight_at params)
+  List.init params.n ~f:(fun j -> add_soft_constraints (enc_weight_at params j))
