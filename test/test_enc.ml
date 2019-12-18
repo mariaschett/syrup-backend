@@ -5,9 +5,19 @@ open Z3util
 open User_params
 open Instruction
 
+let get_max_model_exn params =
+  Z3.Optimize.push !octxt;
+  let enc = Enc.enc_block params in
+  let _ = Enc.enc_weight params in
+  let _ = Z3.Optimize.add !octxt [enc] in
+  let _ = Z3.Optimize.check !octxt in
+  let mdl = Option.value_exn (Z3.Optimize.get_model !octxt)
+  in
+  Z3.Optimize.pop !octxt;
+  mdl
+
 let enc =
   [
-
     "Program pushing 146 on the stack">:: (fun _ ->
         let ups = {
           n = 2;
@@ -18,11 +28,7 @@ let enc =
           user_instrs = []
         } in
         let params = Params.mk predef ups in
-        let enc = Enc.enc_block params in
-        let _ = Enc.enc_weight params in
-        let _ = Z3.Optimize.add !octxt [enc] in
-        let _ = Z3.Optimize.check !octxt in
-        let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
+        let mdl = get_max_model_exn params in
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
@@ -40,11 +46,7 @@ let enc =
           user_instrs = []
         } in
         let params = Params.mk predef ups in
-        let enc = Enc.enc_block params in
-        let _ = Enc.enc_weight params in
-        let _ = Z3.Optimize.add !octxt [enc] in
-        let _ = Z3.Optimize.check !octxt in
-        let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
+        let mdl = get_max_model_exn params in
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
@@ -71,15 +73,11 @@ let enc =
         }
         in
         let params = Params.mk predef ups in
-        let enc = Enc.enc_block params in
-        let _ = Enc.enc_weight params in
-        let _ = Z3.Optimize.add !octxt [enc] in
-        let _ = Z3.Optimize.check !octxt in
-        let mdl = Option.value_exn (Z3.Optimize.get_model !octxt) in
+        let mdl = get_max_model_exn params in
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        ["CALLVALUE"; "SWAP"; "NOP"; "NOP"; "NOP"; "NOP"]
+        ["CALLVALUE_0"; "SWAP"; "NOP"; "NOP"; "NOP"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
 
