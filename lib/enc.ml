@@ -59,8 +59,5 @@ let enc_weight_at params j =
       )
   |> Tuple.T2.get2
 
-let add_soft_constraints cs =
-  List.map cs ~f:(fun (constr, weight) -> Z3util.add_soft_gas constr ([%show: int] weight))
-
 let enc_weight params =
-  List.init params.n ~f:(fun j -> add_soft_constraints (enc_weight_at params j))
+  List.init params.n ~f:(fun j -> enc_weight_at params j)

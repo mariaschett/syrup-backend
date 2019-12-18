@@ -25,6 +25,9 @@ let add_soft_gas constr weight =
   let gas_constr = Z3.Symbol.mk_string !ctxt "gas" in
   Z3.Optimize.add_soft !octxt constr weight gas_constr
 
+let add_soft_constraints =
+  List.map ~f:(List.map ~f:(fun (constr, weight) -> add_soft_gas constr ([%show: int] weight)))
+
 let show_objectives () = Z3.Optimize.get_objectives !octxt
 
 let int_sort = Arithmetic.Integer.mk_sort !ctxt

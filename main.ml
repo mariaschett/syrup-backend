@@ -32,7 +32,8 @@ let () =
         (* create parameters for encoding *)
         let params = Params.mk Instruction.predef user_params in
         let enc = Enc.enc_block params in
-        let _ = Enc.enc_weight params in
+        let enc_weights = Enc.enc_weight params in
+        let _ = Z3util.add_soft_constraints enc_weights in
         let _ = Z3.Optimize.add !octxt [enc] in
         let path = (Filename.dirname fn) in
         write_smt (path^"/encoding_z3") ~data:(show_z3_smt ());
