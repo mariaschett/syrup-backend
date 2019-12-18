@@ -83,7 +83,7 @@ let mk_DUP =
       )
 
 let mk_NOP =
-  mk ~id:"NOP" ~opcode:"" ~disasm:"" ~gas:0
+  mk ~id:"NOP" ~opcode:"" ~disasm:"NOP" ~gas:0
     ~effect:(fun k j ->
         let alpha = 0 and delta = 0 in
         let diff = alpha - delta in
@@ -96,7 +96,7 @@ let predef =
 (* show instruction *)
 
 let show_disasm ?arg:(arg=None) iota =
-  iota.id ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
+  iota.disasm ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
 
 let show_opcode ?arg:(arg=None) iota =
   iota.opcode ^ (Option.value_map arg ~default:"" ~f:(fun i -> Z.format "x" i))

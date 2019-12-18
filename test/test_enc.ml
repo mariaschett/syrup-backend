@@ -70,7 +70,7 @@ let enc =
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        ["CALLVALUE_0"; "SWAP"; "NOP"; "NOP"; "NOP"; "NOP"]
+        ["CALLVALUE"; "SWAP"; "NOP"; "NOP"; "NOP"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
 
