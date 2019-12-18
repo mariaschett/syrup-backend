@@ -115,10 +115,10 @@ let user_instrs = [
         (List.length ps.instrs)
     );
 
-  "Find predefined instruction PUSH32">:: (fun _ ->
-      let id = "PUSH32" in
+  "Find predefined instruction PUSH">:: (fun _ ->
+      let id = "PUSH" in
       let ps = Params.mk Instruction.predef ups_1 in
-      let iota = Params.find_instr ps ~id:"PUSH32" in
+      let iota = Params.find_instr ps ~id:"PUSH" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]
         id
@@ -156,9 +156,9 @@ let user_instrs = [
 
 let int_map = [
 
-  "Converting predefined instruction PUSH32 from int and back is idempotent">:: (fun _ ->
+  "Converting predefined instruction PUSH from int and back is idempotent">:: (fun _ ->
       let ps = Params.mk Instruction.predef ups_0 in
-      let iota = Params.find_instr ps ~id:"PUSH32" in
+      let iota = Params.find_instr ps ~id:"PUSH" in
       let i = Params.instr_to_int ps iota in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
@@ -166,9 +166,9 @@ let int_map = [
         (Params.instr_to_int ps (Params.instr_of_int ps i))
     );
 
-  "Converting int to predefined instruction PUSH32 and back is idempotent">:: (fun _ ->
+  "Converting int to predefined instruction PUSH and back is idempotent">:: (fun _ ->
       let ps = Params.mk Instruction.predef ups_0 in
-      let iota = Params.find_instr ps ~id:"PUSH32" in
+      let iota = Params.find_instr ps ~id:"PUSH" in
       assert_equal
         ~cmp:[%eq: string] ~printer:[%show: string]
         iota.id

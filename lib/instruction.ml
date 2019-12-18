@@ -27,25 +27,21 @@ let hex_add base idx =
   Z.add (Z.of_string_base 16 base) (Z.of_int (idx-1)) |>
   Z.format "x"
 
-let enc_push diff alpha idx k j  =
+let enc_push diff alpha k j  =
   let x'_0 = mk_x' 0 j in
   let u_k = mk_u (k-1) j in
   let a = mk_a j in
-  (* to choose the "optimal" sized PUSH *)
-  let lb = bignum (Z.pow (Z.of_int 2) ((idx - 1) * 8)) in
-  let ub = bignum (Z.pow (Z.of_int 2) (idx * 8)) in
   let open Z3Ops in
   ~! u_k &&
-  (lb <= a) && (a < ub) &&
   (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
 
-let mk_PUSH idx =
-  let id = "PUSH" ^ ([%show: int] idx) in
+let mk_PUSH =
+  let id = "PUSH" in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  mk ~id ~effect:(enc_push diff alpha idx) ~opcode:(hex_add "60" idx) ~gas:3
+  mk ~id ~effect:(enc_push diff alpha) ~opcode:"60" ~gas:3
 
-let is_PUSH iota = String.is_substring iota.id ~substring:"PUSH"
+let is_PUSH iota = iota.id = "PUSH"
 
 let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
   let x i = mk_x i j and x' i = mk_x' i j in
@@ -103,5 +99,4 @@ let mk_NOP =
       )
 
 let predef =
-  let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
-  pushs @ [mk_POP; mk_SWAP; mk_DUP; mk_NOP]
+  [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
