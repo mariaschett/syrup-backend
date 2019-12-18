@@ -64,15 +64,14 @@ let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
 
 (* predefined instructions *)
 
-let enc_pop diff alpha k j =
-  let x_0 = mk_x 0 j in
-  enc_userdef ~in_ws:[x_0] ~out_ws:[] diff alpha k j
-
 let mk_POP =
-  let id = "POP" in
-  let alpha = 0 and delta = 1 in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_pop diff alpha) ~opcode:"50" ~gas:2
+  mk ~id:"POP" ~opcode:"50" ~gas:2
+    ~effect:(fun k j ->
+        let alpha = 0 and delta = 1 in
+        let diff = alpha - delta in
+        let x_0 = mk_x 0 j in
+        enc_userdef ~in_ws:[x_0] ~out_ws:[] diff alpha k j
+      )
 
 let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
