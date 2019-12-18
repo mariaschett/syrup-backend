@@ -102,23 +102,21 @@ let mk_NOP =
   let diff = alpha - delta in
   mk ~id ~alpha ~delta ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
 
-let effect_userdef ~in_ws:in_ws ~out_ws:out_ws j k =
+let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
   let x i = mk_x i j and x' i = mk_x' i j in
   let u i = mk_u i j and u_l i = mk_u (k-1-i) j in
   let open Z3Ops in
-  conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
-  conj (List.mapi out_ws ~f:(fun i w -> ~! (u_l i) && x' i == w))
+  let effect =
+    conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
+    conj (List.mapi out_ws ~f:(fun i w -> ~! (u_l i) && x' i == w))
+  in
+  enc_sk_utlz k j diff &&
+  enc_prsv k j diff alpha && enc_sk_utlz k j diff && effect
 
 let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
   let delta = List.length in_ws and alpha = List.length out_ws in
   let diff = alpha - delta in
-  let enc k j =
-    let open Z3Ops in
-    enc_sk_utlz k j diff &&
-    effect_userdef ~in_ws:in_ws ~out_ws:out_ws j k &&
-    enc_prsv k j diff alpha && enc_sk_utlz k j diff
-  in
-  mk ~id ~alpha ~delta ~effect:enc ~opcode ~gas
+  mk ~id ~alpha ~delta ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
 
 let predef =
   let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
