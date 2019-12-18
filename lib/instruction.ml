@@ -80,12 +80,24 @@ let predef =
 
 (* show instruction *)
 
-let show_disasm ?arg:(arg=None) iota =
-  iota.disasm ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
+let show_hex arg =
+  let hx = Z.format "x" arg in
+  if Int.rem (String.length hx) 2 = 1 then "0" ^ hx else hx
 
-let show_opcode ?arg:(arg=None) iota =
-  iota.opcode ^ (Option.value_map arg ~default:"" ~f:(fun i -> Z.format "x" i))
+let compute_idx arg = String.length (show_hex arg) / 2
+
+let show_disasm ?arg:(arg=None) iota =
+  let idx = if is_PUSH iota then [%show: int] (compute_idx (Option.value_exn arg)) else "" in
+  iota.disasm ^ idx ^ (Option.value_map arg ~default:"" ~f:(fun i -> " " ^ Z.to_string i))
 
 let hex_add base idx =
-  Z.add (Z.of_string_base 16 base) (Z.of_int (idx-1)) |>
+  Z.add (Z.of_string_base 16 base) (Z.of_int idx) |>
   Z.format "x"
+
+let show_opcode ?arg:(arg=None) iota =
+  if is_PUSH iota
+  then
+    let arg = Option.value_exn arg in
+    let idx = compute_idx arg in
+    (hex_add iota.opcode (idx-1) ^ (show_hex arg))
+  else iota.opcode

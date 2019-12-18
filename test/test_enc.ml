@@ -21,7 +21,7 @@ let enc =
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        ["PUSH 146"; "NOP"]
+        ["PUSH1 146"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
 
