@@ -47,10 +47,26 @@ let mk_PUSH idx =
 
 let is_PUSH iota = String.is_substring iota.id ~substring:"PUSH"
 
-let enc_pop diff alpha k j =
-  let u_0 = mk_u 0 j in
+let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
+  let x i = mk_x i j and x' i = mk_x' i j in
+  let u i = mk_u i j and u_l i = mk_u (k-1-i) j in
   let open Z3Ops in
-  u_0 && (enc_prsv k j diff alpha && enc_sk_utlz k j diff)
+  let effect =
+    conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
+    conj (List.mapi out_ws ~f:(fun i w -> ~! (u_l i) && x' i == w))
+  in
+  enc_prsv k j diff alpha && enc_sk_utlz k j diff && effect
+
+let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
+  let delta = List.length in_ws and alpha = List.length out_ws in
+  let diff = alpha - delta in
+  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
+
+(* predefined instructions *)
+
+let enc_pop diff alpha k j =
+  let x_0 = mk_x 0 j in
+  enc_userdef ~in_ws:[x_0] ~out_ws:[] diff alpha k j
 
 let mk_POP =
   let id = "POP" in
@@ -59,8 +75,8 @@ let mk_POP =
   mk ~id ~effect:(enc_pop diff alpha) ~opcode:"50" ~gas:2
 
 let enc_swap diff alpha k j =
-  let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
-  let x_1 = mk_x 1 j and x'_1 = mk_x' 1 j in
+  let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
+  let x'_0 = mk_x' 0 j and x'_1 = mk_x' 1 j in
   let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
   let open Z3Ops in
   u_0 && u_1 &&
@@ -73,32 +89,6 @@ let mk_SWAP =
   (* opcode for SWAP I *)
   mk ~id ~effect:(enc_swap diff alpha) ~opcode:"90" ~gas:3
 
-let enc_nop diff alpha k j =
-  let open Z3Ops in
-  enc_prsv k j diff alpha  && enc_sk_utlz k j diff
-
-let mk_NOP =
-  let id = "NOP" in
-  let alpha = 0 and delta = 0 in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
-
-let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
-  let x i = mk_x i j and x' i = mk_x' i j in
-  let u i = mk_u i j and u_l i = mk_u (k-1-i) j in
-  let open Z3Ops in
-  let effect =
-    conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
-    conj (List.mapi out_ws ~f:(fun i w -> ~! (u_l i) && x' i == w))
-  in
-  enc_sk_utlz k j diff &&
-  enc_prsv k j diff alpha && enc_sk_utlz k j diff && effect
-
-let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
-  let delta = List.length in_ws and alpha = List.length out_ws in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
-
 let enc_dup diff alpha k j =
   let x_0 = mk_x 0 j in
   enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] diff alpha k j
@@ -109,6 +99,15 @@ let mk_DUP =
   let diff = alpha - delta in
   (* opcdoe for DUP I *)
   mk ~id ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
+
+let enc_nop diff alpha k j =
+  enc_userdef ~in_ws:[] ~out_ws:[] diff alpha k j
+
+let mk_NOP =
+  let id = "NOP" in
+  let alpha = 0 and delta = 0 in
+  let diff = alpha - delta in
+  mk ~id ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
 
 let predef =
   let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
