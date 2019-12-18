@@ -74,36 +74,33 @@ let mk_POP =
         enc_userdef ~in_ws:[x_0] ~out_ws:[] diff alpha k j
       )
 
-let enc_swap diff alpha k j =
-  let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
-  enc_userdef ~in_ws:[x_0; x_1] ~out_ws:[x_1; x_0] diff alpha k j
-
 let mk_SWAP =
-  let id = "SWAP" in
-  let alpha = 2 and delta = 2 in
-  let diff = alpha - delta in
   (* opcode for SWAP I *)
-  mk ~id ~effect:(enc_swap diff alpha) ~opcode:"90" ~gas:3
-
-let enc_dup diff alpha k j =
-  let x_0 = mk_x 0 j in
-  enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] diff alpha k j
+  mk ~id:"SWAP" ~opcode:"90" ~gas:3
+    ~effect:(fun k j ->
+        let alpha = 2 and delta = 2 in
+        let diff = alpha - delta in
+        let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
+        enc_userdef ~in_ws:[x_0; x_1] ~out_ws:[x_1; x_0] diff alpha k j
+      )
 
 let mk_DUP =
-  let id = "DUP" in
-  let alpha = 2 and delta = 1 in
-  let diff = alpha - delta in
   (* opcdoe for DUP I *)
-  mk ~id ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
-
-let enc_nop diff alpha k j =
-  enc_userdef ~in_ws:[] ~out_ws:[] diff alpha k j
+  mk ~id:"DUP" ~opcode:"80" ~gas:3
+    ~effect:(fun k j ->
+        let alpha = 2 and delta = 1 in
+        let diff = alpha - delta in
+        let x_0 = mk_x 0 j in
+        enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] diff alpha k j
+      )
 
 let mk_NOP =
-  let id = "NOP" in
-  let alpha = 0 and delta = 0 in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
+  mk ~id:"NOP"  ~opcode:"" ~gas:0
+    ~effect:(fun k j ->
+        let alpha = 0 and delta = 0 in
+        let diff = alpha - delta in
+        enc_userdef ~in_ws:[] ~out_ws:[] diff alpha k j
+      )
 
 let predef =
   let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
