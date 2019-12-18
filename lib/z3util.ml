@@ -36,14 +36,6 @@ let show_smt enc enc_weights =
   in Z3.Optimize.pop !octxt;
   s
 
-let get_objectives enc enc_weights =
-  Z3.Optimize.push !octxt;
-  let _ = add_soft_constraints enc_weights in
-  let _ = Z3.Optimize.add !octxt [enc] in
-  let s = Z3.Optimize.get_objectives !octxt
-  in Z3.Optimize.pop !octxt;
-  s
-
 let int_sort = Arithmetic.Integer.mk_sort !ctxt
 let bv_sort = BitVector.mk_sort !ctxt
 let bool_sort = Boolean.mk_sort !ctxt
@@ -191,8 +183,16 @@ let eval_const m k =
   Option.value_exn (Model.eval m k true)
     ~message:("could not eval " ^ Z3.Expr.to_string k)
 
+let get_objectives enc enc_weights =
+  Z3.Optimize.push !octxt;
+  let _ = add_soft_constraints enc_weights in
+  let _ = Z3.Optimize.add !octxt [enc] in
+  let s = conj (Z3.Optimize.get_objectives !octxt)
+  in Z3.Optimize.pop !octxt;
+  s
+
 let eval_obj m os =
-  eval_const m (conj os)
+  eval_const m os
 
 module Z3Ops = struct
   let (@@) = (<@@>)

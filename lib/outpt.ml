@@ -34,7 +34,7 @@ let write_model fn mdl =
 
 let write_objectives fn enc enc_weights =
   Out_channel.write_all (fn^".smt2")
-    ~data:(Z3.Expr.to_string (Z3util.conj (Z3util.get_objectives enc enc_weights)))
+    ~data:(Z3.Expr.to_string (Z3util.get_objectives enc enc_weights))
 
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
