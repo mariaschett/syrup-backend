@@ -37,19 +37,14 @@ let mk_userdef id ~in_ws ~out_ws ~opcode ~gas ~disasm =
 
 (* predefined instructions *)
 
-let enc_push diff alpha k j  =
-  let x'_0 = mk_x' 0 j in
-  let u_k = mk_u (k-1) j in
-  let a = mk_a j in
-  let open Z3Ops in
-  ~! u_k &&
-  (x'_0 == a && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
-
 let mk_PUSH =
-  let id = "PUSH" in
-  let alpha = 1 and delta = 0 in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_push diff alpha) ~opcode:"60" ~disasm:"PUSH" ~gas:3
+  mk ~id:"PUSH" ~opcode:"60" ~disasm:"PUSH" ~gas:3
+    ~effect:(fun k j ->
+      let alpha = 1 and delta = 0 in
+      let diff = alpha - delta in
+      let a = mk_a j in
+      enc_userdef ~in_ws:[] ~out_ws:[a] diff alpha k j
+    )
 
 let is_PUSH iota = iota.id = "PUSH"
 
