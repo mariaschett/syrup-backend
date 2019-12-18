@@ -166,8 +166,10 @@ let solve_max_model_exn enc enc_weights =
   Z3.Optimize.push !octxt;
   let _ = add_soft_constraints enc_weights in
   let _ = Z3.Optimize.add !octxt [enc] in
-  let _ = Z3.Optimize.check !octxt in
-  let mdl = Option.value_exn (Z3.Optimize.get_model !octxt)
+  let mdl = match Z3.Optimize.check !octxt with
+    | Solver.SATISFIABLE ->
+      Option.value_exn (Z3.Optimize.get_model !octxt) ~message:"SAT but no model"
+    | _ -> failwith "Not satisfiable or unknown."
   in Z3.Optimize.pop !octxt;
   mdl
 
