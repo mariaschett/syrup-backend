@@ -36,7 +36,13 @@ let show_smt enc enc_weights =
   in Z3.Optimize.pop !octxt;
   s
 
-let show_objectives () = Z3.Optimize.get_objectives !octxt
+let show_objectives enc enc_weights =
+  Z3.Optimize.push !octxt;
+  let _ = add_soft_constraints enc_weights in
+  let _ = Z3.Optimize.add !octxt [enc] in
+  let s = Z3.Optimize.get_objectives !octxt
+  in Z3.Optimize.pop !octxt;
+  s
 
 let int_sort = Arithmetic.Integer.mk_sort !ctxt
 let bv_sort = BitVector.mk_sort !ctxt
