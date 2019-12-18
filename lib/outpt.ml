@@ -1,27 +1,26 @@
 open Core
-open Z3util
 open Consts
 open Params
 
-let show_smt () =
+let show_smt enc enc_weights =
   (* hack to set logic, there should be an API call *)
   "(set-logic QF_LIA)\n" ^
-  (Z3.Optimize.to_string !octxt) ^
+  Z3util.show_smt enc enc_weights ^
   (* hack to get model, there should be an API call *)
   "(get-model)\n"
 
-let show_z3_smt () =
-  show_smt () ^
+let show_z3_smt enc enc_weights =
+  show_smt enc enc_weights ^
   (* hack to get objectives, there should be an API call *)
   "(get-objectives)\n"
 
-let show_blcg_smt () =
+let show_blcg_smt enc enc_weights =
   let open String.Search_pattern in
   (* barcelogic requires different start of assert-soft *)
   let op = "assert-soft (" and op' = "assert-soft (! (" in
   (* barcelogic requires additional ) of assert-soft *)
   let cp =  "gas)" and  cp' = "gas))" in
-  let replacd_op = replace_all (create op) ~in_:(show_smt ()) ~with_:op' in
+  let replacd_op = replace_all (create op) ~in_:(show_smt enc enc_weights) ~with_:op' in
   replace_all ~in_:replacd_op (create cp) ~with_:cp'
 
 let write_smt fn ~data =

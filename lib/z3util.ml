@@ -28,6 +28,14 @@ let add_soft_gas constr weight =
 let add_soft_constraints =
   List.map ~f:(List.map ~f:(fun (constr, weight) -> add_soft_gas constr ([%show: int] weight)))
 
+let show_smt enc enc_weights =
+  Z3.Optimize.push !octxt;
+  let _ = add_soft_constraints enc_weights in
+  let _ = Z3.Optimize.add !octxt [enc] in
+  let s = Z3.Optimize.to_string !octxt
+  in Z3.Optimize.pop !octxt;
+  s
+
 let show_objectives () = Z3.Optimize.get_objectives !octxt
 
 let int_sort = Arithmetic.Integer.mk_sort !ctxt
