@@ -156,6 +156,15 @@ let solve_model cs = solve_model_timeout cs 0
 
 let solve_model_exn cs = Option.value_exn (solve_model cs) ~message:"UNSAT"
 
+let solve_max_model_exn enc enc_weights =
+  Z3.Optimize.push !octxt;
+  let _ = add_soft_constraints enc_weights in
+  let _ = Z3.Optimize.add !octxt [enc] in
+  let _ = Z3.Optimize.check !octxt in
+  let mdl = Option.value_exn (Z3.Optimize.get_model !octxt)
+  in Z3.Optimize.pop !octxt;
+  mdl
+
 let is_sat cs = Option.is_some (solve_model cs)
 
 let is_unsat cs = not (is_sat cs)

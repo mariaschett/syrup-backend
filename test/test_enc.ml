@@ -1,18 +1,7 @@
-open Core
 open OUnit2
 open Opti
-open Z3util
 open User_params
 open Instruction
-
-let get_max_model_exn enc enc_weights =
-  Z3.Optimize.push !octxt;
-  let _ = Z3util.add_soft_constraints enc_weights in
-  let _ = Z3.Optimize.add !octxt [enc] in
-  let _ = Z3.Optimize.check !octxt in
-  let mdl = Option.value_exn (Z3.Optimize.get_model !octxt)
-  in Z3.Optimize.pop !octxt;
-  mdl
 
 let enc =
   [
@@ -28,7 +17,7 @@ let enc =
         let params = Params.mk predef ups in
         let enc = Enc.enc_block params in
         let enc_weights = Enc.enc_weight params in
-        let mdl = get_max_model_exn enc enc_weights in
+        let mdl = Z3util.solve_max_model_exn enc enc_weights in
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
@@ -48,7 +37,7 @@ let enc =
         let params = Params.mk predef ups in
         let enc = Enc.enc_block params in
         let enc_weights = Enc.enc_weight params in
-        let mdl = get_max_model_exn enc enc_weights in
+        let mdl = Z3util.solve_max_model_exn enc enc_weights in
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
@@ -77,7 +66,7 @@ let enc =
         let params = Params.mk predef ups in
         let enc = Enc.enc_block params in
         let enc_weights = Enc.enc_weight params in
-        let mdl = get_max_model_exn enc enc_weights in
+        let mdl = Z3util.solve_max_model_exn enc enc_weights in
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
