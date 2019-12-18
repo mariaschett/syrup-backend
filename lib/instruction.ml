@@ -76,11 +76,7 @@ let mk_POP =
 
 let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
-  let x'_0 = mk_x' 0 j and x'_1 = mk_x' 1 j in
-  let u_0 = mk_u 0 j and u_1 = mk_u 1 j in
-  let open Z3Ops in
-  u_0 && u_1 &&
-  ((x'_0 == x_1) && (x'_1 == x_0)) && enc_prsv k j diff alpha && enc_sk_utlz k j diff
+  enc_userdef ~in_ws:[x_0; x_1] ~out_ws:[x_1; x_0] diff alpha k j
 
 let mk_SWAP =
   let id = "SWAP" in
