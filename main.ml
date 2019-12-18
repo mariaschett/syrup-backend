@@ -33,14 +33,15 @@ let () =
         (* compute encodings *)
         let enc = Enc.enc_block params in
         let enc_weights = Enc.enc_weight params in
+        let obj = Z3util.get_objectives enc enc_weights in
         (* write files *)
         let path = (Filename.dirname fn) in
         write_smt (path^"/encoding_z3") ~data:(show_z3_smt enc enc_weights);
         write_smt (path^"/encoding_bclt") ~data:(show_blcg_smt enc enc_weights);
         write_map (path^"/instruction") params;
-        write_objectives (path^"/objectives") enc enc_weights;
+        write_objectives (path^"/objectives") ~data:obj;
         let mdl = Z3util.solve_max_model_exn enc enc_weights in
         write_model (path^"/model") mdl;
-        Yojson.Safe.to_file (path^"/result.json") (Outpt.result_to_yojson (show_result mdl params enc enc_weights))
+        Yojson.Safe.to_file (path^"/result.json") (Outpt.result_to_yojson (show_result mdl obj params))
     ]
   |> Command.run ~version:"0.0"

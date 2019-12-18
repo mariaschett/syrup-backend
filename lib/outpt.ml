@@ -32,9 +32,8 @@ let write_map fn params =
 let write_model fn mdl =
   Out_channel.write_all (fn^".smt2") ~data:(Z3.Model.to_string mdl)
 
-let write_objectives fn enc enc_weights =
-  Out_channel.write_all (fn^".smt2")
-    ~data:(Z3.Expr.to_string (Z3util.get_objectives enc enc_weights))
+let write_objectives fn ~data:obj =
+  Out_channel.write_all (fn^".smt2") ~data:(Z3.Expr.to_string obj)
 
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
@@ -58,8 +57,8 @@ let show_opcode mdl params =
       Instruction.show_opcode iota ~arg:(arg iota i)
     )
 
-let show_cost mdl enc enc_weight =
-  Z3.Expr.to_string (Z3util.eval_obj mdl (Z3util.get_objectives enc enc_weight))
+let show_cost mdl obj =
+  Z3.Expr.to_string (Z3util.eval_obj mdl obj)
 
 type result = {
   opcode : string;
@@ -67,8 +66,8 @@ type result = {
   cost : string;
 } [@@deriving yojson]
 
-let show_result mdl params enc enc_weight =
+let show_result mdl obj params =
   { opcode = [%show: string list] (show_opcode mdl params);
     disasm = [%show: string list] (show_disasm mdl params);
-    cost = [%show: string] (show_cost mdl enc enc_weight);
+    cost = [%show: string] (show_cost mdl obj);
   }
