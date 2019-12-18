@@ -53,7 +53,8 @@ let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
   let open Z3Ops in
   let effect =
     conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
-    conj (List.mapi out_ws ~f:(fun i w -> ~! (u_l i) && x' i == w))
+    conj (List.mapi out_ws ~f:(fun i w -> x' i == w)) &&
+    conj (List.init (Int.max 0 diff) ~f:(fun i -> ~! (u_l i)))
   in
   enc_prsv k j diff alpha && enc_sk_utlz k j diff && effect
 
