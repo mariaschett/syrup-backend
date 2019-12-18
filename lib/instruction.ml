@@ -6,17 +6,13 @@ open Sk_util
 type t = {
   id : string;
   opcode : string;
-  alpha : int;
-  delta : int;
   effect : int -> int -> Z3.Expr.expr;
   gas : int;
 } [@@deriving show {with_path = false}]
 
-let mk ~id ~opcode ~alpha ~delta ~effect ~gas = {
+let mk ~id ~opcode ~effect ~gas = {
   id = id;
   opcode = opcode;
-  alpha = alpha;
-  delta = delta;
   effect = effect;
   gas = gas;
 }
@@ -47,7 +43,7 @@ let mk_PUSH idx =
   let id = "PUSH" ^ ([%show: int] idx) in
   let alpha = 1 and delta = 0 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_push diff alpha idx) ~opcode:(hex_add "60" idx) ~gas:3
+  mk ~id ~effect:(enc_push diff alpha idx) ~opcode:(hex_add "60" idx) ~gas:3
 
 let is_PUSH iota = String.is_substring iota.id ~substring:"PUSH"
 
@@ -60,7 +56,7 @@ let mk_POP =
   let id = "POP" in
   let alpha = 0 and delta = 1 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_pop diff alpha) ~opcode:"50" ~gas:2
+  mk ~id ~effect:(enc_pop diff alpha) ~opcode:"50" ~gas:2
 
 let enc_swap diff alpha k j =
   let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
@@ -75,7 +71,7 @@ let mk_SWAP =
   let alpha = 2 and delta = 2 in
   let diff = alpha - delta in
   (* opcode for SWAP I *)
-  mk ~id ~alpha ~delta ~effect:(enc_swap diff alpha) ~opcode:"90" ~gas:3
+  mk ~id ~effect:(enc_swap diff alpha) ~opcode:"90" ~gas:3
 
 let enc_nop diff alpha k j =
   let open Z3Ops in
@@ -85,7 +81,7 @@ let mk_NOP =
   let id = "NOP" in
   let alpha = 0 and delta = 0 in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
+  mk ~id ~effect:(enc_nop diff alpha) ~opcode:"" ~gas:0
 
 let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
   let x i = mk_x i j and x' i = mk_x' i j in
@@ -101,7 +97,7 @@ let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
 let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
   let delta = List.length in_ws and alpha = List.length out_ws in
   let diff = alpha - delta in
-  mk ~id ~alpha ~delta ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
+  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
 
 let enc_dup diff alpha k j =
   let x_0 = mk_x 0 j in
@@ -112,7 +108,7 @@ let mk_DUP =
   let alpha = 2 and delta = 1 in
   let diff = alpha - delta in
   (* opcdoe for DUP I *)
-  mk ~id ~alpha ~delta ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
+  mk ~id ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
 
 let predef =
   let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
