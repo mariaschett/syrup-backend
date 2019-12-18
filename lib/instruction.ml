@@ -19,7 +19,8 @@ let mk ~id ~opcode ~effect ~gas ~disasm = {
   gas = gas;
 }
 
-let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
+let enc_userdef ~in_ws ~out_ws ~alpha ~delta k j =
+  let diff = alpha - delta in
   let x i = mk_x i j and x' i = mk_x' i j in
   let u i = mk_u i j and u_l i = mk_u (k-1-i) j in
   let open Z3Ops in
@@ -32,18 +33,15 @@ let enc_userdef ~in_ws:in_ws ~out_ws:out_ws diff alpha k j =
 
 let mk_userdef id ~in_ws ~out_ws ~opcode ~gas ~disasm =
   let delta = List.length in_ws and alpha = List.length out_ws in
-  let diff = alpha - delta in
-  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws diff alpha) ~opcode ~gas ~disasm
+  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws ~delta ~alpha) ~opcode ~gas ~disasm
 
 (* predefined instructions *)
 
 let mk_PUSH =
   mk ~id:"PUSH" ~opcode:"60" ~disasm:"PUSH" ~gas:3
     ~effect:(fun k j ->
-      let alpha = 1 and delta = 0 in
-      let diff = alpha - delta in
       let a = mk_a j in
-      enc_userdef ~in_ws:[] ~out_ws:[a] diff alpha k j
+      enc_userdef ~in_ws:[] ~out_ws:[a] ~alpha:1 ~delta:0 k j
     )
 
 let is_PUSH iota = iota.id = "PUSH"
@@ -51,38 +49,30 @@ let is_PUSH iota = iota.id = "PUSH"
 let mk_POP =
   mk ~id:"POP" ~opcode:"50" ~gas:2 ~disasm:"POP"
     ~effect:(fun k j ->
-        let alpha = 0 and delta = 1 in
-        let diff = alpha - delta in
         let x_0 = mk_x 0 j in
-        enc_userdef ~in_ws:[x_0] ~out_ws:[] diff alpha k j
+        enc_userdef ~in_ws:[x_0] ~out_ws:[] ~alpha:0 ~delta:1 k j
       )
 
 let mk_SWAP =
   (* opcode for SWAP I *)
   mk ~id:"SWAP" ~opcode:"90" ~disasm:"SWAP" ~gas:3
     ~effect:(fun k j ->
-        let alpha = 2 and delta = 2 in
-        let diff = alpha - delta in
         let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
-        enc_userdef ~in_ws:[x_0; x_1] ~out_ws:[x_1; x_0] diff alpha k j
+        enc_userdef ~in_ws:[x_0; x_1] ~out_ws:[x_1; x_0] ~alpha:2 ~delta:2 k j
       )
 
 let mk_DUP =
   (* opcdoe for DUP I *)
   mk ~id:"DUP" ~opcode:"80" ~disasm:"DUP" ~gas:3
     ~effect:(fun k j ->
-        let alpha = 2 and delta = 1 in
-        let diff = alpha - delta in
         let x_0 = mk_x 0 j in
-        enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] diff alpha k j
+        enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] ~alpha:2 ~delta:1 k j
       )
 
 let mk_NOP =
   mk ~id:"NOP" ~opcode:"" ~disasm:"NOP" ~gas:0
     ~effect:(fun k j ->
-        let alpha = 0 and delta = 0 in
-        let diff = alpha - delta in
-        enc_userdef ~in_ws:[] ~out_ws:[] diff alpha k j
+        enc_userdef ~in_ws:[] ~out_ws:[] ~alpha:0 ~delta:0 k j
       )
 
 let predef =
