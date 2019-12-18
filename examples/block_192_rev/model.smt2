@@ -31,7 +31,7 @@
 (define-fun x_0_3 () Int
   146)
 (define-fun a_3 () Int
-  147)
+  146)
 (define-fun u_2_3 () Bool
   false)
 (define-fun u_0_3 () Bool

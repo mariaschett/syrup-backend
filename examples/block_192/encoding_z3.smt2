@@ -7,38 +7,38 @@
 (declare-fun t_2 () Int)
 (declare-fun t_1 () Int)
 (declare-fun t_0 () Int)
-(declare-fun u_2_4 () Bool)
-(declare-fun u_2_3 () Bool)
-(declare-fun u_1_4 () Bool)
-(declare-fun u_1_3 () Bool)
-(declare-fun u_0_4 () Bool)
-(declare-fun x_2_3 () Int)
-(declare-fun x_1_4 () Int)
 (declare-fun s_1 () Int)
 (declare-fun x_0_4 () Int)
+(declare-fun u_2_3 () Bool)
 (declare-fun x_1_3 () Int)
+(declare-fun u_1_3 () Bool)
 (declare-fun s_0 () Int)
 (declare-fun x_0_3 () Int)
 (declare-fun u_0_3 () Bool)
+(declare-fun u_2_4 () Bool)
+(declare-fun u_1_4 () Bool)
+(declare-fun u_0_4 () Bool)
+(declare-fun x_2_3 () Int)
+(declare-fun x_1_4 () Int)
 (declare-fun x_2_4 () Int)
 (declare-fun u_2_2 () Bool)
-(declare-fun u_1_2 () Bool)
-(declare-fun x_2_2 () Int)
 (declare-fun x_1_2 () Int)
+(declare-fun u_1_2 () Bool)
 (declare-fun x_0_2 () Int)
 (declare-fun u_0_2 () Bool)
+(declare-fun x_2_2 () Int)
 (declare-fun u_2_1 () Bool)
-(declare-fun u_1_1 () Bool)
-(declare-fun x_2_1 () Int)
 (declare-fun x_1_1 () Int)
+(declare-fun u_1_1 () Bool)
 (declare-fun x_0_1 () Int)
 (declare-fun u_0_1 () Bool)
+(declare-fun x_2_1 () Int)
 (declare-fun u_2_0 () Bool)
-(declare-fun u_1_0 () Bool)
-(declare-fun x_2_0 () Int)
 (declare-fun x_1_0 () Int)
+(declare-fun u_1_0 () Bool)
 (declare-fun x_0_0 () Int)
 (declare-fun u_0_0 () Bool)
+(declare-fun x_2_0 () Int)
 (assert (let ((a!1 (and (= u_0_1 true) (= u_1_1 u_0_0) (= u_2_1 u_1_0)))
       (a!3 (and (= u_0_1 u_1_0) (= u_1_1 u_2_0) (= u_2_1 false)))
       (a!5 (and (= u_0_1 u_0_0) (= u_1_1 u_1_0) (= u_2_1 u_2_0)))
@@ -68,12 +68,15 @@
                     (=> u_2_1 (= x_2_1 x_2_0))
                     a!5)))
       (a!7 (=> (= 34 t_0)
-               (and u_0_0
+               (and a!1
+                    (=> u_2_1 (= x_2_1 x_1_0))
+                    a!1
+                    u_0_0
+                    (= x_0_0 x_0_0)
                     (not u_2_0)
                     (= x_0_1 x_0_0)
-                    (= x_1_1 x_0_0)
-                    (=> u_2_1 (= x_2_1 x_1_0))
-                    a!1)))
+                    (not u_1_0)
+                    (= x_1_1 x_0_0))))
       (a!8 (=> (= 35 t_0)
                (and (=> u_0_1 (= x_0_1 x_0_0))
                     (=> u_1_1 (= x_1_1 x_1_0))
@@ -81,14 +84,14 @@
                     a!5)))
       (a!9 (=> (= 36 t_0)
                (and a!3
+                    (=> u_1_1 (= x_1_1 x_2_0))
+                    a!3
                     u_0_0
                     (= x_0_0 s_0)
                     u_1_0
                     (= x_1_0 1)
                     (not u_2_0)
-                    (= x_0_1 s_1)
-                    (=> u_1_1 (= x_1_1 x_2_0))
-                    a!3)))
+                    (= x_0_1 s_1))))
       (a!11 (and (= x_0_2 a_1)
                  (=> u_1_2 (= x_1_2 x_0_1))
                  (=> u_2_2 (= x_2_2 x_1_1))
@@ -106,12 +109,15 @@
                      (=> u_2_2 (= x_2_2 x_2_1))
                      a!14)))
       (a!16 (=> (= 34 t_1)
-                (and u_0_1
+                (and a!10
+                     (=> u_2_2 (= x_2_2 x_1_1))
+                     a!10
+                     u_0_1
+                     (= x_0_1 x_0_1)
                      (not u_2_1)
                      (= x_0_2 x_0_1)
-                     (= x_1_2 x_0_1)
-                     (=> u_2_2 (= x_2_2 x_1_1))
-                     a!10)))
+                     (not u_1_1)
+                     (= x_1_2 x_0_1))))
       (a!17 (=> (= 35 t_1)
                 (and (=> u_0_2 (= x_0_2 x_0_1))
                      (=> u_1_2 (= x_1_2 x_1_1))
@@ -119,14 +125,14 @@
                      a!14)))
       (a!18 (=> (= 36 t_1)
                 (and a!12
+                     (=> u_1_2 (= x_1_2 x_2_1))
+                     a!12
                      u_0_1
                      (= x_0_1 s_0)
                      u_1_1
                      (= x_1_1 1)
                      (not u_2_1)
-                     (= x_0_2 s_1)
-                     (=> u_1_2 (= x_1_2 x_2_1))
-                     a!12)))
+                     (= x_0_2 s_1))))
       (a!20 (and (= x_0_3 a_2)
                  (=> u_1_3 (= x_1_3 x_0_2))
                  (=> u_2_3 (= x_2_3 x_1_2))
@@ -144,12 +150,15 @@
                      (=> u_2_3 (= x_2_3 x_2_2))
                      a!23)))
       (a!25 (=> (= 34 t_2)
-                (and u_0_2
+                (and a!19
+                     (=> u_2_3 (= x_2_3 x_1_2))
+                     a!19
+                     u_0_2
+                     (= x_0_2 x_0_2)
                      (not u_2_2)
                      (= x_0_3 x_0_2)
-                     (= x_1_3 x_0_2)
-                     (=> u_2_3 (= x_2_3 x_1_2))
-                     a!19)))
+                     (not u_1_2)
+                     (= x_1_3 x_0_2))))
       (a!26 (=> (= 35 t_2)
                 (and (=> u_0_3 (= x_0_3 x_0_2))
                      (=> u_1_3 (= x_1_3 x_1_2))
@@ -157,14 +166,14 @@
                      a!23)))
       (a!27 (=> (= 36 t_2)
                 (and a!21
+                     (=> u_1_3 (= x_1_3 x_2_2))
+                     a!21
                      u_0_2
                      (= x_0_2 s_0)
                      u_1_2
                      (= x_1_2 1)
                      (not u_2_2)
-                     (= x_0_3 s_1)
-                     (=> u_1_3 (= x_1_3 x_2_2))
-                     a!21)))
+                     (= x_0_3 s_1))))
       (a!29 (and (= x_0_4 a_3)
                  (=> u_1_4 (= x_1_4 x_0_3))
                  (=> u_2_4 (= x_2_4 x_1_3))
@@ -182,12 +191,15 @@
                      (=> u_2_4 (= x_2_4 x_2_3))
                      a!32)))
       (a!34 (=> (= 34 t_3)
-                (and u_0_3
+                (and a!28
+                     (=> u_2_4 (= x_2_4 x_1_3))
+                     a!28
+                     u_0_3
+                     (= x_0_3 x_0_3)
                      (not u_2_3)
                      (= x_0_4 x_0_3)
-                     (= x_1_4 x_0_3)
-                     (=> u_2_4 (= x_2_4 x_1_3))
-                     a!28)))
+                     (not u_1_3)
+                     (= x_1_4 x_0_3))))
       (a!35 (=> (= 35 t_3)
                 (and (=> u_0_4 (= x_0_4 x_0_3))
                      (=> u_1_4 (= x_1_4 x_1_3))
@@ -195,14 +207,14 @@
                      a!32)))
       (a!36 (=> (= 36 t_3)
                 (and a!30
+                     (=> u_1_4 (= x_1_4 x_2_3))
+                     a!30
                      u_0_3
                      (= x_0_3 s_0)
                      u_1_3
                      (= x_1_3 1)
                      (not u_2_3)
-                     (= x_0_4 s_1)
-                     (=> u_1_4 (= x_1_4 x_2_3))
-                     a!30))))
+                     (= x_0_4 s_1)))))
   (and (= x_0_0 s_0)
        (= u_0_0 true)
        (= u_1_0 false)

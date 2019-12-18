@@ -77,21 +77,6 @@ let mk_SWAP =
   (* opcode for SWAP I *)
   mk ~id ~alpha ~delta ~effect:(enc_swap diff alpha) ~opcode:"90" ~gas:3
 
-let enc_dup diff alpha k j =
-  let x_0 = mk_x 0 j and x'_0 = mk_x' 0 j in
-  let x'_1 = mk_x' 1 j in
-  let u_0 = mk_u 0 j and u_l = mk_u (k-1) j in
-  let open Z3Ops in
-  u_0 && ~! u_l &&
-  ((x'_0 == x_0) && (x'_1 == x_0) && enc_prsv k j diff alpha && enc_sk_utlz k j diff)
-
-let mk_DUP =
-  let id = "DUP" in
-  let alpha = 2 and delta = 1 in
-  let diff = alpha - delta in
-  (* opcdoe for DUP I *)
-  mk ~id ~alpha ~delta ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
-
 let enc_nop diff alpha k j =
   let open Z3Ops in
   enc_prsv k j diff alpha  && enc_sk_utlz k j diff
@@ -117,6 +102,17 @@ let mk_userdef id ~in_ws ~out_ws ~opcode ~gas =
   let delta = List.length in_ws and alpha = List.length out_ws in
   let diff = alpha - delta in
   mk ~id ~alpha ~delta ~effect:(enc_userdef ~in_ws ~out_ws diff alpha)  ~opcode ~gas
+
+let enc_dup diff alpha k j =
+  let x_0 = mk_x 0 j in
+  enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] diff alpha k j
+
+let mk_DUP =
+  let id = "DUP" in
+  let alpha = 2 and delta = 1 in
+  let diff = alpha - delta in
+  (* opcdoe for DUP I *)
+  mk ~id ~alpha ~delta ~effect:(enc_dup diff alpha) ~opcode:"80" ~gas:3
 
 let predef =
   let pushs = List.init 32 ~f:(fun i -> mk_PUSH (i+1)) in
