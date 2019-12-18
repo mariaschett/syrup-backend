@@ -30,7 +30,7 @@ type user_instr = {
 } [@@deriving yojson]
 
 let mk_user_instr ui =
-  Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas
+  Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas ~disasm:ui.disasm
     ~in_ws:(List.map ui.inpt_sk ~f:enc_user_word)
     ~out_ws:(List.map ui.outpt_sk ~f:enc_user_word)
 

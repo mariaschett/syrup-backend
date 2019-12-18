@@ -386,7 +386,7 @@ let nop = let enc_nop = (Instruction.mk_NOP).effect in
 let block_192_add_1 =
   let s_1 = mk_user_const "s_1" (* =^= ADD_1 *) in
   let s_0 = mk_user_const "s_0" (* =^= input variable on stack *) in
-  let mk_block_192 = Instruction.mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] ~gas:3 ~opcode:"01" in
+  let mk_block_192 = Instruction.mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] ~gas:3 ~opcode:"01" ~disasm:"ADD" in
   let enc_add_1 = mk_block_192.effect in
   [
     "forwards: ADD_1 puts s_1 on stack">:: (fun _ ->
@@ -481,7 +481,7 @@ let block_192_add_1 =
 
 let callvalue = [
   let s_0 = mk_user_const "s_0" in
-  let mk_callvalue = Instruction.mk_userdef "CALLVALUE_1" ~in_ws:[] ~out_ws:[s_0] ~gas:2 ~opcode:"34" in
+  let mk_callvalue = Instruction.mk_userdef "CALLVALUE_1" ~in_ws:[] ~out_ws:[s_0] ~gas:2 ~opcode:"34" ~disasm:"CALLVALUE" in
   let enc_callvalue = mk_callvalue.effect in
 
   "forwards: put callvalue on the stack">:: (fun _ ->
