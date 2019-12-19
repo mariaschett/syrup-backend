@@ -197,6 +197,38 @@ let int_map = [
 
 let gas_grouping =
   [
+  "Gas cost is ascending">:: (fun _ ->
+        let params = Params.mk Instruction.predef ups_1 in
+        let gg = Params.group_instr_by_gas params in
+      assert_bool ""
+        (List.is_sorted (List.map gg ~f:Tuple.T2.get1) ~compare:(Int.compare))
+    );
+
+    "Every instruction is in correct group">:: (fun _ ->
+        let params = Params.mk Instruction.predef ups_1 in
+        let gg = Params.group_instr_by_gas params in
+      assert_bool ""
+        (List.for_all gg
+           ~f:(fun (c, iotas) -> List.for_all iotas ~f:(fun iota -> c = iota.gas)))
+    );
+
+  "Every instruction is in at least one group">:: (fun _ ->
+        let params = Params.mk Instruction.predef ups_1 in
+        let gg = Params.group_instr_by_gas params in
+      assert_bool ""
+        (List.for_all params.instrs
+           ~f:(fun iota -> List.exists gg ~f:(fun (_, iotas) ->
+               List.mem iotas iota ~equal:(fun i1 i2 -> i1.id = i2.id))))
+    );
+
+  "Every instruction is in at most one group">:: (fun _ ->
+      let open Instruction in
+      let params = Params.mk Instruction.predef ups_1 in
+      let gg = Params.group_instr_by_gas params in
+      assert_bool ""
+        (not (List.contains_dup ~compare:(fun i1 i2 -> String.compare i1.id i2.id)
+                (List.concat (List.map gg ~f:Tuple.T2.get2))))
+    );
   ]
 
 let input = "{
