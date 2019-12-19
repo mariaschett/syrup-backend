@@ -51,7 +51,7 @@ let enc =
           k = 5;
           ss = ["s(1)"; "s(2)"];
           src_ws = [Const "s(1)"];
-          tgt_ws = [Const "s(1)"; Const "s(2)";];
+          tgt_ws = [Const "s(2)"; Const "s(1)"];
           user_instrs = [
             {
               id = "CALLVALUE_0";
@@ -70,7 +70,7 @@ let enc =
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        ["CALLVALUE"; "SWAP"; "NOP"; "NOP"; "NOP"; "NOP"]
+        ["CALLVALUE"; "NOP"; "NOP"; "NOP"; "NOP"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
 
