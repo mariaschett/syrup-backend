@@ -77,12 +77,16 @@ let mk_POP =
         enc_userdef ~in_ws:[x_0] ~out_ws:[] ~alpha:0 ~delta:1 k j
       )
 
-let mk_SWAP =
-  (* opcode for SWAP I *)
-  mk ~id:"SWAP" ~opcode:"90" ~disasm:"SWAP" ~gas:3
+let mk_SWAP idx =
+  let disasm = ("SWAP" ^ [%show: int] idx) in
+  let opcode = hex_add "90" (idx-1) in
+  mk ~id:disasm ~opcode ~disasm:disasm ~gas:3
     ~effect:(fun k j ->
-        let x_0 = mk_x 0 j and x_1 = mk_x 1 j in
-        enc_userdef ~in_ws:[x_0; x_1] ~out_ws:[x_1; x_0] ~alpha:2 ~delta:2 k j
+        let x_0 = mk_x 0 j and x_l = mk_x idx j in
+        let prsvd = List.map ~f:(fun i -> mk_x i j)
+            (List.range ~start:`inclusive 1 ~stop:`exclusive idx) in
+        enc_userdef ~in_ws:([x_0] @ prsvd @ [x_l]) ~out_ws:([x_l] @ prsvd @ [x_0])
+          ~alpha:(idx+1) ~delta:(idx+1) k j
       )
 
 let mk_DUP =
@@ -100,5 +104,4 @@ let mk_NOP =
       )
 
 let predef =
-  [mk_PUSH; mk_POP; mk_SWAP; mk_DUP; mk_NOP]
-
+  [mk_PUSH; mk_POP; mk_SWAP 1; mk_DUP; mk_NOP]

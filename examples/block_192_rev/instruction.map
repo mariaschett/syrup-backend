@@ -1,1 +1,1 @@
-PUSH : 0; POP : 1; SWAP : 2; DUP : 3; NOP : 4; ADD_1 : 5; 
+PUSH : 0; POP : 1; SWAP1 : 2; DUP : 3; NOP : 4; ADD_1 : 5; 
