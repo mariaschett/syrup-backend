@@ -106,5 +106,8 @@ let mk_NOP =
         enc_userdef ~in_ws:[] ~out_ws:[] ~alpha:0 ~delta:0 k j
       )
 
-let predef =
-  [mk_PUSH; mk_POP; mk_SWAP 1; mk_DUP 1; mk_NOP]
+let predef ~k =
+  let max_idx = Int.min (k-1) 16 in
+  [mk_PUSH; mk_POP; mk_NOP] @
+  (List.map ~f:mk_SWAP (List.range ~start:`inclusive 1 ~stop:`inclusive max_idx)) @
+  (List.map ~f:mk_DUP (List.range ~start:`inclusive 1 ~stop:`inclusive max_idx))

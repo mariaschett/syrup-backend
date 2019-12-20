@@ -95,7 +95,7 @@ let user_instrs = [
       let ps = Params.mk Instruction.predef ups_0 in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
-        (List.length Instruction.predef)
+        (List.length (Instruction.predef ~k:ps.k))
         (List.length ps.instrs)
     );
 
@@ -103,7 +103,7 @@ let user_instrs = [
       let ps = Params.mk Instruction.predef ups_1 in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
-        ((List.length Instruction.predef) + 1)
+        ((List.length (Instruction.predef ~k:ps.k)) + 1)
         (List.length ps.instrs)
     );
 
@@ -111,7 +111,7 @@ let user_instrs = [
       let ps = Params.mk Instruction.predef ups_2 in
       assert_equal
         ~cmp:[%eq: int] ~printer:[%show: int]
-        ((List.length Instruction.predef) + 2)
+        ((List.length (Instruction.predef ~k:ps.k)) + 2)
         (List.length ps.instrs)
     );
 

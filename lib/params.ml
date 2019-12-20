@@ -15,7 +15,7 @@ type params = {
 let mk predef user_params =
   let open User_params in
   let max_wsz = Z.pow (Z.of_int 2) 256 in
-  let instrs =  predef @ (List.map user_params.user_instrs ~f:User_params.mk_user_instr) in
+  let instrs =  predef ~k:user_params.k @ (List.map user_params.user_instrs ~f:User_params.mk_user_instr) in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
   { instrs = instrs;
     instr_int_map = map;
