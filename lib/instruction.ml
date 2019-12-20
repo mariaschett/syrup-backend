@@ -89,12 +89,15 @@ let mk_SWAP idx =
           ~alpha:(idx+1) ~delta:(idx+1) k j
       )
 
-let mk_DUP =
-  (* opcdoe for DUP I *)
-  mk ~id:"DUP" ~opcode:"80" ~disasm:"DUP" ~gas:3
+let mk_DUP idx =
+  let disasm = ("DUP" ^ [%show: int] idx) in
+  let opcode = hex_add "80" (idx-1) in
+  mk ~id:disasm ~opcode:opcode ~disasm:disasm ~gas:3
     ~effect:(fun k j ->
-        let x_0 = mk_x 0 j in
-        enc_userdef ~in_ws:[x_0] ~out_ws:[x_0; x_0] ~alpha:2 ~delta:1 k j
+        let x_idx = mk_x (idx-1) j in
+        let prsvd = List.map ~f:(fun i -> mk_x i j)
+            (List.range ~start:`inclusive 0 ~stop:`exclusive (idx-1)) in
+        enc_userdef ~in_ws:(prsvd @ [x_idx]) ~out_ws:([x_idx] @ prsvd @ [x_idx]) ~alpha:(idx+1) ~delta:idx k j
       )
 
 let mk_NOP =
@@ -104,4 +107,4 @@ let mk_NOP =
       )
 
 let predef =
-  [mk_PUSH; mk_POP; mk_SWAP 1; mk_DUP; mk_NOP]
+  [mk_PUSH; mk_POP; mk_SWAP 1; mk_DUP 1; mk_NOP]

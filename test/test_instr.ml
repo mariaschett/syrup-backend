@@ -335,13 +335,13 @@ let swap3 =
       );
   ]
 
-let dup = let enc_dup = (Instruction.mk_DUP).effect in
+let dup1 = let enc_dup1 = (Instruction.mk_DUP 1).effect in
   [
-    "forwards: DUP word on stack">:: (fun _ ->
+    "forwards: DUP1 word on stack">:: (fun _ ->
         let k = 4 and j = 0 in
         let vals = [num 21; num 2;] in
         let c = sk_init k j vals in
-        let c' = enc_dup k j in
+        let c' = enc_dup1 k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -350,11 +350,11 @@ let dup = let enc_dup = (Instruction.mk_DUP).effect in
           (List.map [Consts.mk_x 0 (j+1); Consts.mk_x 1 (j+1)] ~f:(eval_const m))
       );
 
-    "forwards: DUP preserves words">:: (fun _ ->
+    "forwards: DUP1 preserves words">:: (fun _ ->
         let k = 4 and j = 0 in
         let vals = [num 1; num 2;] in
         let c = sk_init k j vals in
-        let c' = enc_dup k j in
+        let c' = enc_dup1 k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -363,11 +363,11 @@ let dup = let enc_dup = (Instruction.mk_DUP).effect in
           (List.map [Consts.mk_x 2 (j+1)] ~f:(eval_const m))
       );
 
-    "forwards: DUP utilization of stack">:: (fun _ ->
+    "forwards: DUP1 utilization of stack">:: (fun _ ->
         let k = 4 and j = 0 in
         let vals = [num 1; num 2;] in
         let c = sk_init k j vals in
-        let c' = enc_dup k j in
+        let c' = enc_dup1 k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -376,11 +376,11 @@ let dup = let enc_dup = (Instruction.mk_DUP).effect in
           (List.map (u's k j) ~f:(eval_const m))
       );
 
-    "backwards: DUP word on stack">:: (fun _ ->
+    "backwards: DUP1 word on stack">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 21; num 21; num 2;] in
         let c' = sk_init k (j+1) vals in
-        let c = enc_dup k j in
+        let c = enc_dup1 k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -389,11 +389,11 @@ let dup = let enc_dup = (Instruction.mk_DUP).effect in
           (List.map [Consts.mk_x 0 j] ~f:(eval_const m))
       );
 
-    "backwards: DUP preserves words">:: (fun _ ->
+    "backwards: DUP1 preserves words">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 21; num 21; num 2;] in
         let c' = sk_init k (j+1) vals in
-        let c = enc_dup k j in
+        let c = enc_dup1 k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -402,11 +402,11 @@ let dup = let enc_dup = (Instruction.mk_DUP).effect in
           (List.map [Consts.mk_x 1 j] ~f:(eval_const m))
       );
 
-    "backwards: DUP utilization of stack">:: (fun _ ->
+    "backwards: DUP1 utilization of stack">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 21; num 21; num 2;] in
         let c' = sk_init k (j+1) vals in
-        let c = enc_dup k j in
+        let c = enc_dup1 k j in
         let m = solve_model_exn [c; c'] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -415,19 +415,103 @@ let dup = let enc_dup = (Instruction.mk_DUP).effect in
           (List.map (us k j) ~f:(eval_const m))
       );
 
-    "Cannot DUP on full stack">:: (fun _ ->
+    "Cannot DUP1 on full stack">:: (fun _ ->
         let k = 3 and j = 0 in
         let vals = [num 3; num 2; num 3] in
         let c = sk_init k j vals in
-        let c' = enc_dup k j in
+        let c' = enc_dup1 k j in
         assert_bool "" (is_unsat [c; c'] )
       );
 
-    "Cannot DUP on emtpy stack">:: (fun _ ->
+    "Cannot DUP1 on emtpy stack">:: (fun _ ->
         let k = 3 and j = 0 in
         let vals = [] in
         let c = sk_init k j vals in
-        let c' = enc_dup k j in
+        let c' = enc_dup1 k j in
+        assert_bool "" (is_unsat [c; c'] )
+      );
+  ]
+
+let dup10 = let enc_dup10 = (Instruction.mk_DUP 10).effect in
+  [
+    "forwards: DUP10 word on stack">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = List.init 10 ~f:(fun i -> num (i+1)) in
+        let c = sk_init k j vals in
+        let c' = enc_dup10 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [num 10; num 10]
+          (List.map [Consts.mk_x' 0 j; Consts.mk_x' 10 j] ~f:(eval_const m))
+      );
+
+    "forwards: DUP10 preserves words within range of DUP">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = List.init 10 ~f:(fun i -> num (i+1)) in
+        let c = sk_init k j vals in
+        let c' = enc_dup10 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          vals
+          (List.map (List.mapi vals ~f:(fun i _ -> Consts.mk_x' (i+1) j)) ~f:(eval_const m))
+      );
+
+    "forwards: DUP10 preserves words out of range of DUP">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = (List.init 10 ~f:(fun i -> num (i+1))) @ [num 42] in
+        let c = sk_init k j vals in
+        let c' = enc_dup10 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [num 42;]
+          (List.map [Consts.mk_x' 11 j] ~f:(eval_const m))
+      );
+
+    "forwards: DUP10 utilization of stack">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = List.init 10 ~f:(fun i -> num (i+1)) in
+        let c = sk_init k j vals in
+        let c' = enc_dup10 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          ((List.init 10 ~f:(fun _ -> top)) @ [top; btm])
+          (List.map (u's k j) ~f:(eval_const m))
+      );
+
+    "backwards: DUP10 word on stack">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = [num 42; num 2; num 3; num 4; num 5; num 6; num 7; num 8; num 9; num 10; num 42] in
+        let c' = sk_init k (j+1) vals in
+        let c = enc_dup10 k j in
+        let m = solve_model_exn [c; c'] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t list]
+          ~printer:(List.to_string ~f:Z3.Expr.to_string)
+          [num 42;]
+          (List.map [Consts.mk_x 9 j] ~f:(eval_const m))
+      );
+
+    "Cannot DUP1 on full stack">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = List.init 12 ~f:(fun i -> num (i+1)) in
+        let c = sk_init k j vals in
+        let c' = enc_dup10 k j in
+        assert_bool "" (is_unsat [c; c'] )
+      );
+
+    "Cannot DUP10 on stack with 9 words">:: (fun _ ->
+        let k = 12 and j = 0 in
+        let vals = List.init 9 ~f:(fun i -> num (i+1)) in
+        let c = sk_init k j vals in
+        let c' = enc_dup10 k j in
         assert_bool "" (is_unsat [c; c'] )
       );
   ]
@@ -580,7 +664,7 @@ let callvalue = [
 
 let suite = "suite" >:::
             push @ pop @ swap1 @ swap3
-            @ dup @ nop @ block_192_add_1 @ callvalue
+            @ dup1 @ dup10 @ nop @ block_192_add_1 @ callvalue
 
 let () =
   run_test_tt_main suite

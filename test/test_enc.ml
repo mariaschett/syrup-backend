@@ -41,7 +41,7 @@ let enc =
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        ["DUP"; "NOP"; "NOP"]
+        ["DUP1"; "NOP"; "NOP"]
         (Outpt.show_disasm mdl params)
       );
 
