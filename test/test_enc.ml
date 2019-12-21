@@ -11,7 +11,7 @@ let enc =
           k = 3;
           ss = [];
           src_ws = [];
-          tgt_ws = [Val 146];
+          tgt_ws = [Val (Z.of_int 146)];
           user_instrs = []
         } in
         let params = Params.mk predef ups in

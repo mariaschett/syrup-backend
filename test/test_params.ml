@@ -8,7 +8,7 @@ let ups_0 = {
   k = 3;
   ss = ["s_0";];
   src_ws = [Const "s_0"];
-  tgt_ws = [Val 146; Const "s_0"];
+  tgt_ws = [Val (Z.of_int 146); Const "s_0"];
   user_instrs = []
 }
 
@@ -56,7 +56,7 @@ let add_1 = {
   id = "ADD_1";
   opcode = "00";
   disasm = "ADD";
-  inpt_sk = [Const "s_0"; Val 1];
+  inpt_sk = [Const "s_0"; Val (Z.of_int 1)];
   outpt_sk = [Const "s_1"];
   gas = 3;
 }
@@ -66,7 +66,7 @@ let ups_1 =
     k = 3;
     ss = ["s_0"; "s_1"];
     src_ws = [Const "s_0"];
-    tgt_ws = [Val 146; Const "s_1"];
+    tgt_ws = [Val (Z.of_int 146); Const "s_1"];
     user_instrs = [add_1]
   }
 

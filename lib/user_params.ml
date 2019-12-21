@@ -3,20 +3,21 @@ open Z3util
 open Consts
 
 type user_word =
-  | Val of int
+  | Val of Z.t
   | Const of user_const
 
 let user_word_to_yojson = function
-  | Val i -> [%to_yojson: int] i
+  | Val i -> [%to_yojson: string] (Z.to_string i)
   | Const c -> [%to_yojson: string] c
 
 let user_word_of_yojson = function
-  | `Int i -> Ok (Val i)
+  | `Int i -> Ok (Val (Z.of_int i))
+  | `Intlit i -> Ok (Val (Z.of_string i))
   | `String s -> Ok (Const s)
   | _ -> Error "Cannot parse word. Either variable (string) or value (int) required."
 
 let enc_user_word = function
-  | Val v -> num v
+  | Val v -> bignum v
   | Const c -> mk_user_const c
 
 (* user defined instruction *)

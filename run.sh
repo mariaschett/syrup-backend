@@ -1,5 +1,4 @@
 #!/bin/bash
-make
 Z3DIR=$(ocamlfind query z3)
 
 DIR=$(dirname "$(realpath "$0")")
