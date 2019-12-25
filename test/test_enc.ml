@@ -5,6 +5,26 @@ open Instruction
 
 let enc =
   [
+    "Program with 0 length">:: (fun _ ->
+        let ups = {
+          n = 0;
+          k = 3;
+          ss = ["s_0"; "s_1"];
+          src_ws = [Const "s_0";Const  "s_1"];
+          tgt_ws = [Const "s_0"; Const "s_1"];
+          user_instrs = []
+        } in
+        let params = Params.mk predef ups in
+        let enc = Enc.enc_block params in
+        let enc_weights = Enc.enc_weight params in
+        let mdl = Z3util.solve_max_model_exn enc enc_weights in
+        assert_equal
+        ~cmp:[%eq: string list]
+        ~printer:[%show: string list]
+        []
+        (Outpt.show_disasm mdl params)
+      );
+
     "Program pushing 146 on the stack">:: (fun _ ->
         let ups = {
           n = 2;
