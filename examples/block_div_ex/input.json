@@ -1,0 +1,25 @@
+{
+  "max_progr_len": 6,
+  "max_sk_sz": 6,
+    "vars": [ "x_0", "x_1", "x_2", "x_3", "x_0/x_1", "x_2/x_3" ],
+  "src_ws": [ "x_0", "x_1", "x_2", "x_3" ],
+  "tgt_ws": [ "x_0/x_1", "x_2/x_3" ],
+  "user_instrs": [
+    {
+      "id": "DIV_1",
+      "opcode": "04",
+      "disasm": "DIV",
+      "inpt_sk": [ "x_0", "x_1" ],
+      "outpt_sk": [ "x_0/x_1" ],
+      "gas": 5
+    },
+    {
+      "id": "DIV_2",
+      "opcode": "04",
+      "disasm": "DIV",
+      "inpt_sk": [ "x_2", "x_3" ],
+      "outpt_sk": [ "x_2/x_3" ],
+      "gas": 5
+    }
+  ]
+}
