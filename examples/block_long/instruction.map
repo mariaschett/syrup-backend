@@ -1,0 +1,1 @@
+PUSH : 0; POP : 1; NOP : 2; SWAP1 : 3; SWAP2 : 4; SWAP3 : 5; SWAP4 : 6; SWAP5 : 7; SWAP6 : 8; DUP1 : 9; DUP2 : 10; DUP3 : 11; DUP4 : 12; DUP5 : 13; DUP6 : 14; ADD_0 : 15; EXP_0 : 16; ADD_1 : 17; 
