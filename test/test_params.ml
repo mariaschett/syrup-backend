@@ -9,7 +9,8 @@ let ups_0 = {
   ss = ["s_0";];
   src_ws = [Const "s_0"];
   tgt_ws = [Val (Z.of_int 146); Const "s_0"];
-  user_instrs = []
+  user_instrs = [];
+  current_cost = 9;
 }
 
 let sk = [
@@ -67,7 +68,8 @@ let ups_1 =
     ss = ["s_0"; "s_1"];
     src_ws = [Const "s_0"];
     tgt_ws = [Val (Z.of_int 146); Const "s_1"];
-    user_instrs = [add_1]
+    user_instrs = [add_1];
+    current_cost = 9;
   }
 
 let timestamp = {
@@ -85,7 +87,8 @@ let ups_2 =
     ss = ["s_0"; "s_1"; "s_2"];
     src_ws = [Const "s_0"];
     tgt_ws = [Const "s_2"; Const "s_1"];
-    user_instrs = [add_1; timestamp]
+    user_instrs = [add_1; timestamp];
+    current_cost = 9;
   }
 
 
@@ -237,6 +240,7 @@ let input = "{
   \"vars\": [ \"s(0)\", \"s(1)\" ],
   \"src_ws\": [ \"s(0)\" ],
   \"tgt_ws\": [ 146, \"s(1)\" ],
+  \"current_cost\": 9,
   \"user_instrs\": [
     {
       \"id\": \"ADD_1\",
