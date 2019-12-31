@@ -95,13 +95,14 @@ let utlz = [
 
 let prsv =
   [
-    "All stack is preserved">:: (fun _ ->
+    "All stack is preserved (NOP)">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2;] in
         let l = List.length vals in
-        let diff = 0 in
+        let alpha = 0 and delta = 0 in
+        let diff = alpha - delta in
         let c = sk_init k j vals in
-        let c' = enc_prsv_from_diff k j diff 0 and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -110,13 +111,14 @@ let prsv =
           (List.map (Consts.x's l j) ~f:(eval_const m))
       );
 
-    "Stack is preserved after index 2">:: (fun _ ->
+    "Stack is preserved for adding and deleting two words">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals_prsv = [num 3; num 4;] in
         let vals_chng = [num 1; num 2;] in
-        let diff = 0 in
+        let alpha = 2 and delta = 2 in
+        let diff = alpha - delta in
         let c = sk_init k j (vals_chng @ vals_prsv) in
-        let c' = enc_prsv_from_diff k j diff 2 and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -125,12 +127,13 @@ let prsv =
           (List.map [Consts.mk_x' 2 j; Consts.mk_x' 3 j] ~f:(eval_const m))
       );
 
-    "Stack is preserved after moving one element up from index 1">:: (fun _ ->
+    "Stack is preserved after adding one word">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
-        let diff = 1 in
+        let alpha = 1 and delta = 0 in
+        let diff = alpha - delta  in
         let c = sk_init k j vals in
-        let c' = enc_prsv_from_diff k j diff 1 and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -139,12 +142,13 @@ let prsv =
           (List.map [Consts.mk_x 2 (j+1); Consts.mk_x 3 (j+1)] ~f:(eval_const m))
       );
 
-    "Stack is preserved after moving one element down from index 0">:: (fun _ ->
+    "Stack is preserved after deleting one word">:: (fun _ ->
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
-        let diff = (-1) in
+        let alpha = 0 and delta = 1 in
+        let diff = alpha - delta  in
         let c = sk_init k j vals in
-        let c' = enc_prsv_from_diff k j diff 0 and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
