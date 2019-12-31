@@ -4,6 +4,7 @@
   "vars": [ "s_0", "s_1" ],
   "src_ws": [ "s_0" ],
   "tgt_ws": [ 146, "s_1" ],
+  "current_cost": 12,
   "user_instrs": [
     {
       "id": "ADD_1",
