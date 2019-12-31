@@ -33,12 +33,14 @@ let enc_sk_utlz k j diff = enc_sk_utlz_shft k j diff
 
 (* preserve *)
 
-let enc_prsv k j ~alpha ~delta =
-  let diff = alpha - delta in
-  let u' i = mk_u' i j in
-  let x i = mk_x (i-diff) j and x' i = mk_x' i j in
+let idxs_to_shift k alpha delta =
   (* to avoid generating x_k_j *)
-  let k = if diff < 0 then k - abs(diff) else k in
-  let ks = List.range ~start:`inclusive ~stop:`exclusive alpha k in
+  let k = if alpha > delta then k - alpha + delta else k in
+  List.range ~start:`inclusive delta ~stop:`exclusive k
+
+let enc_prsv k j ~alpha ~delta =
+  let u i = mk_u i j in
+  let x i = mk_x i j and x' i = mk_x' (i - delta + alpha) j in
+  let idx = idxs_to_shift k alpha delta in
   let open Z3Ops in
-  conj (List.map ks ~f:(fun i -> u' i ==> (x' i == x i)))
+  conj (List.map idx ~f:(fun i -> u i ==> (x' i == x i)))
