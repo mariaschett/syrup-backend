@@ -34,7 +34,7 @@ let enc_sk_utlz k j diff = enc_sk_utlz_shft k j diff
 (* preserve *)
 
 let idxs_to_shift k alpha delta =
-  (* to avoid generating x_k_j *)
+  (* to avoid generating x_l_j for l >= k *)
   let k = if alpha > delta then k - alpha + delta else k in
   List.range ~start:`inclusive delta ~stop:`exclusive k
 
