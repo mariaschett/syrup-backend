@@ -39,7 +39,7 @@ let () =
         let enc_weights = Enc.enc_weight params in
         let obj = Z3util.get_objectives enc enc_weights in
         (* write files *)
-        let path = (Filename.dirname fn) in
+        let path = Filename.dirname fn in
         write_smt Z3 ~path ~data:(show_z3_smt enc enc_weights);
         write_smt BCLT ~path ~data:(show_blcg_smt enc enc_weights);
         write_map (path^"/instruction") params;
