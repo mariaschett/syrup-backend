@@ -15,26 +15,30 @@ let string_of_slvr = function
   | Z3 -> "z3"
   | BCLT -> "bclt"
 
-let show_smt enc enc_weights =
-  (* hack to set logic, there should be an API call *)
-  "(set-logic QF_LIA)\n" ^
-  Z3util.show_smt enc enc_weights ^
-  (* hack to get model, there should be an API call *)
-  "(get-model)\n"
-
-let show_z3_smt enc enc_weights =
-  show_smt enc enc_weights ^
+let show_z3_smt cmn_smt =
+  cmn_smt ^
   (* hack to get objectives, there should be an API call *)
   "(get-objectives)\n"
 
-let show_blcg_smt enc enc_weights =
+let show_blct_smt cmn_smt =
   let open String.Search_pattern in
   (* barcelogic requires different start of assert-soft *)
   let op = "assert-soft (" and op' = "assert-soft (! (" in
   (* barcelogic requires additional ) of assert-soft *)
   let cp =  "gas)" and  cp' = "gas))" in
-  let replacd_op = replace_all (create op) ~in_:(show_smt enc enc_weights) ~with_:op' in
+  let replacd_op = replace_all (create op) ~in_:cmn_smt ~with_:op' in
   replace_all ~in_:replacd_op (create cp) ~with_:cp'
+
+let show_smt slvr enc enc_weights =
+  let cmn_smt =
+    (* hack to set logic, there should be an API call *)
+    "(set-logic QF_LIA)\n" ^
+    Z3util.show_smt enc enc_weights ^
+    (* hack to get model, there should be an API call *)
+    "(get-model)\n"
+  in match slvr with
+  | Z3 -> show_z3_smt cmn_smt
+  | BCLT -> show_blct_smt cmn_smt
 
 let write_smt ~data ~path slvr =
   let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in

@@ -40,8 +40,8 @@ let () =
         let obj = Z3util.get_objectives enc enc_weights in
         (* write files *)
         let path = Filename.dirname fn in
-        write_smt Z3 ~path ~data:(show_z3_smt enc enc_weights);
-        write_smt BCLT ~path ~data:(show_blcg_smt enc enc_weights);
+        write_smt Z3 ~path ~data:(show_smt Z3 enc enc_weights);
+        write_smt BCLT ~path ~data:(show_smt BCLT enc enc_weights);
         write_map (path^"/instruction") params;
         write_objectives (path^"/objectives") ~data:obj;
         let mdl = Z3util.solve_max_model_exn enc enc_weights in
