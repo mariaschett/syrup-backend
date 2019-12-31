@@ -11,6 +11,10 @@ let slvr_of_string = function
   | "BCLT" -> BCLT
   | _ -> failwith "Unknown solver."
 
+let string_of_slvr = function
+  | Z3 -> "z3"
+  | BCLT -> "bclt"
+
 let show_smt enc enc_weights =
   (* hack to set logic, there should be an API call *)
   "(set-logic QF_LIA)\n" ^
@@ -32,8 +36,9 @@ let show_blcg_smt enc enc_weights =
   let replacd_op = replace_all (create op) ~in_:(show_smt enc enc_weights) ~with_:op' in
   replace_all ~in_:replacd_op (create cp) ~with_:cp'
 
-let write_smt fn ~data =
-  Out_channel.write_all (fn^".smt2") ~data:data
+let write_smt ~data ~path slvr =
+  let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in
+  Out_channel.write_all ~data fn
 
 let write_map fn params =
   Out_channel.write_all (fn^".map") ~data:(Params.show_instr_to_int params)
