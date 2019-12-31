@@ -45,18 +45,21 @@ let show_opcode ?arg:(arg=None) iota =
     (hex_add iota.opcode (idx-1) ^ (show_hex arg))
   else iota.opcode
 
+let enc_semtc ~in_ws ~out_ws ~alpha ~delta k j =
+  let out_idxs = List.range ~start:`inclusive (k - alpha + delta) ~stop:`exclusive k in
+  let x i = mk_x i j and x' i = mk_x' i j in
+  let u i = mk_u i j in
+  let open Z3Ops in
+  conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
+  conj (List.mapi out_ws ~f:(fun i w -> x' i == w)) &&
+  conj (List.map out_idxs ~f:(fun i -> ~! (u i)))
+
 let enc_userdef ~in_ws ~out_ws k j =
   let delta = List.length in_ws and alpha = List.length out_ws in
   let diff = alpha - delta in
-  let x i = mk_x i j and x' i = mk_x' i j in
-  let u i = mk_u i j and u_l i = mk_u (k-1-i) j in
   let open Z3Ops in
-  let effect =
-    conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
-    conj (List.mapi out_ws ~f:(fun i w -> x' i == w)) &&
-    conj (List.init (Int.max 0 diff) ~f:(fun i -> ~! (u_l i)))
-  in
-  enc_prsv k j diff alpha && enc_sk_utlz k j diff && effect
+  enc_semtc ~in_ws ~out_ws ~alpha ~delta k j &&
+  enc_prsv k j diff alpha && enc_sk_utlz k j diff
 
 let mk_userdef id ~in_ws ~out_ws ~opcode ~gas ~disasm =
   mk ~id ~effect:(enc_userdef ~in_ws ~out_ws) ~opcode ~gas ~disasm
