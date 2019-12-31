@@ -42,5 +42,6 @@ let enc_prsv_from_diff k j diff l =
   let open Z3Ops in
   conj (List.map ks ~f:(fun i -> u' i ==> (x' i == x i)))
 
-let enc_prsv k j diff alpha =
+let enc_prsv k j ~alpha ~delta =
+  let diff = alpha - delta in
   enc_prsv_from_diff k j diff alpha

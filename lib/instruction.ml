@@ -59,7 +59,7 @@ let enc_userdef ~in_ws ~out_ws k j =
   let diff = alpha - delta in
   let open Z3Ops in
   enc_semtc ~in_ws ~out_ws ~alpha ~delta k j &&
-  enc_prsv k j diff alpha && enc_sk_utlz k j diff
+  enc_prsv k j ~alpha ~delta && enc_sk_utlz k j diff
 
 let mk_userdef id ~in_ws ~out_ws ~opcode ~gas ~disasm =
   mk ~id ~effect:(enc_userdef ~in_ws ~out_ws) ~opcode ~gas ~disasm
