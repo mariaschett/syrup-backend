@@ -12,6 +12,7 @@ let enc =
           ss = ["s_0"; "s_1"];
           src_ws = [Const "s_0";Const  "s_1"];
           tgt_ws = [Const "s_0"; Const "s_1"];
+          current_cost = 9;
           user_instrs = []
         } in
         let params = Params.mk predef ups in
@@ -32,6 +33,7 @@ let enc =
           ss = [];
           src_ws = [];
           tgt_ws = [Val (Z.of_int 146)];
+          current_cost = 9;
           user_instrs = []
         } in
         let params = Params.mk predef ups in
@@ -52,6 +54,7 @@ let enc =
           ss = ["s_0"];
           src_ws = [Const "s_0"];
           tgt_ws = [Const "s_0"; Const "s_0"];
+          current_cost = 9;
           user_instrs = []
         } in
         let params = Params.mk predef ups in
@@ -72,6 +75,7 @@ let enc =
           ss = ["s(1)"; "s(2)"];
           src_ws = [Const "s(1)"];
           tgt_ws = [Const "s(2)"; Const "s(1)"];
+          current_cost = 9;
           user_instrs = [
             {
               id = "CALLVALUE_0";
