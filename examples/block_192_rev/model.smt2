@@ -14,12 +14,12 @@
   true)
 (define-fun x_1_1 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639936)
+(define-fun a_2 () Int
+  146)
 (define-fun x_1_3 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639937)
 (define-fun x_2_3 () Int
   7)
-(define-fun a_2 () Int
-  146)
 (define-fun a_1 () Int
   0)
 (define-fun x_2_0 () Int
@@ -35,7 +35,7 @@
 (define-fun x_1_0 () Int
   3)
 (define-fun a_3 () Int
-  147)
+  145)
 (define-fun u_2_3 () Bool
   false)
 (define-fun u_0_3 () Bool
