@@ -2,6 +2,15 @@ open Core
 open Consts
 open Params
 
+type slvr =
+    Z3
+  | BCLT
+
+let slvr_of_string = function
+  | "Z3" -> Z3
+  | "BCLT" -> BCLT
+  | _ -> failwith "Unknown solver."
+
 let show_smt enc enc_weights =
   (* hack to set logic, there should be an API call *)
   "(set-logic QF_LIA)\n" ^
