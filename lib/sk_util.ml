@@ -18,7 +18,8 @@ let enc_sk_utlz_init k l =
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u i == is_utlzd i))
 
-let enc_sk_utlz_shft k j diff =
+let enc_sk_utlz k j ~alpha ~delta =
+  let diff = alpha - delta in
   let u' i = mk_u' i j in
   let u i = mk_u i j in
   let shft i =
@@ -28,8 +29,6 @@ let enc_sk_utlz_shft k j diff =
   in
   let open Z3Ops in
   conj (List.init k ~f:(fun i -> u' i == shft i))
-
-let enc_sk_utlz k j diff = enc_sk_utlz_shft k j diff
 
 (* preserve *)
 

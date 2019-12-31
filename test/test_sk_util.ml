@@ -100,9 +100,8 @@ let prsv =
         let vals = [num 1; num 2;] in
         let l = List.length vals in
         let alpha = 0 and delta = 0 in
-        let diff = alpha - delta in
         let c = sk_init k j vals in
-        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j ~alpha ~delta in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -116,9 +115,8 @@ let prsv =
         let vals_prsv = [num 3; num 4;] in
         let vals_chng = [num 1; num 2;] in
         let alpha = 2 and delta = 2 in
-        let diff = alpha - delta in
         let c = sk_init k j (vals_chng @ vals_prsv) in
-        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j ~alpha ~delta in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -131,9 +129,8 @@ let prsv =
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let alpha = 1 and delta = 0 in
-        let diff = alpha - delta  in
         let c = sk_init k j vals in
-        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j ~alpha ~delta in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
@@ -146,9 +143,8 @@ let prsv =
         let k = 4 and j = 2 in
         let vals = [num 1; num 2; num 3;] in
         let alpha = 0 and delta = 1 in
-        let diff = alpha - delta  in
         let c = sk_init k j vals in
-        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j diff in
+        let c' = enc_prsv k j ~alpha ~delta and c'' = enc_sk_utlz k j ~alpha ~delta in
         let m = solve_model_exn [c; c'; c''] in
         assert_equal
           ~cmp:[%eq: Z3.Expr.t list]
