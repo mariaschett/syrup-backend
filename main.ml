@@ -33,7 +33,7 @@ let () =
           ~doc:"print constraint given to solver in SMT-LIB format"
       and slvr = flag "solver"
           (optional (Arg_type.create slvr_of_string))
-          ~doc:"choose solver Z3 | BCLT"
+          ~doc:"choose solver Z3 | BCLT | OMS"
       and
         fn = anon ("USER_PARAMS" %: string)
       in
@@ -67,6 +67,7 @@ let () =
           | Z3 ->
             let result = exec_slvr ("z3 -T:"^ time_out ^" -in ") enc_z3
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
-          | _ -> failwith "not implemented yet"
+          | BCLT -> failwith "not implemented yet"
+          | OMS -> failwith "not implemented yet"
     ]
   |> Command.run ~version:"0.0"

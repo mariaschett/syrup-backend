@@ -5,15 +5,18 @@ open Params
 type slvr =
     Z3
   | BCLT
+  | OMS
 
 let slvr_of_string = function
   | "Z3" -> Z3
   | "BCLT" -> BCLT
+  | "OMS" -> BCLT
   | _ -> failwith "Unknown solver."
 
 let string_of_slvr = function
   | Z3 -> "z3"
   | BCLT -> "bclt"
+  | OMS -> "oms"
 
 let show_z3_smt cmn_smt =
   cmn_smt ^
@@ -39,6 +42,7 @@ let show_smt slvr enc enc_weights =
   in match slvr with
   | Z3 -> show_z3_smt cmn_smt
   | BCLT -> show_blct_smt cmn_smt
+  | OMS -> show_z3_smt cmn_smt
 
 let write_smt ~data ~path slvr =
   let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in
