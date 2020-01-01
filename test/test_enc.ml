@@ -83,6 +83,7 @@ let enc =
               disasm = "CALLVALUE";
               inpt_sk = [];
               outpt_sk = [Const "s(2)"];
+              commutative = true;
               gas = 2;}
           ];
         }

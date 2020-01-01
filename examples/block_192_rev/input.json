@@ -12,6 +12,7 @@
       "disasm": "ADD",
       "inpt_sk": [ 1, "s_0" ],
       "outpt_sk": [ "s_1" ],
+      "commutative" : true,
       "gas": 3
     }
   ]

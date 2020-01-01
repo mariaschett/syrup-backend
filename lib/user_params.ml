@@ -27,6 +27,7 @@ type user_instr = {
   disasm : string;
   inpt_sk : user_word list;
   outpt_sk : user_word list;
+  commutative : bool;
   gas : int;
 } [@@deriving yojson]
 

@@ -59,6 +59,7 @@ let add_1 = {
   disasm = "ADD";
   inpt_sk = [Const "s_0"; Val (Z.of_int 1)];
   outpt_sk = [Const "s_1"];
+  commutative = true;
   gas = 3;
 }
 
@@ -78,6 +79,7 @@ let timestamp = {
   disasm = "TIMESTAMP";
   inpt_sk = [];
   outpt_sk = [Const "s_2"];
+  commutative = false;
   gas = 2;
 }
 
@@ -248,6 +250,7 @@ let input = "{
       \"disasm\": \"ADD\",
       \"inpt_sk\": [ \"s(0)\", 1 ],
       \"outpt_sk\": [ \"s(1)\" ],
+      \"commutative\" : true,
       \"gas\": 3
     }
   ]

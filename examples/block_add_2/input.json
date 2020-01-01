@@ -1,42 +1,53 @@
 {
   "max_progr_len": 6,
   "max_sk_sz": 6,
-    "vars": [ "x0", "x1", "x2", "x3", "x0+x1", "x2+x3" ],
-  "src_ws": [ "x0", "x1", "x2", "x3" ],
-  "tgt_ws": [ "x0+x1", "x2+x3" ],
+  "vars": [
+    "x0",
+    "x1",
+    "x2",
+    "x3",
+    "x0+x1",
+    "x2+x3"
+  ],
+  "src_ws": [
+    "x0",
+    "x1",
+    "x2",
+    "x3"
+  ],
+  "tgt_ws": [
+    "x0+x1",
+    "x2+x3"
+  ],
+  "current_cost": 12,
   "user_instrs": [
-      {
-	  "id": "ADD_1",
-	  "opcode": "01",
-	  "disasm": "ADD",
-	  "inpt_sk": [ "x0", "x1" ],
-	  "outpt_sk": [ "x0+x1" ],
-	  "gas": 3
-      },
-      {
-          "id": "ADD_1_commut",
-	  "opcode": "01",
-	  "disasm": "ADD",
-	  "inpt_sk": [ "x1", "x0" ],
-	  "outpt_sk": [ "x0+x1" ],
-	  "gas": 3
-      },
-      {
-	  "id": "ADD_2",
-	  "opcode": "01",
-	  "disasm": "ADD",
-	  "inpt_sk": [ "x2", "x3" ],
-	  "outpt_sk": [ "x2+x3" ],
-	  "gas": 3
-      },
-      {
-	  "id": "ADD_2_commut",
-	  "opcode": "01",
-	  "disasm": "ADD",
-	  "inpt_sk": [ "x3", "x2" ],
-	  "outpt_sk": [ "x2+x3" ],
-	  "gas": 3
-      }
-      
+    {
+      "id": "ADD_1",
+      "opcode": "01",
+      "disasm": "ADD",
+      "inpt_sk": [
+        "x0",
+        "x1"
+      ],
+      "outpt_sk": [
+        "x0+x1"
+      ],
+      "commutative": true,
+      "gas": 3
+    },
+    {
+      "id": "ADD_2",
+      "opcode": "01",
+      "disasm": "ADD",
+      "inpt_sk": [
+        "x2",
+        "x3"
+      ],
+      "outpt_sk": [
+        "x2+x3"
+      ],
+      "commutative": true,
+      "gas": 3
+    }
   ]
 }
