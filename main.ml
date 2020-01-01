@@ -70,21 +70,21 @@ let () =
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.result_to_yojson (show_result mdl obj params))
         | Some slvr ->
-          match slvr with
-          | Z3 ->
-            let path_to_slvr = "z3" in
-            let call_to_slvr = path_to_slvr ^ " -T:"^ [%show: int] timeout ^" -in " in
-            let result = exec_slvr ~call_to_slvr enc_z3
-            in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
-          | BCLT ->
-            let path_to_slvr = "~/opti/EBSO/implementation/barcelogic" in
-            let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
-            let result = exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
-            in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
-          | OMS ->
-            let path_to_slvr = "~/opti/optiMathSAT/optimathsat-1.6.3-linux-64-bit/bin/optimathsat" in
-            let call_to_slvr = path_to_slvr in
-            let result = exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
-            in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
+          let result =
+            match slvr with
+            | Z3 ->
+              let path_to_slvr = "z3" in
+              let call_to_slvr = path_to_slvr ^ " -T:"^ [%show: int] timeout ^" -in " in
+              exec_slvr ~call_to_slvr enc_z3
+            | BCLT ->
+              let path_to_slvr = "~/opti/EBSO/implementation/barcelogic" in
+              let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
+              exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
+            | OMS ->
+              let path_to_slvr = "~/opti/optiMathSAT/optimathsat-1.6.3-linux-64-bit/bin/optimathsat" in
+              let call_to_slvr = path_to_slvr in
+              exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
+          in
+          Out_channel.print_endline result
     ]
   |> Command.run ~version:"0.0"
