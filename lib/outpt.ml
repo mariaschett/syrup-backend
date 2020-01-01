@@ -23,6 +23,15 @@ let show_z3_smt cmn_smt =
   (* hack to get objectives, there should be an API call *)
   "(get-objectives)\n"
 
+let show_oms_smt cmn_smt =
+  let open String.Search_pattern in
+  (* optiMaxSAT requires to have (minimize gas) before (check sat) *)
+  let cmn_smt' =
+    let mg = "(check-sat)" in let mg' = "(minimize gas)\n" ^ mg in
+    replace_all ~in_:cmn_smt (create mg) ~with_:mg'
+  in
+  cmn_smt' ^ "(get-objectives)\n"
+
 let show_blct_smt cmn_smt =
   let open String.Search_pattern in
   (* barcelogic requires different start of assert-soft *)
@@ -40,7 +49,7 @@ let show_smt slvr enc enc_weights =
   in match slvr with
   | Z3 -> show_z3_smt cmn_smt
   | BCLT -> show_blct_smt cmn_smt
-  | OMS -> show_z3_smt cmn_smt
+  | OMS -> show_oms_smt cmn_smt
 
 let write_smt ~data ~path slvr =
   let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in

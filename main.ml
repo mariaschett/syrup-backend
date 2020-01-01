@@ -52,6 +52,7 @@ let () =
         let obj = Z3util.get_objectives enc enc_weights in
         let enc_z3 = show_smt Z3 enc enc_weights in
         let enc_bclt = show_smt BCLT enc enc_weights in
+        let enc_oms = show_smt OMS enc enc_weights in
         (* write files *)
         let path = Filename.dirname fn in
         (* solve *)
@@ -60,6 +61,7 @@ let () =
         | None ->
           write_smt Z3 ~path ~data:enc_z3;
           write_smt BCLT ~path ~data:enc_bclt;
+          write_smt OMS ~path ~data:enc_oms;
           write_map (path^"/instruction") params;
           write_objectives (path^"/objectives") ~data:obj;
           let mdl = Z3util.solve_max_model_exn enc enc_weights in
