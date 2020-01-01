@@ -8,7 +8,7 @@ type output_options =
   ; slvr : slvr option
   }
 
-let exec_slvr call_to_slvr enc =
+let exec_slvr ~call_to_slvr enc =
   let (in_chn, out_chn) as chn = Unix.open_process call_to_slvr in
   Out_channel.output_string out_chn enc;
   Out_channel.close out_chn;
@@ -65,7 +65,8 @@ let () =
         | Some slvr ->
           match slvr with
           | Z3 ->
-            let result = exec_slvr ("z3 -T:"^ time_out ^" -in ") enc_z3
+            let call_to_slvr = "z3 -T:"^ time_out ^" -in " in
+            let result = exec_slvr ~call_to_slvr enc_z3
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
           | BCLT -> failwith "not implemented yet"
           | OMS -> failwith "not implemented yet"
