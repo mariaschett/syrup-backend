@@ -37,6 +37,9 @@ let () =
       and slvr = flag "solver"
           (optional (Arg_type.create slvr_of_string))
           ~doc:"choose solver Z3 | BCLT | OMS"
+      and timeout = flag "timeout"
+          (optional_with_default 10 (Arg_type.create int_of_string))
+          ~doc:"set timeout in seconds"
       and
         fn = anon ("USER_PARAMS" %: string)
       in
@@ -56,7 +59,6 @@ let () =
         (* write files *)
         let path = Filename.dirname fn in
         (* solve *)
-        let time_out = "10" in
         match slvr with
         | None ->
           write_smt Z3 ~path ~data:enc_z3;
@@ -71,18 +73,18 @@ let () =
           match slvr with
           | Z3 ->
             let path_to_slvr = "z3" in
-            let call_to_slvr = path_to_slvr ^ " -T:"^ time_out ^" -in " in
+            let call_to_slvr = path_to_slvr ^ " -T:"^ [%show: int] timeout ^" -in " in
             let result = exec_slvr ~call_to_slvr enc_z3
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
           | BCLT ->
             let path_to_slvr = "~/opti/EBSO/implementation/barcelogic" in
-            let call_to_slvr = path_to_slvr ^ " -tlimit " ^ time_out ^ " -success false " in
+            let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
             let result = exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
           | OMS ->
             let path_to_slvr = "~/opti/optiMathSAT/optimathsat-1.6.3-linux-64-bit/bin/optimathsat" in
             let call_to_slvr = path_to_slvr in
-            let result = exec_slvr ~call_to_slvr ("(set-option :timeout 1.0)\n" ^ enc_oms)
+            let result = exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
     ]
   |> Command.run ~version:"0.0"
