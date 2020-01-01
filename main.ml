@@ -79,6 +79,10 @@ let () =
             let call_to_slvr = path_to_slvr ^ " -tlimit " ^ time_out ^ " -success false " in
             let result = exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
-          | OMS -> failwith "not implemented yet"
+          | OMS ->
+            let path_to_slvr = "~/opti/optiMathSAT/optimathsat-1.6.3-linux-64-bit/bin/optimathsat" in
+            let call_to_slvr = path_to_slvr in
+            let result = exec_slvr ~call_to_slvr ("(set-option :timeout 1.0)\n" ^ enc_oms)
+            in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
     ]
   |> Command.run ~version:"0.0"

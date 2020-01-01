@@ -10,7 +10,7 @@ type slvr =
 let slvr_of_string = function
   | "Z3" -> Z3
   | "BCLT" -> BCLT
-  | "OMS" -> BCLT
+  | "OMS" -> OMS
   | _ -> failwith "Unknown solver."
 
 let string_of_slvr = function
