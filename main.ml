@@ -8,14 +8,17 @@ type output_options =
   ; slvr : slvr option
   }
 
-let exec_slvr ~call_to_slvr enc =
+let exec_slvr ?ignore_exit_cd:(ignore_exit_cd=false) ~call_to_slvr enc =
   let (in_chn, out_chn) as chn = Unix.open_process call_to_slvr in
   Out_channel.output_string out_chn enc;
   Out_channel.close out_chn;
   let rslt = In_channel.input_all in_chn in
   match Unix.close_process chn with
   | Ok () -> rslt
-  | Error e -> failwith (Sexp.to_string (Unix.Exit_or_signal.sexp_of_error e))
+  | Error e ->
+    if ignore_exit_cd
+    then rslt
+    else failwith (Sexp.to_string (Unix.Exit_or_signal.sexp_of_error e))
 
 let outputcfg =
   ref {pmodel = false; psmt = false; slvr = None}
@@ -65,10 +68,15 @@ let () =
         | Some slvr ->
           match slvr with
           | Z3 ->
-            let call_to_slvr = "z3 -T:"^ time_out ^" -in " in
+            let path_to_slvr = "z3" in
+            let call_to_slvr = path_to_slvr ^ " -T:"^ time_out ^" -in " in
             let result = exec_slvr ~call_to_slvr enc_z3
             in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
-          | BCLT -> failwith "not implemented yet"
+          | BCLT ->
+            let path_to_slvr = "~/opti/EBSO/implementation/barcelogic" in
+            let call_to_slvr = path_to_slvr ^ " -tlimit " ^ time_out ^ " -success false " in
+            let result = exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
+            in Out_channel.write_all (path^"/"^ (string_of_slvr slvr) ^".outpt") ~data:result
           | OMS -> failwith "not implemented yet"
     ]
   |> Command.run ~version:"0.0"
