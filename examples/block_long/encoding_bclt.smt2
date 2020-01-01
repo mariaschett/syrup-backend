@@ -3483,4 +3483,3 @@
 (assert-soft (! (or (= 2 t_8) (= 1 t_8)) :weight 1 :id gas))
 (assert-soft (! (= 2 t_8) :weight 2 :id gas))
 (check-sat)
-(get-model)

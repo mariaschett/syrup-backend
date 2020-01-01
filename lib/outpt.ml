@@ -36,9 +36,7 @@ let show_smt slvr enc enc_weights =
   let cmn_smt =
     (* hack to set logic, there should be an API call *)
     "(set-logic QF_LIA)\n" ^
-    Z3util.show_smt enc enc_weights ^
-    (* hack to get model, there should be an API call *)
-    "(get-model)\n"
+    Z3util.show_smt enc enc_weights
   in match slvr with
   | Z3 -> show_z3_smt cmn_smt
   | BCLT -> show_blct_smt cmn_smt

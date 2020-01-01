@@ -460,5 +460,4 @@
 (assert-soft (or (= 2 t_3) (= 1 t_3)) :weight 1 :id gas)
 (assert-soft (= 2 t_3) :weight 2 :id gas)
 (check-sat)
-(get-model)
 (get-objectives)
