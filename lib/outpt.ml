@@ -64,6 +64,46 @@ let write_model fn mdl =
 let write_objectives fn ~data:obj =
   Out_channel.write_all (fn^".smt2") ~data:(Z3.Expr.to_string obj)
 
+(* pretty print output *)
+
+type rslt =
+  | TIMEOUT
+  | OPTIMAL of int
+  | RANGE of int * int
+  | MISC of string
+[@@deriving show {with_path = false}]
+
+let output_z3 = function
+  | Sexp.List [ Sexp.Atom "sat";
+                 Sexp.List [Sexp.Atom "objectives";
+                  Sexp.List [Sexp.Atom "gas"; Sexp.Atom g]
+                 ]
+               ]
+    -> OPTIMAL (Int.of_string g)
+  | List [Sexp.Atom "timeout"] -> TIMEOUT
+  | s -> failwith ("Failed to parse: " ^ Sexp.to_string s)
+
+let output_bclt = function
+  | Sexp.List [ Sexp.List [Sexp.Atom "optimal"; Sexp.Atom g] ]
+
+    -> OPTIMAL (Int.of_string g)
+  | Sexp.List [ Sexp.List [Sexp.Atom "cost"; Sexp.Atom g] ]
+    -> RANGE (0, (Int.of_string g))
+  | List [Sexp.Atom "unknown"] -> TIMEOUT
+  | s -> MISC ("Failed to parse: " ^ Sexp.to_string s)
+
+let output_oms = function
+  | Sexp.List [ Sexp.Atom "sat";
+                 Sexp.List [Sexp.Atom "objectives";
+                  Sexp.List [Sexp.Atom "gas"; Sexp.Atom g]
+                 ]
+               ]
+    -> OPTIMAL (Int.of_string g)
+  | List [Sexp.Atom "timeout"] -> TIMEOUT
+  | s -> MISC ("Failed to parse: " ^ Sexp.to_string s)
+
+(* pretty print from model *)
+
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
   Z.of_string (Z3.Arithmetic.Integer.numeral_to_string a_i)
