@@ -73,34 +73,40 @@ type rslt =
   | MISC of string
 [@@deriving show {with_path = false}]
 
-let output_z3 = function
-  | Sexp.List [ Sexp.Atom "sat";
-                 Sexp.List [Sexp.Atom "objectives";
-                  Sexp.List [Sexp.Atom "gas"; Sexp.Atom g]
-                 ]
-               ]
-    -> OPTIMAL (Int.of_string g)
-  | List [Sexp.Atom "timeout"] -> TIMEOUT
-  | s -> failwith ("Failed to parse: " ^ Sexp.to_string s)
+let ws = [%sedlex.regexp? Star white_space]
+let digits = [%sedlex.regexp? Plus '0'..'9']
 
-let output_bclt = function
-  | Sexp.List [ Sexp.List [Sexp.Atom "optimal"; Sexp.Atom g] ]
+let match_int buf =
+  let open Sedlexing in
+  match%sedlex buf with
+  | digits -> Int.of_string (Latin1.lexeme buf)
+  | _ -> failwith "Failed to parse int."
 
-    -> OPTIMAL (Int.of_string g)
-  | Sexp.List [ Sexp.List [Sexp.Atom "cost"; Sexp.Atom g] ]
-    -> RANGE (0, (Int.of_string g))
-  | List [Sexp.Atom "unknown"] -> TIMEOUT
-  | s -> MISC ("Failed to parse: " ^ Sexp.to_string s)
+let output_z3 outpt =
+  let open Sedlexing in
+  let buf = Latin1.from_string outpt in
+  match%sedlex buf with
+  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
+  | "timeout" -> TIMEOUT
+  | _ -> MISC outpt
 
-let output_oms = function
-  | Sexp.List [ Sexp.Atom "sat";
-                 Sexp.List [Sexp.Atom "objectives";
-                  Sexp.List [Sexp.Atom "gas"; Sexp.Atom g]
-                 ]
-               ]
-    -> OPTIMAL (Int.of_string g)
-  | List [Sexp.Atom "timeout"] -> TIMEOUT
-  | s -> MISC ("Failed to parse: " ^ Sexp.to_string s)
+let output_bclt outpt =
+  let open Sedlexing in
+  let buf = Latin1.from_string outpt in
+  match%sedlex buf with
+  | ws, "(optimal", ws -> OPTIMAL (match_int buf)
+  | ws, "(cost", ws -> RANGE (0, match_int buf)
+  | ws, "unknown" -> TIMEOUT
+  | _ -> MISC outpt
+
+let output_oms outpt =
+  let open Sedlexing in
+  let buf = Latin1.from_string outpt in
+  match%sedlex buf with
+  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
+  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
+  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> RANGE (0, match_int buf)
+  | _ -> MISC outpt
 
 (* pretty print from model *)
 

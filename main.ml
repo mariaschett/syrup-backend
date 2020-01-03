@@ -78,15 +78,15 @@ let () =
             | Z3 ->
               let call_to_slvr = path_to_slvr ^ " -T:"^ [%show: int] timeout ^" -in " in
               let output = exec_slvr ~call_to_slvr enc_z3 in
-              [%show: rslt] (output_z3 (Sexp.of_string ("(" ^  output ^ ")")))
+              [%show: rslt] (output_z3 output)
             | BCLT ->
               let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
               let output = exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true in
-              [%show: rslt] (output_bclt (Sexp.of_string ("(" ^  output ^ ")")))
+              [%show: rslt] (output_bclt output)
             | OMS ->
               let call_to_slvr = path_to_slvr in
               let output = exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms) in
-              [%show: rslt] (output_oms (Sexp.of_string ("(" ^  output ^ ")")))
+              [%show: rslt] (output_oms output)
           in
           Out_channel.print_endline result
     ]
