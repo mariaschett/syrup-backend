@@ -37,6 +37,9 @@ let () =
       and slvr = flag "solver"
           (optional (Arg_type.create slvr_of_string))
           ~doc:"choose solver Z3 | BCLT | OMS"
+      and path_to_slvr = flag "path"
+          (optional_with_default "z3" (Arg_type.create Fn.id))
+          ~doc:"give path to solver"
       and timeout = flag "timeout"
           (optional_with_default 10 (Arg_type.create int_of_string))
           ~doc:"set timeout in seconds"
@@ -73,15 +76,12 @@ let () =
           let result =
             match slvr with
             | Z3 ->
-              let path_to_slvr = "z3" in
               let call_to_slvr = path_to_slvr ^ " -T:"^ [%show: int] timeout ^" -in " in
               exec_slvr ~call_to_slvr enc_z3
             | BCLT ->
-              let path_to_slvr = "~/opti/EBSO/implementation/barcelogic" in
               let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
               exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
             | OMS ->
-              let path_to_slvr = "~/opti/optiMathSAT/optimathsat-1.6.3-linux-64-bit/bin/optimathsat" in
               let call_to_slvr = path_to_slvr in
               exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
           in
