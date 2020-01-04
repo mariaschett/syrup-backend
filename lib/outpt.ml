@@ -69,7 +69,7 @@ let write_objectives fn ~data:obj =
 type rslt =
   | TIMEOUT
   | OPTIMAL of int
-  | RANGE of int * int
+  | UB of int (* UpperBound *)
   | MISC of string
 [@@deriving show {with_path = false}]
 
@@ -87,6 +87,7 @@ let output_z3 outpt =
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
+  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UB (match_int buf)
   | "timeout" -> TIMEOUT
   | _ -> MISC outpt
 
@@ -95,7 +96,7 @@ let output_bclt outpt =
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | ws, "(optimal", ws -> OPTIMAL (match_int buf)
-  | ws, "(cost", ws -> RANGE (0, match_int buf)
+  | ws, "(cost", ws -> UB (match_int buf)
   | ws, "unknown" -> TIMEOUT
   | _ -> MISC outpt
 
@@ -105,7 +106,7 @@ let output_oms outpt =
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
-  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> RANGE (0, match_int buf)
+  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UB (match_int buf)
   | _ -> MISC outpt
 
 (* pretty print from model *)

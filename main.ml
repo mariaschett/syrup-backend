@@ -76,8 +76,9 @@ let () =
           let result =
             match slvr with
             | Z3 ->
-              let call_to_slvr = path_to_slvr ^ " -T:"^ [%show: int] timeout ^" -in " in
-              let output = exec_slvr ~call_to_slvr enc_z3 in
+              let call_to_slvr = path_to_slvr ^ " -in " in
+              let timeout_in_ms = timeout * 1000 in
+              let output = exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3) in
               [%show: rslt] (output_z3 output)
             | BCLT ->
               let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
