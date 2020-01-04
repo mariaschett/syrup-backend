@@ -41,7 +41,7 @@ let () =
           (optional_with_default "z3" (Arg_type.create Fn.id))
           ~doc:"give path to solver"
       and timeout = flag "timeout"
-          (optional_with_default 10 (Arg_type.create int_of_string))
+          (optional_with_default 0 (Arg_type.create int_of_string))
           ~doc:"set timeout in seconds"
       and
         fn = anon ("USER_PARAMS" %: string)
