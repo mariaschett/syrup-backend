@@ -50,7 +50,8 @@ let enc_semtc ~in_ws ~out_ws ~alpha ~delta k j =
   let x i = mk_x i j and x' i = mk_x' i j in
   let u i = mk_u i j in
   let open Z3Ops in
-  conj (List.mapi in_ws ~f:(fun i w -> u i && x i == w)) &&
+  conj (List.mapi in_ws ~f:(fun i _ -> u i)) &&
+  conj (List.mapi in_ws ~f:(fun i w ->  x i == w)) &&
   conj (List.mapi out_ws ~f:(fun i w -> x' i == w)) &&
   conj (List.map out_idxs ~f:(fun i -> ~! (u i)))
 
