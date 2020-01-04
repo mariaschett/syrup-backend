@@ -45,24 +45,25 @@ let show_opcode ?arg:(arg=None) iota =
     (hex_add iota.opcode (idx-1) ^ (show_hex arg))
   else iota.opcode
 
-let enc_semtc ~in_ws ~out_ws ~alpha ~delta k j =
+let enc_semtc ~in_ws ~is_commutative ~out_ws ~alpha ~delta k j =
   let out_idxs = List.range ~start:`inclusive (k - alpha + delta) ~stop:`exclusive k in
   let x i = mk_x i j and x' i = mk_x' i j in
   let u i = mk_u i j in
+  let in_ws' = if is_commutative then Helper.permutations in_ws else [in_ws] in
   let open Z3Ops in
   conj (List.mapi in_ws ~f:(fun i _ -> u i)) &&
-  conj (List.mapi in_ws ~f:(fun i w ->  x i == w)) &&
+  disj (List.map in_ws' ~f:(fun ws -> conj (List.mapi ws ~f:(fun i w ->  x i == w)))) &&
   conj (List.mapi out_ws ~f:(fun i w -> x' i == w)) &&
   conj (List.map out_idxs ~f:(fun i -> ~! (u i)))
 
-let enc_userdef ~in_ws ~out_ws k j =
+let enc_userdef ~in_ws ~out_ws ~is_commutative k j =
   let delta = List.length in_ws and alpha = List.length out_ws in
   let open Z3Ops in
-  enc_semtc ~in_ws ~out_ws ~alpha ~delta k j &&
+  enc_semtc ~in_ws ~is_commutative ~out_ws ~alpha ~delta k j &&
   enc_prsv k j ~alpha ~delta && enc_sk_utlz k j ~alpha ~delta
 
-let mk_userdef id ~in_ws ~out_ws ~opcode ~gas ~disasm =
-  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws) ~opcode ~gas ~disasm
+let mk_userdef id ~in_ws ~out_ws ~opcode ~gas ~disasm ~is_commutative =
+  mk ~id ~effect:(enc_userdef ~in_ws ~out_ws ~is_commutative) ~opcode ~gas ~disasm
 
 (* predefined instructions *)
 
@@ -70,14 +71,14 @@ let mk_PUSH =
   mk ~id:"PUSH" ~opcode:"60" ~disasm:"PUSH" ~gas:3
     ~effect:(fun k j ->
       let a = mk_a j in
-      enc_userdef ~in_ws:[] ~out_ws:[a] k j
+      enc_userdef ~in_ws:[] ~is_commutative:false ~out_ws:[a] k j
     )
 
 let mk_POP =
   mk ~id:"POP" ~opcode:"50" ~gas:2 ~disasm:"POP"
     ~effect:(fun k j ->
         let x_0 = mk_x 0 j in
-        enc_userdef ~in_ws:[x_0] ~out_ws:[] k j
+        enc_userdef ~in_ws:[x_0] ~is_commutative:false ~out_ws:[] k j
       )
 
 let mk_SWAP idx =
@@ -88,7 +89,7 @@ let mk_SWAP idx =
         let x_0 = mk_x 0 j and x_l = mk_x idx j in
         let prsvd = List.map ~f:(fun i -> mk_x i j)
             (List.range ~start:`inclusive 1 ~stop:`exclusive idx) in
-        enc_userdef ~in_ws:([x_0] @ prsvd @ [x_l]) ~out_ws:([x_l] @ prsvd @ [x_0]) k j
+        enc_userdef ~in_ws:([x_0] @ prsvd @ [x_l]) ~is_commutative:false ~out_ws:([x_l] @ prsvd @ [x_0]) k j
       )
 
 let mk_DUP idx =
@@ -99,13 +100,13 @@ let mk_DUP idx =
         let x_idx = mk_x (idx-1) j in
         let prsvd = List.map ~f:(fun i -> mk_x i j)
             (List.range ~start:`inclusive 0 ~stop:`exclusive (idx-1)) in
-        enc_userdef ~in_ws:(prsvd @ [x_idx]) ~out_ws:([x_idx] @ prsvd @ [x_idx]) k j
+        enc_userdef ~in_ws:(prsvd @ [x_idx]) ~is_commutative:false ~out_ws:([x_idx] @ prsvd @ [x_idx]) k j
       )
 
 let mk_NOP =
   mk ~id:"NOP" ~opcode:"" ~disasm:"NOP" ~gas:0
     ~effect:(fun k j ->
-        enc_userdef ~in_ws:[] ~out_ws:[] k j
+        enc_userdef ~in_ws:[] ~is_commutative:false ~out_ws:[] k j
       )
 
 let predef ~k =

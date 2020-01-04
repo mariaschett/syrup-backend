@@ -548,7 +548,7 @@ let nop = let enc_nop = (Instruction.mk_NOP).effect in
 let block_192_add_1 =
   let s_1 = mk_user_const "s_1" (* =^= ADD_1 *) in
   let s_0 = mk_user_const "s_0" (* =^= input variable on stack *) in
-  let mk_block_192 = Instruction.mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~out_ws:[s_1] ~gas:3 ~opcode:"01" ~disasm:"ADD" in
+  let mk_block_192 = Instruction.mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~is_commutative:false ~out_ws:[s_1] ~gas:3 ~opcode:"01" ~disasm:"ADD" in
   let enc_add_1 = mk_block_192.effect in
   [
     "forwards: ADD_1 puts s_1 on stack">:: (fun _ ->
@@ -643,7 +643,7 @@ let block_192_add_1 =
 
 let callvalue = [
   let s_0 = mk_user_const "s_0" in
-  let mk_callvalue = Instruction.mk_userdef "CALLVALUE_1" ~in_ws:[] ~out_ws:[s_0] ~gas:2 ~opcode:"34" ~disasm:"CALLVALUE" in
+  let mk_callvalue = Instruction.mk_userdef "CALLVALUE_1" ~in_ws:[] ~is_commutative:false ~out_ws:[s_0] ~gas:2 ~opcode:"34" ~disasm:"CALLVALUE" in
   let enc_callvalue = mk_callvalue.effect in
 
   "forwards: put callvalue on the stack">:: (fun _ ->
@@ -662,9 +662,55 @@ let callvalue = [
       );
 ]
 
+let block_commutative =
+  let s_1 = mk_user_const "s_1" (* =^= ADD_1 *) in
+  let s_0 = mk_user_const "s_0" (* =^= input variable on stack *) in
+  let mk_block_commutative = Instruction.mk_userdef "ADD_1" ~in_ws:[s_0; num 1] ~is_commutative:true ~out_ws:[s_1] ~gas:3 ~opcode:"01" ~disasm:"ADD" in
+  let enc_add_1 = mk_block_commutative.effect in
+  [
+    "forwards: ADD_1 puts s_1 on stack for [s_0; 1]">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let vals = [s_0; num 1] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        let x'_0 = Consts.mk_x' 0 j in
+        let c_s_1 = let open Z3Ops in s_1 == num 42 in
+        let m = solve_model_exn [c; c'; c_s_1] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t]
+          ~printer:Z3.Expr.to_string
+          (num 42)
+          (eval_const m x'_0)
+      );
+
+    "forwards: ADD_1 puts s_1 on stack for [1; s_0]">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let vals = [s_0; num 1] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        let x'_0 = Consts.mk_x' 0 j in
+        let c_s_1 = let open Z3Ops in s_1 == num 42 in
+        let m = solve_model_exn [c; c'; c_s_1] in
+        assert_equal
+          ~cmp:[%eq: Z3.Expr.t]
+          ~printer:Z3.Expr.to_string
+          (num 42)
+          (eval_const m x'_0)
+      );
+
+    "forwards: ADD_1 is not applicable">:: (fun _ ->
+        let k = 4 and j = 0 in
+        let vals = [s_0; num 2;] in
+        let c = sk_init k j vals in
+        let c' = enc_add_1 k j in
+        assert_bool "" (is_unsat [c; c'])
+      );
+
+]
+
 let suite = "suite" >:::
             push @ pop @ swap1 @ swap3
-            @ dup1 @ dup10 @ nop @ block_192_add_1 @ callvalue
+            @ dup1 @ dup10 @ nop @ block_192_add_1 @ callvalue @ block_commutative
 
 let () =
   run_test_tt_main suite
