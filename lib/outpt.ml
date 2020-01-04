@@ -69,7 +69,7 @@ let write_objectives fn ~data:obj =
 type rslt =
   | TIMEOUT
   | OPTIMAL of int
-  | UB of int (* UpperBound *)
+  | UPPERBOUND of int
   | MISC of string
 [@@deriving show {with_path = false}]
 
@@ -87,7 +87,7 @@ let parse_gas_rslt_z3 rslt =
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
-  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UB (match_int buf)
+  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UPPERBOUND (match_int buf)
   | "timeout" -> TIMEOUT
   | _ -> MISC rslt
 
@@ -96,7 +96,7 @@ let parse_gas_rslt_bclt rslt =
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | ws, "(optimal", ws -> OPTIMAL (match_int buf)
-  | ws, "(cost", ws -> UB (match_int buf)
+  | ws, "(cost", ws -> UPPERBOUND (match_int buf)
   | ws, "unknown" -> TIMEOUT
   | _ -> MISC rslt
 
@@ -106,7 +106,7 @@ let parse_gas_rslt_oms rslt =
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
-  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UB (match_int buf)
+  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UPPERBOUND (match_int buf)
   | _ -> MISC rslt
 
 let parse_gas_rslt rslt = function
