@@ -82,32 +82,37 @@ let match_int buf =
   | digits -> Int.of_string (Latin1.lexeme buf)
   | _ -> failwith "Failed to parse int."
 
-let output_z3 outpt =
+let parse_gas_rslt_z3 rslt =
   let open Sedlexing in
-  let buf = Latin1.from_string outpt in
+  let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UB (match_int buf)
   | "timeout" -> TIMEOUT
-  | _ -> MISC outpt
+  | _ -> MISC rslt
 
-let output_bclt outpt =
+let parse_gas_rslt_bclt rslt =
   let open Sedlexing in
-  let buf = Latin1.from_string outpt in
+  let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | ws, "(optimal", ws -> OPTIMAL (match_int buf)
   | ws, "(cost", ws -> UB (match_int buf)
   | ws, "unknown" -> TIMEOUT
-  | _ -> MISC outpt
+  | _ -> MISC rslt
 
-let output_oms outpt =
+let parse_gas_rslt_oms rslt =
   let open Sedlexing in
-  let buf = Latin1.from_string outpt in
+  let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
   | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UB (match_int buf)
-  | _ -> MISC outpt
+  | _ -> MISC rslt
+
+let parse_gas_rslt rslt = function
+  | Z3 -> parse_gas_rslt_z3 rslt
+  | BCLT -> parse_gas_rslt_bclt rslt
+  | OMS -> parse_gas_rslt_oms rslt
 
 (* pretty print from model *)
 

@@ -73,22 +73,19 @@ let () =
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.result_to_yojson (show_result mdl obj params))
         | Some slvr ->
-          let result =
+          let rslt =
             match slvr with
             | Z3 ->
               let call_to_slvr = path_to_slvr ^ " -in " in
               let timeout_in_ms = timeout * 1000 in
-              let output = exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3) in
-              [%show: rslt] (output_z3 output)
+              exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3)
             | BCLT ->
               let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
-              let output = exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true in
-              [%show: rslt] (output_bclt output)
+              exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
             | OMS ->
               let call_to_slvr = path_to_slvr in
-              let output = exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms) in
-              [%show: rslt] (output_oms output)
+              exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
           in
-          Out_channel.print_endline result
+          Out_channel.print_endline ([%show: rslt] (parse_gas_rslt rslt slvr))
     ]
   |> Command.run ~version:"0.0"
