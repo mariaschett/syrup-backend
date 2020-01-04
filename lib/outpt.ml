@@ -76,7 +76,7 @@ type rslt =
 let ws = [%sedlex.regexp? Star white_space]
 let digits = [%sedlex.regexp? Plus '0'..'9']
 
-let match_int buf =
+let parse_int buf =
   let open Sedlexing in
   match%sedlex buf with
   | digits -> Int.of_string (Latin1.lexeme buf)
@@ -86,8 +86,8 @@ let parse_gas_rslt_z3 rslt =
   let open Sedlexing in
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
-  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
-  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UPPERBOUND (match_int buf)
+  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
+  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UPPERBOUND (parse_int buf)
   | "timeout" -> TIMEOUT
   | _ -> MISC rslt
 
@@ -95,8 +95,8 @@ let parse_gas_rslt_bclt rslt =
   let open Sedlexing in
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
-  | ws, "(optimal", ws -> OPTIMAL (match_int buf)
-  | ws, "(cost", ws -> UPPERBOUND (match_int buf)
+  | ws, "(optimal", ws -> OPTIMAL (parse_int buf)
+  | ws, "(cost", ws -> UPPERBOUND (parse_int buf)
   | ws, "unknown" -> TIMEOUT
   | _ -> MISC rslt
 
@@ -104,9 +104,9 @@ let parse_gas_rslt_oms rslt =
   let open Sedlexing in
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
-  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (match_int buf)
+  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
-  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UPPERBOUND (match_int buf)
+  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UPPERBOUND (parse_int buf)
   | _ -> MISC rslt
 
 let parse_gas_rslt rslt = function
