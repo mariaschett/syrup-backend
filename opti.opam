@@ -12,15 +12,14 @@ depends: [
   "ocaml"
   "dune"
   "ocamlfind"
-  "z3" {= "4.7.1"}
+  "z3" 
   "core"
   "sedlex"
-  "csv"
   "zarith"
   "ounit" {with-test}
   "ppx_sexp_conv"
-  "ppx_enumerate"
   "ppx_deriving"
+  "ppx_deriving_yojson"
 ]
 build: [
   [ "dune" "subst" ] {pinned}
