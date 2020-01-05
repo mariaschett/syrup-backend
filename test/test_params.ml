@@ -10,7 +10,7 @@ let ups_0 = {
   src_ws = [Const "s_0"];
   tgt_ws = [Val (Z.of_int 146); Const "s_0"];
   user_instrs = [];
-  current_cost = 9;
+  curr_cst = 9;
 }
 
 let sk = [
@@ -70,7 +70,7 @@ let ups_1 =
     src_ws = [Const "s_0"];
     tgt_ws = [Val (Z.of_int 146); Const "s_1"];
     user_instrs = [add_1];
-    current_cost = 9;
+    curr_cst = 9;
   }
 
 let timestamp = {
@@ -90,7 +90,7 @@ let ups_2 =
     src_ws = [Const "s_0"];
     tgt_ws = [Const "s_2"; Const "s_1"];
     user_instrs = [add_1; timestamp];
-    current_cost = 9;
+    curr_cst = 9;
   }
 
 

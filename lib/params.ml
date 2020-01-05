@@ -10,6 +10,7 @@ type params = {
   src_ws : Z3.Expr.expr list; (* words on source stack, top of stack at postion 0 *)
   tgt_ws : Z3.Expr.expr list;
   ss : Z3.Expr.expr list; (* "forall quantified" variables *)
+  curr_cst : int;
 }
 
 let mk predef user_params =
@@ -25,6 +26,7 @@ let mk predef user_params =
     src_ws = User_params.mk_ws user_params.src_ws;
     tgt_ws = User_params.mk_ws user_params.tgt_ws;
     ss = List.map user_params.ss ~f:Consts.mk_user_const;
+    curr_cst = user_params.curr_cst;
   }
 
 let find_instr params ~id =

@@ -42,7 +42,7 @@ type user_params = {
   ss : user_const list [@key "vars"];
   src_ws : user_word list;
   tgt_ws : user_word list;
-  current_cost : int;
+  curr_cst : int [@key "current_cost"];
   user_instrs : user_instr list;
 } [@@deriving yojson { exn = true }]
 
