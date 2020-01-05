@@ -120,6 +120,30 @@ let parse_gas_rslt rslt = function
   | BCLT -> parse_gas_rslt_bclt rslt
   | OMS -> parse_gas_rslt_oms rslt
 
+(* produce result json *)
+
+type outpt = {
+  lower_bound : int option;
+  upper_bound : int option;
+  shown_optimal : bool;
+  timed_out : bool;
+  current_cost : int;
+} [@@deriving yojson { exn = true } ]
+
+let outpt_json (params : params) (gas_rslt : rslt) =
+  let (lower_bound, upper_bound) = match gas_rslt with RANGE (lb, ub) -> (Some lb, Some ub) | _ -> (None, None) in
+  let shown_optimal = match gas_rslt with OPTIMAL _ -> true | _ -> false in
+  let timed_out = match gas_rslt with TIMEOUT -> true | _ -> false in
+  let outpt =
+    { lower_bound = lower_bound;
+      upper_bound = upper_bound;
+      shown_optimal = shown_optimal;
+      timed_out = timed_out;
+      current_cost = params.curr_cst;
+    }
+  in
+  outpt_to_yojson outpt
+
 (* pretty print from model *)
 
 let dec_arg mdl i =

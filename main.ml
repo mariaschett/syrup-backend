@@ -86,6 +86,6 @@ let () =
               let call_to_slvr = path_to_slvr in
               exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
           in
-          Out_channel.print_endline ([%show: rslt] (parse_gas_rslt rslt slvr) ^ " (CURR_COST " ^ [%show: int] params.curr_cst ^ ")")
+          Out_channel.print_endline (Yojson.Safe.to_string (outpt_json params (parse_gas_rslt rslt slvr)))
     ]
   |> Command.run ~version:"0.0"
