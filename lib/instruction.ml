@@ -21,7 +21,7 @@ let mk ~id ~opcode ~effect ~gas ~disasm = {
 
 (* show instruction *)
 
-let is_PUSH iota = iota.id = "PUSH"
+let is_PUSH iota = String.equal iota.id "PUSH"
 
 let show_hex arg =
   let hx = Z.format "x" arg in

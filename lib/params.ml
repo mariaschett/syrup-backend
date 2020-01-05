@@ -30,13 +30,13 @@ let mk predef user_params =
   }
 
 let find_instr params ~id =
-  List.find_exn params.instrs ~f:(fun iota -> iota.id = id)
+  List.find_exn params.instrs ~f:(fun iota -> String.equal iota.id id)
 
 let instr_of_int params i =
   List.Assoc.find_exn (List.Assoc.inverse (params.instr_int_map)) i ~equal:(=)
 
 let instr_to_int params iota =
-  List.Assoc.find_exn (params.instr_int_map) iota ~equal:(fun i1 i2 -> i1.id = i2.id)
+  List.Assoc.find_exn (params.instr_int_map) iota ~equal:(fun i1 i2 -> String.equal i1.id i2.id)
 
 let show_instr_to_int params =
   let show_pair (iota, i) = iota.id ^ " : " ^ [%show: int] i ^ "; " in
