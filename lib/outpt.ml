@@ -144,13 +144,13 @@ let show_opcode mdl params =
       Instruction.show_opcode iota ~arg:(arg iota i)
     )
 
-type result = {
+type trgt_prgrm = {
   opcode : string;
   disasm : string;
   cost : string;
 } [@@deriving yojson]
 
-let show_result mdl obj params =
+let show_trgt_prgrm mdl obj params =
   { opcode = [%show: string list] (show_opcode mdl params);
     disasm = [%show: string list] (show_disasm mdl params);
     cost = [%show: int] (Z3util.solve_objectives mdl obj);

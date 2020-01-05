@@ -71,7 +71,7 @@ let () =
           write_objectives (path^"/objectives") ~data:obj;
           let mdl = Z3util.solve_max_model_exn enc enc_weights in
           write_model (path^"/model") mdl;
-          Yojson.Safe.to_file (path^"/result.json") (Outpt.result_to_yojson (show_result mdl obj params))
+          Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
         | Some slvr ->
           let rslt =
             match slvr with
@@ -86,6 +86,6 @@ let () =
               let call_to_slvr = path_to_slvr in
               exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
           in
-          Out_channel.print_endline ([%show: rslt] (parse_gas_rslt rslt slvr))
+          Out_channel.print_endline ([%show: rslt] (parse_gas_rslt rslt slvr) ^ " (CURR_COST " ^ [%show: int] params.curr_cst ^ ")")
     ]
   |> Command.run ~version:"0.0"
