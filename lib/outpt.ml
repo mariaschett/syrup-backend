@@ -69,7 +69,7 @@ let write_objectives fn ~data:obj =
 type rslt =
   | TIMEOUT
   | OPTIMAL of int
-  | UPPERBOUND of int
+  | RANGE of int * int
   | MISC of string
 [@@deriving show {with_path = false}]
 
@@ -87,7 +87,10 @@ let parse_gas_rslt_z3 rslt =
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
-  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval 0", ws -> UPPERBOUND (parse_int buf)
+  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws ->
+    let lb = parse_int buf in
+    let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
+    RANGE (lb, ub)
   | "timeout" -> TIMEOUT
   | _ -> MISC rslt
 
@@ -96,7 +99,7 @@ let parse_gas_rslt_bclt rslt =
   let buf = Latin1.from_string rslt in
   match%sedlex buf with
   | ws, "(optimal", ws -> OPTIMAL (parse_int buf)
-  | ws, "(cost", ws -> UPPERBOUND (parse_int buf)
+  | ws, "(cost", ws -> RANGE (0, parse_int buf)
   | ws, "unknown" -> TIMEOUT
   | _ -> MISC rslt
 
@@ -106,7 +109,10 @@ let parse_gas_rslt_oms rslt =
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
-  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [ 0,", ws -> UPPERBOUND (parse_int buf)
+  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws ->
+    let lb = parse_int buf in
+    let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
+    RANGE (lb, ub)
   | _ -> MISC rslt
 
 let parse_gas_rslt rslt = function
