@@ -132,7 +132,7 @@ type outpt = {
 
 let outpt_json (params : params) (gas_rslt : rslt) =
   let (lower_bound, upper_bound) = match gas_rslt with RANGE (lb, ub) -> (Some lb, Some ub) | _ -> (None, None) in
-  let shown_optimal = match gas_rslt with OPTIMAL _ -> true | _ -> false in
+  let (shown_optimal, lower_bound, upper_bound) = match gas_rslt with OPTIMAL b -> (true, Some b, Some b) | _ -> (false, lower_bound, upper_bound) in
   let timed_out = match gas_rslt with TIMEOUT -> true | _ -> false in
   let outpt =
     { lower_bound = lower_bound;
