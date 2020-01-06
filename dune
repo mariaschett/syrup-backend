@@ -2,5 +2,6 @@
  (modules main)
  (libraries core z3 opti yojson ppx_deriving_yojson.runtime)
  (preprocess (pps ppx_jane ppx_deriving.std ppx_deriving_yojson))
+ (link_flags -cc g++)
  (public_name opti)
 )
