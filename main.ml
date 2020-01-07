@@ -93,7 +93,7 @@ let () =
           if Option.is_some rslt
           then
             let gas_rslt = parse_gas_rslt (Option.value_exn rslt) slvr in
-            Out_channel.print_endline (Yojson.Safe.to_string (outpt_json params gas_rslt))
+            Out_channel.print_endline ([%show: outpt] (mk_outpt params gas_rslt))
           else ()
     ]
   |> Command.run ~version:"0.0"
