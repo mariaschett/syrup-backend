@@ -64,6 +64,11 @@ let write_model fn mdl =
 let write_objectives fn ~data:obj =
   Out_channel.write_all (fn^".smt2") ~data:(Z3.Expr.to_string obj)
 
+let write_all ~path ~slvr ~enc ~obj ~params =
+  write_smt slvr ~path ~data:enc;
+  write_map (path^"/instruction") params;
+  write_objectives (path^"/objectives") ~data:obj;
+
 (* pretty print output *)
 
 type rslt =

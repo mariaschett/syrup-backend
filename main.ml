@@ -62,11 +62,9 @@ let () =
         (* solve *)
         match slvr with
         | None ->
-          write_smt Z3 ~path ~data:enc_z3;
-          write_smt BCLT ~path ~data:enc_bclt;
-          write_smt OMS ~path ~data:enc_oms;
-          write_map (path^"/instruction") params;
-          write_objectives (path^"/objectives") ~data:obj;
+          write_all ~slvr:Z3 ~path ~enc:enc_z3 ~obj ~params;
+          write_all ~slvr:BCLT ~path ~enc:enc_bclt ~obj ~params;
+          write_all ~slvr:OMS ~path ~enc:enc_oms ~obj ~params;
           let mdl = Z3util.solve_max_model_exn enc enc_weights in
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
