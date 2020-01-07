@@ -54,9 +54,6 @@ let () =
         let enc = Enc.enc_block params in
         let enc_weights = Enc.enc_weight params in
         let obj = Z3util.get_objectives enc enc_weights in
-        let enc_z3 = show_smt Z3 enc enc_weights in
-        let enc_bclt = show_smt BCLT enc enc_weights in
-        let enc_oms = show_smt OMS enc enc_weights in
         (* write files *)
         let path = Filename.dirname fn in
         (* solve *)
@@ -69,24 +66,29 @@ let () =
           let rslt =
             match slvr with
             | Z3 ->
+              let enc_z3 = show_smt Z3 enc enc_weights in
+              let timeout_in_ms = timeout * 1000 in
+              let enc_z3_with_timeout = "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3 in
               if write_only
-              then (write_all ~slvr:Z3 ~path ~enc:enc_z3 ~obj ~params; None)
+              then (write_all ~slvr:Z3 ~path ~enc:enc_z3_with_timeout ~obj ~params; None)
               else
                 let call_to_slvr = path_to_slvr ^ " -in " in
-                let timeout_in_ms = timeout * 1000 in
-                Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3))
+                Some (exec_slvr ~call_to_slvr enc_z3_with_timeout)
             | BCLT ->
+              let enc_bclt = show_smt BCLT enc enc_weights in
               if write_only
               then (write_all ~slvr:BCLT ~path ~enc:enc_bclt ~obj ~params; None)
               else
                 let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
                 Some (exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true)
             | OMS ->
+              let enc_oms = show_smt OMS enc enc_weights in
+              let enc_oms_with_time_out = "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms in
               if write_only
-              then (write_all ~slvr:OMS ~path ~enc:enc_oms ~obj ~params; None)
+              then (write_all ~slvr:OMS ~path ~enc:enc_oms_with_time_out ~obj ~params; None)
               else
                 let call_to_slvr = path_to_slvr in
-                Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms))
+                Some (exec_slvr ~call_to_slvr enc_oms_with_time_out)
           in
           if Option.is_some rslt
           then

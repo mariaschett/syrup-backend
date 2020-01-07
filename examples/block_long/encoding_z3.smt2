@@ -1,3 +1,4 @@
+(set-option :timeout 0.0)
 (set-logic QF_LIA)
 (declare-fun a_8 () Int)
 (declare-fun a_7 () Int)
