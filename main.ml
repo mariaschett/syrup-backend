@@ -63,27 +63,25 @@ let () =
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
         | Some slvr ->
+          let enc = show_smt slvr enc enc_weights in
           let slvr_rslt =
             match slvr with
             | Z3 ->
-              let enc_z3 = show_smt Z3 enc enc_weights in
               let timeout_in_ms = timeout * 1000 in
-              let enc_z3_with_timeout = "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3 in
+              let enc_z3_with_timeout = "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc in
               if write_only
               then (write_all ~slvr:Z3 ~path ~enc:enc_z3_with_timeout ~obj ~params; None)
               else
                 let call_to_slvr = path_to_slvr ^ " -in " in
                 Some (exec_slvr ~call_to_slvr enc_z3_with_timeout)
             | BCLT ->
-              let enc_bclt = show_smt BCLT enc enc_weights in
               if write_only
-              then (write_all ~slvr:BCLT ~path ~enc:enc_bclt ~obj ~params; None)
+              then (write_all ~slvr:BCLT ~path ~enc:enc ~obj ~params; None)
               else
                 let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
-                Some (exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true)
+                Some (exec_slvr ~call_to_slvr enc ~ignore_exit_cd:true)
             | OMS ->
-              let enc_oms = show_smt OMS enc enc_weights in
-              let enc_oms_with_time_out = "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms in
+              let enc_oms_with_time_out = "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc in
               if write_only
               then (write_all ~slvr:OMS ~path ~enc:enc_oms_with_time_out ~obj ~params; None)
               else
