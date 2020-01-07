@@ -63,35 +63,23 @@ let () =
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
         | Some slvr ->
-          let enc = show_smt slvr enc enc_weights in
-          let slvr_rslt =
-            match slvr with
-            | Z3 ->
-              let timeout_in_ms = timeout * 1000 in
-              let enc_z3_with_timeout = "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc in
-              if write_only
-              then (write_all ~slvr:Z3 ~path ~enc:enc_z3_with_timeout ~obj ~params; None)
-              else
+          let enc = show_smt slvr enc enc_weights timeout in
+          if write_only
+          then write_all ~slvr ~path ~enc ~obj ~params
+          else
+            let slvr_rslt =
+              match slvr with
+              | Z3 ->
                 let call_to_slvr = path_to_slvr ^ " -in " in
-                Some (exec_slvr ~call_to_slvr enc_z3_with_timeout)
-            | BCLT ->
-              if write_only
-              then (write_all ~slvr:BCLT ~path ~enc:enc ~obj ~params; None)
-              else
+                exec_slvr ~call_to_slvr enc
+              | BCLT ->
                 let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
-                Some (exec_slvr ~call_to_slvr enc ~ignore_exit_cd:true)
-            | OMS ->
-              let enc_oms_with_time_out = "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc in
-              if write_only
-              then (write_all ~slvr:OMS ~path ~enc:enc_oms_with_time_out ~obj ~params; None)
-              else
+                exec_slvr ~call_to_slvr enc ~ignore_exit_cd:true
+              | OMS ->
                 let call_to_slvr = path_to_slvr in
-                Some (exec_slvr ~call_to_slvr enc_oms_with_time_out)
-          in
-          if Option.is_some slvr_rslt
-          then
-            let gas_rslt = parse_gas_rslt (Option.value_exn slvr_rslt) slvr in
+                exec_slvr ~call_to_slvr enc
+            in
+            let gas_rslt = parse_gas_rslt slvr_rslt slvr in
             Out_channel.print_endline ([%show: outpt] (mk_outpt params gas_rslt))
-          else ()
     ]
   |> Command.run ~version:"0.0"

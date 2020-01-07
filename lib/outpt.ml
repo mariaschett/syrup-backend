@@ -41,15 +41,17 @@ let show_blct_smt cmn_smt =
   let replacd_op = replace_all (create op) ~in_:cmn_smt ~with_:op' in
   replace_all ~in_:replacd_op (create cp) ~with_:cp'
 
-let show_smt slvr enc enc_weights =
+let show_smt slvr enc enc_weights timeout =
   let cmn_smt =
     (* hack to set logic, there should be an API call *)
     "(set-logic QF_LIA)\n" ^
     Z3util.show_smt enc enc_weights
   in match slvr with
-  | Z3 -> show_z3_smt cmn_smt
+  | Z3 ->
+    let timeout_in_ms = timeout * 1000 in
+    "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ (show_z3_smt cmn_smt)
   | BCLT -> show_blct_smt cmn_smt
-  | OMS -> show_oms_smt cmn_smt
+  | OMS -> "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ (show_oms_smt cmn_smt)
 
 let write_smt ~data ~path slvr =
   let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in
