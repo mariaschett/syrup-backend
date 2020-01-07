@@ -160,6 +160,20 @@ let mk_rslt block_id (params : params) (gas_rslt : slvr_rslt) =
     current_cost = params.curr_cst;
     }
 
+let show_csv rslt =
+  let csv_header = ["block_id"; "lower_bound"; "upper_bound"; "shown_optimal"; "timed_out"; "current_cost"] in
+  let data =
+    [rslt.block_id;
+     (Option.value_map ~default:"" ~f:([%show: int]) rslt.lower_bound);
+     (Option.value_map ~default:"" ~f:([%show: int]) rslt.upper_bound);
+     [%show: bool] rslt.shown_optimal;
+     [%show: bool] rslt.timed_out;
+     [%show: int] rslt.current_cost;
+    ]
+  in
+  (String.concat ~sep:"," csv_header) ^ "\n" ^
+  (String.concat ~sep:"," data)
+
 (* pretty print from model *)
 
 let dec_arg mdl i =
