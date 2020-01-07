@@ -18,10 +18,11 @@ let mk predef user_params =
   let max_wsz = Z.pow (Z.of_int 2) 256 in
   let instrs =  predef ~k:user_params.k @ (List.map user_params.user_instrs ~f:User_params.mk_user_instr) in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
+  let n = if user_params.n <= 0 then 1 else user_params.n in
   { instrs = instrs;
     instr_int_map = map;
     k = user_params.k;
-    n = user_params.n;
+    n = n;
     max_wsz = max_wsz;
     src_ws = User_params.mk_ws user_params.src_ws;
     tgt_ws = User_params.mk_ws user_params.tgt_ws;
