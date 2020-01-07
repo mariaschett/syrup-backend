@@ -3,8 +3,7 @@ open Opti
 open Outpt
  
 type output_options =
-  { pmodel : bool
-  ; psmt : bool
+  { psmt : bool
   ; slvr : slvr option
   }
 
@@ -21,19 +20,18 @@ let exec_slvr ?ignore_exit_cd:(ignore_exit_cd=false) ~call_to_slvr enc =
     else failwith (Sexp.to_string (Unix.Exit_or_signal.sexp_of_error e))
 
 let outputcfg =
-  ref {pmodel = false; psmt = false; slvr = None}
+  ref {psmt = false; slvr = None}
 
-let set_options pm psmt slvr =
-  outputcfg := {pmodel = pm; psmt = psmt; slvr = slvr}
+let set_options psmt slvr =
+  outputcfg := {psmt = psmt; slvr = slvr}
 
 let () =
   let open Command.Let_syntax in
   Command.basic ~summary:"opti: an optimizer"
     [%map_open
-      let p_model = flag "print-model" no_arg
-          ~doc:"print model found by solver"
-      and p_smt = flag "print-smt" no_arg
-          ~doc:"print constraint given to solver in SMT-LIB format"
+      let
+        p_smt = flag "only-print-smt" no_arg
+          ~doc:"only print constraint given to solver in SMT-LIB format"
       and slvr = flag "solver"
           (optional (Arg_type.create slvr_of_string))
           ~doc:"choose solver Z3 | BCLT | OMS"
@@ -47,7 +45,7 @@ let () =
         fn = anon ("USER_PARAMS" %: string)
       in
       fun () ->
-        set_options p_model p_smt slvr;
+        set_options p_smt slvr;
         (* parse user parameters from json *)
         let user_params = User_params.user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
         (* create parameters for encoding *)
