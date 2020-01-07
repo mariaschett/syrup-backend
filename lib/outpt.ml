@@ -136,6 +136,7 @@ type rslt = {
   shown_optimal : bool;
   timed_out : bool;
   current_cost : int;
+  saved_gas: int option;
 } [@@deriving show]
 
 let mk_rslt block_id (params : params) (gas_rslt : slvr_rslt) =
@@ -151,17 +152,20 @@ let mk_rslt block_id (params : params) (gas_rslt : slvr_rslt) =
       TIMEOUT -> true
     | _ -> false
   in
+  let current_cost = params.curr_cst in
+  let saved_gas = Option.map ~f:(fun ub -> Int.max (current_cost - ub) 0) upper_bound in
   {
     block_id = block_id;
     lower_bound = lower_bound;
     upper_bound = upper_bound;
     shown_optimal = shown_optimal;
+    saved_gas = saved_gas;
     timed_out = timed_out;
-    current_cost = params.curr_cst;
+    current_cost = current_cost;
     }
 
 let show_csv rslt =
-  let csv_header = ["block_id"; "lower_bound"; "upper_bound"; "shown_optimal"; "timed_out"; "current_cost"] in
+  let csv_header = ["block_id"; "lower_bound"; "upper_bound"; "shown_optimal"; "timed_out"; "current_cost"; "saved_gas"] in
   let data =
     [rslt.block_id;
      (Option.value_map ~default:"" ~f:([%show: int]) rslt.lower_bound);
@@ -169,6 +173,7 @@ let show_csv rslt =
      [%show: bool] rslt.shown_optimal;
      [%show: bool] rslt.timed_out;
      [%show: int] rslt.current_cost;
+     (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
     ]
   in
   (String.concat ~sep:"," csv_header) ^ "\n" ^
