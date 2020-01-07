@@ -129,7 +129,7 @@ let parse_gas_rslt rslt = function
 
 (* produce result json *)
 
-type outpt = {
+type rslt = {
   lower_bound : int option;
   upper_bound : int option;
   shown_optimal : bool;
@@ -137,7 +137,7 @@ type outpt = {
   current_cost : int;
 } [@@deriving show]
 
-let mk_outpt (params : params) (gas_rslt : slvr_rslt) =
+let mk_rslt (params : params) (gas_rslt : slvr_rslt) =
   let (lower_bound, upper_bound) = match gas_rslt with
       RANGE (lb, ub) -> (Some lb, Some ub)
     | OPTIMAL b -> (Some b, Some b)

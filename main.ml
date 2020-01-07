@@ -80,6 +80,6 @@ let () =
                 exec_slvr ~call_to_slvr enc
             in
             let gas_rslt = parse_gas_rslt slvr_rslt slvr in
-            Out_channel.print_endline ([%show: outpt] (mk_outpt params gas_rslt))
+            Out_channel.print_endline ([%show: rslt] (mk_rslt params gas_rslt))
     ]
   |> Command.run ~version:"0.0"
