@@ -62,9 +62,6 @@ let () =
         (* solve *)
         match slvr with
         | None ->
-          write_all ~slvr:Z3 ~path ~enc:enc_z3 ~obj ~params;
-          write_all ~slvr:BCLT ~path ~enc:enc_bclt ~obj ~params;
-          write_all ~slvr:OMS ~path ~enc:enc_oms ~obj ~params;
           let mdl = Z3util.solve_max_model_exn enc enc_weights in
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
@@ -72,15 +69,24 @@ let () =
           let rslt =
             match slvr with
             | Z3 ->
-              let call_to_slvr = path_to_slvr ^ " -in " in
-              let timeout_in_ms = timeout * 1000 in
-              Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3))
+              if write_only
+              then (write_all ~slvr:Z3 ~path ~enc:enc_z3 ~obj ~params; None)
+              else
+                let call_to_slvr = path_to_slvr ^ " -in " in
+                let timeout_in_ms = timeout * 1000 in
+                Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3))
             | BCLT ->
-              let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
-              Some (exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true)
+              if write_only
+              then (write_all ~slvr:BCLT ~path ~enc:enc_bclt ~obj ~params; None)
+              else
+                let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
+                Some (exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true)
             | OMS ->
-              let call_to_slvr = path_to_slvr in
-              Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms))
+              if write_only
+              then (write_all ~slvr:OMS ~path ~enc:enc_oms ~obj ~params; None)
+              else
+                let call_to_slvr = path_to_slvr in
+                Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms))
           in
           if Option.is_some rslt
           then
