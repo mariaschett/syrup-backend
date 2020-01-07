@@ -71,7 +71,7 @@ let write_all ~path ~slvr ~enc ~obj ~params =
 
 (* pretty print output *)
 
-type rslt =
+type slvr_rslt =
   | TIMEOUT
   | OPTIMAL of int
   | RANGE of int * int
@@ -135,7 +135,7 @@ type outpt = {
   current_cost : int;
 } [@@deriving show]
 
-let mk_outpt (params : params) (gas_rslt : rslt) =
+let mk_outpt (params : params) (gas_rslt : slvr_rslt) =
   let (lower_bound, upper_bound) = match gas_rslt with
       RANGE (lb, ub) -> (Some lb, Some ub)
     | OPTIMAL b -> (Some b, Some b)

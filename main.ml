@@ -63,7 +63,7 @@ let () =
           write_model (path^"/model") mdl;
           Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
         | Some slvr ->
-          let rslt =
+          let slvr_rslt =
             match slvr with
             | Z3 ->
               let enc_z3 = show_smt Z3 enc enc_weights in
@@ -90,9 +90,9 @@ let () =
                 let call_to_slvr = path_to_slvr in
                 Some (exec_slvr ~call_to_slvr enc_oms_with_time_out)
           in
-          if Option.is_some rslt
+          if Option.is_some slvr_rslt
           then
-            let gas_rslt = parse_gas_rslt (Option.value_exn rslt) slvr in
+            let gas_rslt = parse_gas_rslt (Option.value_exn slvr_rslt) slvr in
             Out_channel.print_endline ([%show: outpt] (mk_outpt params gas_rslt))
           else ()
     ]
