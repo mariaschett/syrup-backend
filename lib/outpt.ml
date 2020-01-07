@@ -130,6 +130,7 @@ let parse_gas_rslt rslt = function
 (* produce result json *)
 
 type rslt = {
+  block_id : string;
   lower_bound : int option;
   upper_bound : int option;
   shown_optimal : bool;
@@ -137,7 +138,7 @@ type rslt = {
   current_cost : int;
 } [@@deriving show]
 
-let mk_rslt (params : params) (gas_rslt : slvr_rslt) =
+let mk_rslt block_id (params : params) (gas_rslt : slvr_rslt) =
   let (lower_bound, upper_bound) = match gas_rslt with
       RANGE (lb, ub) -> (Some lb, Some ub)
     | OPTIMAL b -> (Some b, Some b)
@@ -150,11 +151,13 @@ let mk_rslt (params : params) (gas_rslt : slvr_rslt) =
       TIMEOUT -> true
     | _ -> false
   in
-    { lower_bound = lower_bound;
-      upper_bound = upper_bound;
-      shown_optimal = shown_optimal;
-      timed_out = timed_out;
-      current_cost = params.curr_cst;
+  {
+    block_id = block_id;
+    lower_bound = lower_bound;
+    upper_bound = upper_bound;
+    shown_optimal = shown_optimal;
+    timed_out = timed_out;
+    current_cost = params.curr_cst;
     }
 
 (* pretty print from model *)
