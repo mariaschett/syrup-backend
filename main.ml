@@ -74,14 +74,18 @@ let () =
             | Z3 ->
               let call_to_slvr = path_to_slvr ^ " -in " in
               let timeout_in_ms = timeout * 1000 in
-              exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3)
+              Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ enc_z3))
             | BCLT ->
               let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
-              exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true
+              Some (exec_slvr ~call_to_slvr enc_bclt ~ignore_exit_cd:true)
             | OMS ->
               let call_to_slvr = path_to_slvr in
-              exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms)
+              Some (exec_slvr ~call_to_slvr ("(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ enc_oms))
           in
-          Out_channel.print_endline (Yojson.Safe.to_string (outpt_json params (parse_gas_rslt rslt slvr)))
+          if Option.is_some rslt
+          then
+            let gas_rslt = parse_gas_rslt (Option.value_exn rslt) slvr in
+            Out_channel.print_endline (Yojson.Safe.to_string (outpt_json params gas_rslt))
+          else ()
     ]
   |> Command.run ~version:"0.0"
