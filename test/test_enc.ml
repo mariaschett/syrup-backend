@@ -13,7 +13,8 @@ let enc =
           src_ws = [Const "s_0";Const  "s_1"];
           tgt_ws = [Const "s_0"; Const "s_1"];
           curr_cst = 9;
-          user_instrs = []
+          user_instrs = [];
+          init_progr_len = 0;
         } in
         let params = Params.mk predef ups in
         let enc = Enc.enc_block params in
@@ -22,7 +23,7 @@ let enc =
         assert_equal
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
-        []
+        ["NOP"]
         (Outpt.show_disasm mdl params)
       );
 
@@ -34,7 +35,8 @@ let enc =
           src_ws = [];
           tgt_ws = [Val (Z.of_int 146)];
           curr_cst = 9;
-          user_instrs = []
+          user_instrs = [];
+          init_progr_len = 2;
         } in
         let params = Params.mk predef ups in
         let enc = Enc.enc_block params in
@@ -50,6 +52,7 @@ let enc =
     "Program duplicating top of the stack">:: (fun _ ->
         let ups = {
           n = 3;
+          init_progr_len = 2;
           k = 3;
           ss = ["s_0"];
           src_ws = [Const "s_0"];
@@ -71,6 +74,7 @@ let enc =
     "Program pushing CALLVALUE on the stack">:: (fun _ ->
         let ups = {
           n = 6;
+          init_progr_len = 6;
           k = 5;
           ss = ["s(1)"; "s(2)"];
           src_ws = [Const "s(1)"];

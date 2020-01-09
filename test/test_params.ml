@@ -11,6 +11,7 @@ let ups_0 = {
   tgt_ws = [Val (Z.of_int 146); Const "s_0"];
   user_instrs = [];
   curr_cst = 9;
+  init_progr_len = 4;
 }
 
 let sk = [
@@ -71,6 +72,7 @@ let ups_1 =
     tgt_ws = [Val (Z.of_int 146); Const "s_1"];
     user_instrs = [add_1];
     curr_cst = 9;
+    init_progr_len = 4;
   }
 
 let timestamp = {
@@ -91,6 +93,7 @@ let ups_2 =
     tgt_ws = [Const "s_2"; Const "s_1"];
     user_instrs = [add_1; timestamp];
     curr_cst = 9;
+    init_progr_len = 4;
   }
 
 
@@ -243,6 +246,7 @@ let input = "{
   \"src_ws\": [ \"s(0)\" ],
   \"tgt_ws\": [ 146, \"s(1)\" ],
   \"current_cost\": 9,
+  \"init_progr_len\": 4,
   \"user_instrs\": [
     {
       \"id\": \"ADD_1\",
