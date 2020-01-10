@@ -1,5 +1,6 @@
 {
   "max_progr_len": 9,
+  "init_progr_len": 9,
   "tgt_ws": [
     "s(4)",
     "s(6)",

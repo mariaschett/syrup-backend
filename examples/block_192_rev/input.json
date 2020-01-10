@@ -1,5 +1,6 @@
 {
   "max_progr_len": 4,
+  "init_progr_len": 4,
   "max_sk_sz": 3,
   "vars": [ "s_0", "s_1" ],
   "src_ws": [ "s_0" ],

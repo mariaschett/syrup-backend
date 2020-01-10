@@ -1,5 +1,6 @@
 {
   "max_progr_len": 6,
+  "init_progr_len": 6,
   "max_sk_sz": 6,
   "vars": [
     "x0",
