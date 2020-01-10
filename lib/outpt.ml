@@ -32,7 +32,7 @@ let show_oms_smt cmn_smt =
   in
   cmn_smt' ^ "(get-objectives)\n"
 
-let show_blct_smt cmn_smt =
+let show_bclt_smt cmn_smt =
   let open String.Search_pattern in
   (* barcelogic requires different start of assert-soft *)
   let op = "assert-soft (" and op' = "assert-soft (! (" in
@@ -50,7 +50,7 @@ let show_smt slvr enc enc_weights timeout =
   | Z3 ->
     let timeout_in_ms = timeout * 1000 in
     "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ (show_z3_smt cmn_smt)
-  | BCLT -> show_blct_smt cmn_smt
+  | BCLT -> show_bclt_smt cmn_smt
   | OMS -> "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ (show_oms_smt cmn_smt)
 
 let write_smt ~data ~path slvr =
