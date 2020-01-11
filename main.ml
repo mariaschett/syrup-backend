@@ -35,13 +35,13 @@ let () =
           ~doc:"print smt constraint in SMT-LIB format, a mapping to instructions, and objectives"
       and slvr = flag "solver"
           (optional (Arg_type.create slvr_of_string))
-          ~doc:"choose solver Z3 | BCLT | OMS"
+          ~doc:"S choose solver: Z3 | BCLT | OMS"
       and path_to_slvr = flag "path"
           (optional_with_default "z3" (Arg_type.create Fn.id))
-          ~doc:"give path to solver"
+          ~doc:"P give path to binary of corresponding solver"
       and timeout = flag "timeout"
           (optional_with_default 0 (Arg_type.create int_of_string))
-          ~doc:"set timeout in seconds"
+          ~doc:"TO set timeout in seconds"
       and omit_csv_header = flag "omit-csv-header" no_arg
           ~doc:"omit writing the csv header of the output"
       and
