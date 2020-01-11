@@ -177,11 +177,13 @@ let show_csv_header =
     "timed_out";
     "current_cost";
     "saved_gas";
-    "misc"]
+    "misc";
+    "solver_time_in_sec"
+  ]
   in
   (String.concat ~sep:"," csv_header) ^ "\n"
 
-let show_csv rslt omit_csv_header =
+let show_csv rslt omit_csv_header slvr_time_in_sec =
   let data =
     [rslt.block_id;
      (Option.value_map ~default:"" ~f:([%show: int]) rslt.lower_bound);
@@ -191,6 +193,7 @@ let show_csv rslt omit_csv_header =
      [%show: int] rslt.current_cost;
      (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
      (Option.value_map ~default:"" ~f:(fun misc -> "\"" ^  misc ^ "\"") rslt.misc);
+     [%show: float] slvr_time_in_sec;
     ]
   in
   (if omit_csv_header then "" else show_csv_header) ^

@@ -83,6 +83,10 @@ let () =
                 exec_slvr ~call_to_slvr enc
             in
             let rslt = parse_slvr_outpt slvr_outpt slvr path params in
-            Out_channel.print_endline (show_csv rslt omit_csv_header)
+            (* count system and user time of child process to also count memory allocation etc.
+               get actual time used by process *)
+            let slvr_time_in_sec = (let t = Unix.times () in (t.tms_cutime +. t.tms_cstime)) in
+            let csv = show_csv rslt omit_csv_header slvr_time_in_sec in
+            Out_channel.print_endline csv
     ]
   |> Command.run ~version:"0.0"
