@@ -81,10 +81,10 @@ type rslt = {
   timed_out : bool;
   current_cost : int;
   saved_gas: int option;
-  misc : string option;
+  slvr_outpt : string;
 } [@@deriving show]
 
-let mk_default_rslt block_id params =
+let mk_default_rslt block_id params outpt =
   {
     block_id = block_id;
     lower_bound = None;
@@ -93,7 +93,7 @@ let mk_default_rslt block_id params =
     saved_gas = None;
     timed_out = false;
     current_cost = params.curr_cst;
-    misc = None;
+    slvr_outpt = outpt;
   }
 
 let ws = [%sedlex.regexp? Star white_space]
@@ -121,9 +121,6 @@ let set_range lower_bound upper_bound prtl_rslt =
 let set_timeout prtl_rslt =
   { prtl_rslt with timed_out = true}
 
-let set_misc outpt prtl_rslt =
-  { prtl_rslt with misc = Some outpt }
-
 let parse_slvr_outpt_z3 outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
@@ -135,7 +132,7 @@ let parse_slvr_outpt_z3 outpt =
     let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
     set_range lb ub
   | "timeout" -> set_timeout
-  | _ -> set_misc outpt
+  | _ -> Fn.id
 
 let parse_slvr_outpt_bclt outpt =
   let open Sedlexing in
@@ -144,7 +141,7 @@ let parse_slvr_outpt_bclt outpt =
   | ws, "(optimal", ws -> set_optimal (parse_int buf)
   | ws, "(cost", ws -> set_range 0 (parse_int buf)
   | ws, "unknown" -> set_timeout
-  | _ -> set_misc outpt
+  | _ -> Fn.id
 
 let parse_slvr_outpt_oms outpt =
   let open Sedlexing in
@@ -156,10 +153,10 @@ let parse_slvr_outpt_oms outpt =
     let lb = parse_int buf in
     let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
     set_range lb ub
-  | _ -> set_misc outpt
+  | _ -> Fn.id
 
 let parse_slvr_outpt outpt slvr block_id params =
-  let dflt_rslt = mk_default_rslt block_id params in
+  let dflt_rslt = mk_default_rslt block_id params outpt in
   let prtl_rslt = match slvr with
     | Z3 -> parse_slvr_outpt_z3 outpt dflt_rslt
     | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
@@ -177,8 +174,8 @@ let show_csv_header =
     "timed_out";
     "current_cost";
     "saved_gas";
-    "misc";
-    "solver_time_in_sec"
+    "solver_time_in_sec";
+    "solver_output";
   ]
   in
   (String.concat ~sep:"," csv_header) ^ "\n"
@@ -192,8 +189,8 @@ let show_csv rslt omit_csv_header slvr_time_in_sec =
      [%show: bool] rslt.timed_out;
      [%show: int] rslt.current_cost;
      (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
-     (Option.value_map ~default:"" ~f:(fun misc -> "\"" ^  misc ^ "\"") rslt.misc);
      [%show: float] slvr_time_in_sec;
+     "\"" ^  rslt.slvr_outpt ^ "\"";
     ]
   in
   (if omit_csv_header then "" else show_csv_header) ^
