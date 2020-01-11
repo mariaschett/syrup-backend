@@ -79,7 +79,7 @@ let () =
                 let call_to_slvr = path_to_slvr in
                 exec_slvr ~call_to_slvr enc
             in
-            let gas_rslt = parse_slvr_outpt slvr_outpt slvr in
-            Out_channel.print_endline (show_csv (mk_rslt path params gas_rslt))
+            let rslt = parse_slvr_outpt slvr_outpt slvr path params in
+            Out_channel.print_endline (show_csv rslt)
     ]
   |> Command.run ~version:"0.0"

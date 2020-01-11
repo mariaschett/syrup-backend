@@ -73,62 +73,6 @@ let write_all ~path ~slvr ~enc ~obj ~params =
 
 (* pretty print output *)
 
-type slvr_rslt =
-  | TIMEOUT
-  | OPTIMAL of int
-  | RANGE of int * int
-  | MISC of string
-[@@deriving show {with_path = false}]
-
-let ws = [%sedlex.regexp? Star white_space]
-let digits = [%sedlex.regexp? Plus '0'..'9']
-
-let parse_int buf =
-  let open Sedlexing in
-  match%sedlex buf with
-  | digits -> Int.of_string (Latin1.lexeme buf)
-  | _ -> failwith "Failed to parse int."
-
-let parse_slvr_outpt_z3 outpt =
-  let open Sedlexing in
-  let buf = Latin1.from_string outpt in
-  match%sedlex buf with
-  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
-  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws ->
-    let lb = parse_int buf in
-    let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
-    RANGE (lb, ub)
-  | "timeout" -> TIMEOUT
-  | _ -> MISC outpt
-
-let parse_slvr_outpt_bclt outpt =
-  let open Sedlexing in
-  let buf = Latin1.from_string outpt in
-  match%sedlex buf with
-  | ws, "(optimal", ws -> OPTIMAL (parse_int buf)
-  | ws, "(cost", ws -> RANGE (0, parse_int buf)
-  | ws, "unknown" -> TIMEOUT
-  | _ -> MISC outpt
-
-let parse_slvr_outpt_oms outpt =
-  let open Sedlexing in
-  let buf = Latin1.from_string outpt in
-  match%sedlex buf with
-  | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
-  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
-  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws ->
-    let lb = parse_int buf in
-    let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
-    RANGE (lb, ub)
-  | _ -> MISC outpt
-
-let parse_slvr_outpt outpt = function
-  | Z3 -> parse_slvr_outpt_z3 outpt
-  | BCLT -> parse_slvr_outpt_bclt outpt
-  | OMS -> parse_slvr_outpt_oms outpt
-
-(* produce result json *)
-
 type rslt = {
   block_id : string;
   lower_bound : int option;
@@ -140,35 +84,89 @@ type rslt = {
   misc : string option;
 } [@@deriving show]
 
-let mk_rslt block_id (params : params) (gas_rslt : slvr_rslt) =
-  let (lower_bound, upper_bound) = match gas_rslt with
-      RANGE (lb, ub) -> (Some lb, Some ub)
-    | OPTIMAL b -> (Some b, Some b)
-    | _ -> (None, None)
-  in
-  let shown_optimal = match gas_rslt with
-      OPTIMAL _ -> true
-    | _ -> false in
-  let timed_out = match gas_rslt with
-      TIMEOUT -> true
-    | _ -> false
-  in
-  let misc = match gas_rslt with
-    | MISC m -> Some m
-    | _ -> None
-  in
-  let current_cost = params.curr_cst in
-  let saved_gas = Option.map ~f:(fun ub -> Int.max (current_cost - ub) 0) upper_bound in
+let mk_default_rslt block_id params =
   {
     block_id = block_id;
-    lower_bound = lower_bound;
-    upper_bound = upper_bound;
-    shown_optimal = shown_optimal;
-    saved_gas = saved_gas;
-    timed_out = timed_out;
-    current_cost = current_cost;
-    misc = misc;
-    }
+    lower_bound = None;
+    upper_bound = None;
+    shown_optimal = false;
+    saved_gas = None;
+    timed_out = false;
+    current_cost = params.curr_cst;
+    misc = None;
+  }
+
+let ws = [%sedlex.regexp? Star white_space]
+let digits = [%sedlex.regexp? Plus '0'..'9']
+
+let parse_int buf =
+  let open Sedlexing in
+  match%sedlex buf with
+  | digits -> Int.of_string (Latin1.lexeme buf)
+  | _ -> failwith "Failed to parse int."
+
+let set_optimal bound prtl_rslt =
+  {prtl_rslt with
+     lower_bound = Some bound;
+     upper_bound = Some bound;
+     shown_optimal = true
+  }
+
+let set_range lower_bound upper_bound prtl_rslt =
+  { prtl_rslt with
+     lower_bound = Some lower_bound;
+     upper_bound = Some upper_bound;
+  }
+
+let set_timeout prtl_rslt =
+  { prtl_rslt with timed_out = true}
+
+let set_misc outpt prtl_rslt =
+  { prtl_rslt with misc = Some outpt }
+
+let parse_slvr_outpt_z3 outpt =
+  let open Sedlexing in
+  let buf = Latin1.from_string outpt in
+  match%sedlex buf with
+  | "sat", ws, "(objectives", ws, "(gas", ws ->
+    set_optimal (parse_int buf)
+  | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws ->
+    let lb = parse_int buf in
+    let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
+    set_range lb ub
+  | "timeout" -> set_timeout
+  | _ -> set_misc outpt
+
+let parse_slvr_outpt_bclt outpt =
+  let open Sedlexing in
+  let buf = Latin1.from_string outpt in
+  match%sedlex buf with
+  | ws, "(optimal", ws -> set_optimal (parse_int buf)
+  | ws, "(cost", ws -> set_range 0 (parse_int buf)
+  | ws, "unknown" -> set_timeout
+  | _ -> set_misc outpt
+
+let parse_slvr_outpt_oms outpt =
+  let open Sedlexing in
+  let buf = Latin1.from_string outpt in
+  match%sedlex buf with
+  | "sat", ws, "(objectives", ws, "(gas", ws -> set_optimal (parse_int buf)
+  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_timeout
+  | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws ->
+    let lb = parse_int buf in
+    let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
+    set_range lb ub
+  | _ -> set_misc outpt
+
+let parse_slvr_outpt outpt slvr block_id params =
+  let dflt_rslt = mk_default_rslt block_id params in
+  let prtl_rslt = match slvr with
+    | Z3 -> parse_slvr_outpt_z3 outpt dflt_rslt
+    | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
+    | OMS -> parse_slvr_outpt_oms outpt dflt_rslt
+  in
+  let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.current_cost - ub) 0) prtl_rslt.upper_bound in
+  {prtl_rslt with saved_gas = saved_gas}
 
 let show_csv rslt =
   let csv_header = ["block_id"; "lower_bound"; "upper_bound"; "shown_optimal"; "timed_out"; "current_cost"; "saved_gas"; "misc"] in
