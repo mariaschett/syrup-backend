@@ -67,7 +67,7 @@ let () =
           if write_only
           then write_all ~slvr ~path ~enc ~obj ~params
           else
-            let slvr_rslt =
+            let slvr_outpt =
               match slvr with
               | Z3 ->
                 let call_to_slvr = path_to_slvr ^ " -in " in
@@ -79,7 +79,7 @@ let () =
                 let call_to_slvr = path_to_slvr in
                 exec_slvr ~call_to_slvr enc
             in
-            let gas_rslt = parse_gas_rslt slvr_rslt slvr in
+            let gas_rslt = parse_slvr_outpt slvr_outpt slvr in
             Out_channel.print_endline (show_csv (mk_rslt path params gas_rslt))
     ]
   |> Command.run ~version:"0.0"

@@ -89,9 +89,9 @@ let parse_int buf =
   | digits -> Int.of_string (Latin1.lexeme buf)
   | _ -> failwith "Failed to parse int."
 
-let parse_gas_rslt_z3 rslt =
+let parse_slvr_outpt_z3 outpt =
   let open Sedlexing in
-  let buf = Latin1.from_string rslt in
+  let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws ->
@@ -99,20 +99,20 @@ let parse_gas_rslt_z3 rslt =
     let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
     RANGE (lb, ub)
   | "timeout" -> TIMEOUT
-  | _ -> MISC rslt
+  | _ -> MISC outpt
 
-let parse_gas_rslt_bclt rslt =
+let parse_slvr_outpt_bclt outpt =
   let open Sedlexing in
-  let buf = Latin1.from_string rslt in
+  let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | ws, "(optimal", ws -> OPTIMAL (parse_int buf)
   | ws, "(cost", ws -> RANGE (0, parse_int buf)
   | ws, "unknown" -> TIMEOUT
-  | _ -> MISC rslt
+  | _ -> MISC outpt
 
-let parse_gas_rslt_oms rslt =
+let parse_slvr_outpt_oms outpt =
   let open Sedlexing in
-  let buf = Latin1.from_string rslt in
+  let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws -> OPTIMAL (parse_int buf)
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> TIMEOUT
@@ -120,12 +120,12 @@ let parse_gas_rslt_oms rslt =
     let lb = parse_int buf in
     let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
     RANGE (lb, ub)
-  | _ -> MISC rslt
+  | _ -> MISC outpt
 
-let parse_gas_rslt rslt = function
-  | Z3 -> parse_gas_rslt_z3 rslt
-  | BCLT -> parse_gas_rslt_bclt rslt
-  | OMS -> parse_gas_rslt_oms rslt
+let parse_slvr_outpt outpt = function
+  | Z3 -> parse_slvr_outpt_z3 outpt
+  | BCLT -> parse_slvr_outpt_bclt outpt
+  | OMS -> parse_slvr_outpt_oms outpt
 
 (* produce result json *)
 
