@@ -5,3 +5,5 @@
  (link_flags -cc g++)
  (public_name opti)
 )
+
+(env (static (flags -cc g++ -ccopt -static)))

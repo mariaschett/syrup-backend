@@ -3,6 +3,9 @@ Z3DIR := $(shell ocamlfind query z3)
 build :
 	dune build @install
 
+static:
+	dune build main.exe --profile static
+
 test : build
 	LD_LIBRARY_PATH=$(Z3DIR) \
 	dune runtest
@@ -14,6 +17,6 @@ test_% : build
 clean :
 	dune clean
 
-.PHONY : build run test test_% utop clean
+.PHONY : build run test test_% utop clean static
 
 
