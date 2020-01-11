@@ -168,8 +168,20 @@ let parse_slvr_outpt outpt slvr block_id params =
   let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.current_cost - ub) 0) prtl_rslt.upper_bound in
   {prtl_rslt with saved_gas = saved_gas}
 
-let show_csv rslt =
-  let csv_header = ["block_id"; "lower_bound"; "upper_bound"; "shown_optimal"; "timed_out"; "current_cost"; "saved_gas"; "misc"] in
+let show_csv_header =
+  let csv_header = [
+    "block_id";
+    "lower_bound";
+    "upper_bound";
+    "shown_optimal";
+    "timed_out";
+    "current_cost";
+    "saved_gas";
+    "misc"]
+  in
+  (String.concat ~sep:"," csv_header) ^ "\n"
+
+let show_csv rslt omit_csv_header =
   let data =
     [rslt.block_id;
      (Option.value_map ~default:"" ~f:([%show: int]) rslt.lower_bound);
@@ -181,7 +193,7 @@ let show_csv rslt =
      (Option.value_map ~default:"" ~f:(fun misc -> "\"" ^  misc ^ "\"") rslt.misc);
     ]
   in
-  (String.concat ~sep:"," csv_header) ^ "\n" ^
+  (if omit_csv_header then "" else show_csv_header) ^
   (String.concat ~sep:"," data)
 
 (* pretty print from model *)

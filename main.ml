@@ -5,6 +5,7 @@ open Outpt
 type output_options =
   { write_only : bool
   ; slvr : slvr option
+  ; omit_csv_header : bool
   }
 
 let exec_slvr ?ignore_exit_cd:(ignore_exit_cd=false) ~call_to_slvr enc =
@@ -20,10 +21,10 @@ let exec_slvr ?ignore_exit_cd:(ignore_exit_cd=false) ~call_to_slvr enc =
     else failwith (Sexp.to_string (Unix.Exit_or_signal.sexp_of_error e))
 
 let outputcfg =
-  ref {write_only = false; slvr = None}
+  ref {write_only = false; slvr = None; omit_csv_header = false}
 
-let set_options write_only slvr =
-  outputcfg := {write_only = write_only; slvr = slvr}
+let set_options write_only slvr omit_csv_header =
+  outputcfg := {write_only = write_only; slvr = slvr; omit_csv_header = omit_csv_header}
 
 let () =
   let open Command.Let_syntax in
@@ -41,11 +42,13 @@ let () =
       and timeout = flag "timeout"
           (optional_with_default 0 (Arg_type.create int_of_string))
           ~doc:"set timeout in seconds"
+      and omit_csv_header = flag "omit-csv-header" no_arg
+          ~doc:"omit writing the csv header of the output"
       and
         fn = anon ("USER_PARAMS" %: string)
       in
       fun () ->
-        set_options write_only slvr;
+        set_options write_only slvr omit_csv_header;
         (* parse user parameters from json *)
         let user_params = User_params.user_params_of_yojson_exn (Yojson.Safe.from_file fn) in
         (* create parameters for encoding *)
@@ -80,6 +83,6 @@ let () =
                 exec_slvr ~call_to_slvr enc
             in
             let rslt = parse_slvr_outpt slvr_outpt slvr path params in
-            Out_channel.print_endline (show_csv rslt)
+            Out_channel.print_endline (show_csv rslt omit_csv_header)
     ]
   |> Command.run ~version:"0.0"
