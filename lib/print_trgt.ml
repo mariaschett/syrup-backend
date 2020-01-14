@@ -2,6 +2,12 @@ open Core
 open Consts
 open Params
 
+type trgt_prgrm = {
+  opcode : string;
+  disasm : string;
+  cost : int;
+} [@@deriving yojson]
+
 (* pretty print target program *)
 
 let show_disasm params ~dec_instr ~dec_arg =
@@ -17,6 +23,10 @@ let show_opcode params ~dec_instr ~dec_arg =
       let iota = dec_instr i in
       Instruction.show_opcode iota ~arg:(arg iota i)
     )
+
+let compute_cost params ~dec_instr =
+  List.init params.n ~f:(dec_instr) |>
+  List.sum (module Int) ~f:(Instruction.get_gas)
 
 (* pretty print target program from t_i/a_i list *)
 
@@ -40,13 +50,18 @@ let show_opcode_from_slvr params ts as_ =
     ~dec_arg:(dec_arg_from_slvr as_)
   |> String.concat
 
-(* pretty print from internal model *)
+let compute_cost_from_slvr params ts =
+  compute_cost  params
+    ~dec_instr:(dec_instr_from_slvr ts params)
 
-type trgt_prgrm = {
-  opcode : string;
-  disasm : string;
-  cost : string;
-} [@@deriving yojson]
+let trgt_prgrm_from_slvr params ts as_ =
+  {
+    opcode = show_opcode_from_slvr params ts as_;
+    disasm = show_disasm_from_slvr params ts as_;
+    cost = compute_cost_from_slvr params ts;
+  }
+
+(* pretty print from internal model *)
 
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
@@ -67,5 +82,5 @@ let show_opcode_mdl mdl params = show_opcode params
 let show_trgt_prgrm mdl obj params =
   { opcode = [%show: string list] (show_opcode_mdl mdl params );
     disasm = [%show: string list] (show_disasm_mdl mdl params);
-    cost = [%show: int] (Z3util.solve_objectives mdl obj);
+    cost = Z3util.solve_objectives mdl obj;
   }

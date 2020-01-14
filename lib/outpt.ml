@@ -119,15 +119,15 @@ let parse_remainder buf =
   | remainder -> Latin1.lexeme buf
   | _ -> failwith "Parse error."
 
-let set_target_gas_cost target_gas_cost trgt_disasm trgt_opcode prtl_rslt =
+let set_target_gas_cost trgt prtl_rslt =
   { prtl_rslt with
-    target_gas_cost = Some target_gas_cost;
-    target_disasm = Some trgt_disasm;
-    target_opcode = Some trgt_opcode;
+    target_gas_cost = Some trgt.cost;
+    target_disasm = Some trgt.disasm;
+    target_opcode = Some trgt.opcode;
   }
 
-let set_optimal bound trgt_disasm trgt_opcode prtl_rslt =
-  let prtl_rslt' = set_target_gas_cost bound trgt_disasm trgt_opcode prtl_rslt in
+let set_optimal trgt prtl_rslt =
+  let prtl_rslt' = set_target_gas_cost trgt prtl_rslt in
   {prtl_rslt' with shown_optimal = true}
 
 let set_no_model_found prtl_rslt =
@@ -145,31 +145,30 @@ let rec find_consts_Z3 const = function
 let parse_target_Z3 params mdl =
   let exp = Sexp.of_string mdl in
   let ts = find_consts_Z3 "t" exp and as_ = find_consts_Z3 "a" exp in
-  (show_disasm_from_slvr params ts as_,
-   show_opcode_from_slvr params ts as_)
+  trgt_prgrm_from_slvr params ts as_
 
 let parse_slvr_outpt_z3 params outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws ->
-    let optimal = parse_int buf in
+    let _ = parse_int buf in
     begin
       match%sedlex buf with
       | ws, ")", ws, ")" ->
         let mdl = parse_remainder buf in
-        let (trgt_disasm, trgt_opcode) = parse_target_Z3 params mdl in
-        set_optimal optimal trgt_disasm trgt_opcode
+        let trgt = parse_target_Z3 params mdl in
+        set_optimal trgt
       | _ -> failwith "Parse error."
     end
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws, digits ->
-    let upper_bound =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
+    let _ = match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
     begin
       match%sedlex buf with
       | ws, ")", ws, ")", ws, ")", ws, "(model" ->
         let mdl =  "(model" ^ parse_remainder buf in
-        let (trgt_disasm, trgt_opcode) = parse_target_Z3 params mdl in
-        set_target_gas_cost upper_bound trgt_disasm trgt_opcode
+        let trgt = parse_target_Z3 params mdl in
+        set_target_gas_cost trgt
       | ws, ")", ws, ")", ws, ")", ws, "(error" ->
         set_no_model_found
       | _ -> failwith "Parse error."
@@ -184,23 +183,23 @@ let parse_slvr_outpt_bclt params outpt =
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | ws, "(optimal", ws ->
-    let optimal = parse_int buf in
+    let _ = parse_int buf in
     begin
       match%sedlex buf with
       | ws, ")", ws ->
         let mdl = parse_remainder buf in
-        let (trgt_disasm, trgt_opcode) = parse_target_BCLT params mdl in
-        set_optimal optimal trgt_disasm trgt_opcode
+        let trgt = parse_target_BCLT params mdl in
+        set_optimal trgt
       | _ -> failwith "Parse error."
     end
   | ws, "(cost", ws ->
-    let upper_bound = parse_int buf in
+    let _ = parse_int buf in
     begin
       match%sedlex buf with
       | ws, ")", ws ->
         let mdl = parse_remainder buf in
-        let (trgt_disasm, trgt_opcode) = parse_target_BCLT params mdl in
-        set_target_gas_cost upper_bound trgt_disasm trgt_opcode
+        let trgt = parse_target_BCLT params mdl in
+        set_target_gas_cost trgt
       | _ -> failwith "Parse error."
     end
   | ws, "unknown" -> set_no_model_found
@@ -216,31 +215,30 @@ let rec find_consts_OMS const = function
 let parse_target_OMS params mdl =
   let exp = Sexp.of_string mdl in
   let ts = find_consts_OMS "t" exp and as_ = find_consts_OMS "a" exp in
-  (show_disasm_from_slvr params ts as_,
-   show_opcode_from_slvr params ts as_)
+  trgt_prgrm_from_slvr params ts as_
 
 let parse_slvr_outpt_oms params outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws ->
-    let optimal = parse_int buf in
+    let _ = parse_int buf in
     begin
       match%sedlex buf with
       | ws, ")", ws, ")", ws ->
         let mdl = parse_remainder buf in
-        let (trgt_disasm, trgt_opcode) = parse_target_OMS params mdl in
-        set_optimal optimal trgt_disasm trgt_opcode
+        let trgt = parse_target_OMS params mdl in
+        set_optimal trgt
       | _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws, digits ->
-    let upper_bound =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
+    let _ =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
     begin
       match%sedlex buf with
       | ws, "]", ws, ")", ws ->
         let mdl = parse_remainder buf in
-        let (trgt_disasm, trgt_opcode) = parse_target_OMS params mdl in
-        set_target_gas_cost upper_bound trgt_disasm trgt_opcode
+        let trgt = parse_target_OMS params mdl in
+        set_target_gas_cost trgt
       |  _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_no_model_found

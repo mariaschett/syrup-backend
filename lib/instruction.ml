@@ -45,6 +45,8 @@ let show_opcode ?arg:(arg=None) iota =
     (hex_add iota.opcode (idx-1) ^ (show_hex arg))
   else iota.opcode
 
+let get_gas iota = iota.gas
+
 let enc_semtc ~in_ws ~is_commutative ~out_ws ~alpha ~delta k j =
   let out_idxs = List.range ~start:`inclusive (k - alpha + delta) ~stop:`exclusive k in
   let x i = mk_x i j and x' i = mk_x' i j in
