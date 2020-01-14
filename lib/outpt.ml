@@ -1,7 +1,7 @@
 open Core
-open Consts
 open Params
 open Sexplib
+open Print_trgt
 
 type slvr =
     Z3
@@ -87,11 +87,11 @@ type rslt = {
   no_model_found : bool;
   source_gas_cost : int;
   saved_gas: int option;
-  slvr_outpt : string;
-  target_program : string option;
+  target_disasm : string option;
+  target_opcode : string option;
 } [@@deriving show]
 
-let mk_default_rslt block_id params outpt =
+let mk_default_rslt block_id params =
   {
     block_id = block_id;
     target_gas_cost = None;
@@ -99,8 +99,8 @@ let mk_default_rslt block_id params outpt =
     saved_gas = None;
     no_model_found = false;
     source_gas_cost = params.curr_cst;
-    slvr_outpt = outpt;
-    target_program = None;
+    target_disasm = None;
+    target_opcode = None;
   }
 
 let ws = [%sedlex.regexp? Star white_space]
@@ -119,17 +119,16 @@ let parse_remainder buf =
   | remainder -> Latin1.lexeme buf
   | _ -> failwith "Parse error."
 
-let set_optimal bound trgt_prgr prtl_rslt =
-  {prtl_rslt with
-     target_gas_cost = Some bound;
-     shown_optimal = true;
-     target_program = Some trgt_prgr
+let set_target_gas_cost target_gas_cost trgt_disasm trgt_opcode prtl_rslt =
+  { prtl_rslt with
+    target_gas_cost = Some target_gas_cost;
+    target_disasm = Some trgt_disasm;
+    target_opcode = Some trgt_opcode;
   }
 
-let set_target_gas_cost target_gas_cost prtl_rslt =
-  { prtl_rslt with
-     target_gas_cost = Some target_gas_cost;
-  }
+let set_optimal bound trgt_disasm trgt_opcode prtl_rslt =
+  let prtl_rslt' = set_target_gas_cost bound trgt_disasm trgt_opcode prtl_rslt in
+  {prtl_rslt' with shown_optimal = true}
 
 let set_no_model_found prtl_rslt =
   { prtl_rslt with no_model_found = true}
@@ -143,12 +142,13 @@ let rec find_consts_Z3 const = function
     when String.is_prefix id ~prefix:(const ^ "_") -> [(id, vl)]
   | Sexp.List ss -> List.concat_map ss ~f:(find_consts_Z3 const)
 
-let parse_target_Z3 mdl =
+let parse_target_Z3 params mdl =
   let exp = Sexp.of_string mdl in
-  [%show: (string * string) list] (find_consts_Z3 "t" exp) ^
-  [%show: (string * string) list] (find_consts_Z3 "a" exp)
+  let ts = find_consts_Z3 "t" exp and as_ = find_consts_Z3 "a" exp in
+  (show_disasm_from_slvr params ts as_,
+   show_opcode_from_slvr params ts as_)
 
-let parse_slvr_outpt_z3 outpt =
+let parse_slvr_outpt_z3 params outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
@@ -158,8 +158,8 @@ let parse_slvr_outpt_z3 outpt =
       match%sedlex buf with
       | ws, ")", ws, ")" ->
         let mdl = parse_remainder buf in
-        let trgt_prgr = parse_target_Z3 mdl in
-        set_optimal optimal trgt_prgr
+        let (trgt_disasm, trgt_opcode) = parse_target_Z3 params mdl in
+        set_optimal optimal trgt_disasm trgt_opcode
       | _ -> failwith "Parse error."
     end
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws, digits ->
@@ -167,8 +167,9 @@ let parse_slvr_outpt_z3 outpt =
     begin
       match%sedlex buf with
       | ws, ")", ws, ")", ws, ")", ws, "(model" ->
-        let _ = "(model" ^ (Latin1.lexeme buf) in
-        set_target_gas_cost upper_bound
+        let mdl =  "(model" ^ parse_remainder buf in
+        let (trgt_disasm, trgt_opcode) = parse_target_Z3 params mdl in
+        set_target_gas_cost upper_bound trgt_disasm trgt_opcode
       | ws, ")", ws, ")", ws, ")", ws, "(error" ->
         set_no_model_found
       | _ -> failwith "Parse error."
@@ -178,7 +179,7 @@ let parse_slvr_outpt_z3 outpt =
 
 let parse_target_BCLT = parse_target_Z3
 
-let parse_slvr_outpt_bclt outpt =
+let parse_slvr_outpt_bclt params outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
@@ -188,8 +189,8 @@ let parse_slvr_outpt_bclt outpt =
       match%sedlex buf with
       | ws, ")", ws ->
         let mdl = parse_remainder buf in
-        let trgt_prgr = parse_target_BCLT mdl in
-        set_optimal optimal trgt_prgr
+        let (trgt_disasm, trgt_opcode) = parse_target_BCLT params mdl in
+        set_optimal optimal trgt_disasm trgt_opcode
       | _ -> failwith "Parse error."
     end
   | ws, "(cost", ws ->
@@ -197,8 +198,9 @@ let parse_slvr_outpt_bclt outpt =
     begin
       match%sedlex buf with
       | ws, ")", ws ->
-        let _ = Latin1.lexeme buf in
-        set_target_gas_cost upper_bound
+        let mdl = parse_remainder buf in
+        let (trgt_disasm, trgt_opcode) = parse_target_BCLT params mdl in
+        set_target_gas_cost upper_bound trgt_disasm trgt_opcode
       | _ -> failwith "Parse error."
     end
   | ws, "unknown" -> set_no_model_found
@@ -211,12 +213,13 @@ let rec find_consts_OMS const = function
     when String.is_prefix id ~prefix:(const ^ "_") -> [(id, vl)]
   | Sexp.List ss -> List.concat_map ss ~f:(find_consts_OMS const)
 
-let parse_target_OMS mdl =
+let parse_target_OMS params mdl =
   let exp = Sexp.of_string mdl in
-  [%show: (string * string) list] (find_consts_OMS "t" exp) ^
-  [%show: (string * string) list] (find_consts_OMS "a" exp)
+  let ts = find_consts_OMS "t" exp and as_ = find_consts_OMS "a" exp in
+  (show_disasm_from_slvr params ts as_,
+   show_opcode_from_slvr params ts as_)
 
-let parse_slvr_outpt_oms outpt =
+let parse_slvr_outpt_oms params outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
@@ -226,8 +229,8 @@ let parse_slvr_outpt_oms outpt =
       match%sedlex buf with
       | ws, ")", ws, ")", ws ->
         let mdl = parse_remainder buf in
-        let trgt_prgr = parse_target_OMS mdl in
-        set_optimal optimal trgt_prgr
+        let (trgt_disasm, trgt_opcode) = parse_target_OMS params mdl in
+        set_optimal optimal trgt_disasm trgt_opcode
       | _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws, digits ->
@@ -235,19 +238,20 @@ let parse_slvr_outpt_oms outpt =
     begin
       match%sedlex buf with
       | ws, "]", ws, ")", ws ->
-        let _ = Latin1.lexeme buf in
-        set_target_gas_cost upper_bound
+        let mdl = parse_remainder buf in
+        let (trgt_disasm, trgt_opcode) = parse_target_OMS params mdl in
+        set_target_gas_cost upper_bound trgt_disasm trgt_opcode
       |  _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_no_model_found
   | _ -> Fn.id
 
 let parse_slvr_outpt outpt slvr block_id params =
-  let dflt_rslt = mk_default_rslt block_id params outpt in
+  let dflt_rslt = mk_default_rslt block_id params in
   let prtl_rslt = match slvr with
-    | Z3 -> parse_slvr_outpt_z3 outpt dflt_rslt
-    | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
-    | OMS -> parse_slvr_outpt_oms outpt dflt_rslt
+    | Z3 -> parse_slvr_outpt_z3 params outpt dflt_rslt
+    | BCLT -> parse_slvr_outpt_bclt params outpt dflt_rslt
+    | OMS -> parse_slvr_outpt_oms params outpt dflt_rslt
   in
   let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.source_gas_cost - ub) 0) prtl_rslt.target_gas_cost in
   {prtl_rslt with saved_gas = saved_gas}
@@ -262,7 +266,8 @@ let show_csv_header =
     "saved_gas";
     "solver_time_in_sec";
     "solver_output";
-    "target_program"
+    "target_disasm";
+    "target_opcode"
   ]
   in
   (String.concat ~sep:"," csv_header) ^ "\n"
@@ -276,55 +281,9 @@ let show_csv rslt omit_csv_header slvr_time_in_sec =
      [%show: int] rslt.source_gas_cost;
      (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
      [%show: float] slvr_time_in_sec;
-     "\"" ^  rslt.slvr_outpt ^ "\"";
-     (Option.value_map ~default:"" ~f:([%show: string]) rslt.target_program);
+     (Option.value_map ~default:"" ~f:([%show: string]) rslt.target_disasm);
+     (Option.value_map ~default:"" ~f:([%show: string]) rslt.target_opcode);
     ]
   in
   (if omit_csv_header then "" else show_csv_header) ^
   (String.concat ~sep:"," data)
-
-(* pretty print target program *)
-
-let show_disasm params ~dec_instr ~dec_arg =
-  let arg iota i = Option.some_if (Instruction.is_PUSH iota) (dec_arg i) in
-  List.init params.n ~f:(fun i ->
-      let iota = dec_instr i in
-      Instruction.show_disasm iota ~arg:(arg iota i)
-    )
-
-let show_opcode params ~dec_instr ~dec_arg =
-  let arg iota i = Option.some_if (Instruction.is_PUSH iota) (dec_arg i) in
-  List.init params.n ~f:(fun i ->
-      let iota = dec_instr i in
-      Instruction.show_opcode iota ~arg:(arg iota i)
-    )
-
-(* pretty print from internal model *)
-
-type trgt_prgrm = {
-  opcode : string;
-  disasm : string;
-  cost : string;
-} [@@deriving yojson]
-
-let dec_arg mdl i =
-  let a_i = Z3util.eval_const mdl (mk_a i) in
-  Z.of_string (Z3.Arithmetic.Integer.numeral_to_string a_i)
-
-let dec_instr mdl params i =
-  let t_i = Z3util.eval_const mdl (mk_t i) in
-  instr_of_int params (Big_int.int_of_big_int (Z3.Arithmetic.Integer.get_big_int t_i))
-
-let show_disasm_mdl mdl params = show_disasm params
-    ~dec_instr:(dec_instr mdl params)
-    ~dec_arg:(dec_arg mdl)
-
-let show_opcode_mdl mdl params = show_opcode params
-    ~dec_instr:(dec_instr mdl params)
-    ~dec_arg:(dec_arg mdl)
-
-let show_trgt_prgrm mdl obj params =
-  { opcode = [%show: string list] (show_opcode_mdl mdl params );
-    disasm = [%show: string list] (show_disasm_mdl mdl params);
-    cost = [%show: int] (Z3util.solve_objectives mdl obj);
-  }

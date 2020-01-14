@@ -64,7 +64,7 @@ let () =
         | None ->
           let mdl = Z3util.solve_max_model_exn enc enc_weights in
           write_model (path^"/model") mdl;
-          Yojson.Safe.to_file (path^"/result.json") (Outpt.trgt_prgrm_to_yojson (show_trgt_prgrm mdl obj params))
+          Yojson.Safe.to_file (path^"/result.json") (Print_trgt.trgt_prgrm_to_yojson (Print_trgt.show_trgt_prgrm mdl obj params))
         | Some slvr ->
           let enc = show_smt slvr enc enc_weights timeout in
           if write_only

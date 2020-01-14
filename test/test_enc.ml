@@ -24,7 +24,7 @@ let enc =
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
         ["NOP"]
-        (Outpt.show_disasm_mdl mdl params)
+        (Print_trgt.show_disasm_mdl mdl params)
       );
 
     "Program pushing 146 on the stack">:: (fun _ ->
@@ -46,7 +46,7 @@ let enc =
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
         ["PUSH1 146"; "NOP"]
-        (Outpt.show_disasm_mdl mdl params)
+        (Print_trgt.show_disasm_mdl mdl params)
       );
 
     "Program duplicating top of the stack">:: (fun _ ->
@@ -68,7 +68,7 @@ let enc =
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
         ["DUP1"; "NOP"; "NOP"]
-        (Outpt.show_disasm_mdl mdl params)
+        (Print_trgt.show_disasm_mdl mdl params)
       );
 
     "Program pushing CALLVALUE on the stack">:: (fun _ ->
@@ -100,7 +100,7 @@ let enc =
         ~cmp:[%eq: string list]
         ~printer:[%show: string list]
         ["CALLVALUE"; "NOP"; "NOP"; "NOP"; "NOP"; "NOP"]
-        (Outpt.show_disasm_mdl mdl params)
+        (Print_trgt.show_disasm_mdl mdl params)
       );
 
   ]
