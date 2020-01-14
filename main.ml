@@ -74,13 +74,13 @@ let () =
               match slvr with
               | Z3 ->
                 let call_to_slvr = path_to_slvr ^ " -in " in
-                exec_slvr ~call_to_slvr enc
+                exec_slvr ~call_to_slvr enc ~ignore_exit_cd:true
               | BCLT ->
                 let call_to_slvr = path_to_slvr ^ " -tlimit " ^ [%show: int] timeout ^ " -success false " in
                 exec_slvr ~call_to_slvr enc ~ignore_exit_cd:true
               | OMS ->
                 let call_to_slvr = path_to_slvr in
-                exec_slvr ~call_to_slvr enc
+                exec_slvr ~call_to_slvr enc ~ignore_exit_cd:true
             in
             let rslt = parse_slvr_outpt slvr_outpt slvr fn params in
             (* count system and user time of child process to also count memory allocation etc.
