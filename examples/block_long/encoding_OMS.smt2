@@ -1,3 +1,5 @@
+(set-option :timeout 0.0)
+(set-option :produce-models true)
 (set-logic QF_LIA)
 (declare-fun a_8 () Int)
 (declare-fun a_7 () Int)
@@ -3590,3 +3592,5 @@
 (minimize gas)
 (check-sat)
 (get-objectives)
+(load-objective-model -1)
+(get-model)

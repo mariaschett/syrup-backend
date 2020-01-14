@@ -14,9 +14,9 @@ let slvr_of_string = function
   | _ -> failwith "Unknown solver."
 
 let string_of_slvr = function
-  | Z3 -> "z3"
-  | BCLT -> "bclt"
-  | OMS -> "oms"
+  | Z3 -> "Z3"
+  | BCLT -> "BCLT"
+  | OMS -> "OMS"
 
 let show_z3_smt cmn_smt =
   cmn_smt ^

@@ -2,6 +2,8 @@
 
 for fn in `find examples/ -name input.json`
 do
-    ./run.sh -solver Z3 $fn -write-only
+    ./run.sh $fn -write-only -solver Z3
+    ./run.sh $fn -write-only -solver BCLT
+    ./run.sh $fn -write-only -solver OMS
 done
 	  

@@ -1,41 +1,19 @@
-(define-fun x_2_2 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639944)
-(define-fun t_3 () Int
-  16)
-(define-fun u_6_3 () Bool
-  false)
-(define-fun u_6_8 () Bool
-  false)
-(define-fun u_6_2 () Bool
-  false)
 (define-fun x_1_5 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639942)
-(define-fun x_0_8 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639940)
-(define-fun x_4_9 () Int
-  28)
 (define-fun x_5_5 () Int
-  15)
+  17)
 (define-fun x_0_6 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639940)
 (define-fun u_4_1 () Bool
   true)
-(define-fun u_1_6 () Bool
-  true)
 (define-fun x_6_4 () Int
-  13)
+  14)
 (define-fun a_6 () Int
   1)
 (define-fun u_3_8 () Bool
   false)
-(define-fun x_5_2 () Int
-  5)
-(define-fun x_6_5 () Int
-  16)
 (define-fun u_4_8 () Bool
   false)
-(define-fun t_5 () Int
-  2)
 (define-fun u_5_4 () Bool
   false)
 (define-fun x_1_4 () Int
@@ -45,33 +23,135 @@
 (define-fun u_4_6 () Bool
   false)
 (define-fun x_4_4 () Int
-  11)
-(define-fun u_2_2 () Bool
-  true)
-(define-fun a_4 () Int
-  0)
-(define-fun x_2_5 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+  12)
 (define-fun u_2_5 () Bool
   true)
-(define-fun x_6_6 () Int
-  19)
+(define-fun a_4 () Int
+  2)
 (define-fun u_6_6 () Bool
   false)
-(define-fun x_6_7 () Int
+(define-fun x_6_6 () Int
   22)
-(define-fun t_7 () Int
-  2)
 (define-fun a_7 () Int
   0)
-(define-fun x_0_5 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639940)
 (define-fun x_3_9 () Int
-  27)
+  31)
 (define-fun u_2_4 () Bool
   true)
 (define-fun u_1_3 () Bool
   true)
+(define-fun x_4_1 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun x_4_8 () Int
+  28)
+(define-fun u_1_1 () Bool
+  true)
+(define-fun u_0_5 () Bool
+  true)
+(define-fun x_6_1 () Int
+  5)
+(define-fun x_4_3 () Int
+  8)
+(define-fun u_1_7 () Bool
+  true)
+(define-fun a_0 () Int
+  0)
+(define-fun u_2_8 () Bool
+  true)
+(define-fun u_6_4 () Bool
+  false)
+(define-fun x_2_4 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun x_3_6 () Int
+  19)
+(define-fun a_8 () Int
+  0)
+(define-fun a_2 () Int
+  0)
+(define-fun x_1_3 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639944)
+(define-fun u_5_7 () Bool
+  false)
+(define-fun x_1_2 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639938)
+(define-fun x_2_6 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun u_0_4 () Bool
+  true)
+(define-fun u_5_6 () Bool
+  false)
+(define-fun u_3_3 () Bool
+  true)
+(define-fun x_5_6 () Int
+  21)
+(define-fun u_3_7 () Bool
+  false)
+(define-fun u_6_1 () Bool
+  false)
+(define-fun x_2_8 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun u_3_5 () Bool
+  false)
+(define-fun x_4_7 () Int
+  24)
+(define-fun u_2_7 () Bool
+  true)
+(define-fun x_3_2 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639940)
+(define-fun u_0_3 () Bool
+  true)
+(define-fun u_3_4 () Bool
+  false)
+(define-fun u_5_5 () Bool
+  false)
+(define-fun u_2_1 () Bool
+  true)
+(define-fun u_0_6 () Bool
+  true)
+(define-fun u_0_8 () Bool
+  true)
+(define-fun x_4_2 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun a_5 () Int
+  0)
+(define-fun x_3_7 () Int
+  23)
+(define-fun u_4_7 () Bool
+  false)
+(define-fun x_4_5 () Int
+  16)
+(define-fun x_5_1 () Int
+  4)
+(define-fun x_2_7 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun x_2_2 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639944)
+(define-fun x_6_2 () Int
+  6)
+(define-fun u_6_3 () Bool
+  false)
+(define-fun u_6_8 () Bool
+  false)
+(define-fun u_6_2 () Bool
+  false)
+(define-fun x_4_9 () Int
+  32)
+(define-fun x_0_8 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639940)
+(define-fun u_1_6 () Bool
+  true)
+(define-fun x_5_2 () Int
+  7)
+(define-fun x_6_5 () Int
+  18)
+(define-fun u_2_2 () Bool
+  true)
+(define-fun x_2_5 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+(define-fun x_6_7 () Int
+  26)
+(define-fun x_0_5 () Int
+  115792089237316195423570985008687907853269984665640564039457584007913129639940)
 (define-fun x_0_2 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639939)
 (define-fun x_2_3 () Int
@@ -83,123 +163,63 @@
 (define-fun x_0_7 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639940)
 (define-fun x_6_9 () Int
-  30)
-(define-fun x_4_1 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+  34)
 (define-fun x_0_3 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639943)
-(define-fun t_4 () Int
-  3)
-(define-fun x_4_8 () Int
-  24)
 (define-fun a_3 () Int
-  2)
-(define-fun u_1_1 () Bool
-  true)
-(define-fun u_0_5 () Bool
-  true)
-(define-fun x_6_1 () Int
-  4)
-(define-fun x_4_3 () Int
-  7)
+  3)
 (define-fun u_4_5 () Bool
   false)
-(define-fun u_1_7 () Bool
-  true)
-(define-fun a_0 () Int
-  0)
 (define-fun u_3_6 () Bool
   false)
 (define-fun x_2_1 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639939)
 (define-fun x_5_7 () Int
-  21)
+  25)
 (define-fun u_0_2 () Bool
   true)
-(define-fun t_1 () Int
-  4)
-(define-fun t_2 () Int
-  15)
-(define-fun u_2_8 () Bool
-  true)
-(define-fun u_6_4 () Bool
-  false)
-(define-fun x_2_4 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
-(define-fun x_3_6 () Int
-  17)
-(define-fun a_8 () Int
-  0)
 (define-fun x_1_1 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639938)
-(define-fun a_2 () Int
-  0)
 (define-fun x_3_1 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639940)
-(define-fun x_1_3 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639944)
 (define-fun x_5_8 () Int
-  25)
+  29)
 (define-fun u_1_4 () Bool
   true)
 (define-fun u_1_5 () Bool
   true)
 (define-fun u_1_2 () Bool
   true)
-(define-fun u_5_7 () Bool
-  false)
-(define-fun t_0 () Int
-  17)
-(define-fun x_1_2 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639938)
 (define-fun x_6_3 () Int
-  9)
+  10)
 (define-fun x_3_5 () Int
-  14)
-(define-fun t_6 () Int
-  2)
-(define-fun x_2_6 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+  15)
 (define-fun x_3_8 () Int
-  23)
+  27)
 (define-fun x_5_9 () Int
-  29)
+  33)
 (define-fun u_3_2 () Bool
   true)
-(define-fun u_0_4 () Bool
-  true)
-(define-fun u_5_6 () Bool
-  false)
 (define-fun u_0_7 () Bool
   true)
 (define-fun u_6_7 () Bool
   false)
-(define-fun u_3_3 () Bool
-  true)
-(define-fun x_5_4 () Int
-  12)
-(define-fun x_5_3 () Int
-  8)
 (define-fun x_1_6 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639942)
-(define-fun x_5_6 () Int
-  18)
-(define-fun u_3_7 () Bool
-  false)
+(define-fun x_5_4 () Int
+  13)
+(define-fun x_5_3 () Int
+  9)
 (define-fun x_0_1 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639944)
 (define-fun u_5_2 () Bool
   false)
 (define-fun x_0_4 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639942)
-(define-fun u_6_1 () Bool
-  false)
 (define-fun u_5_3 () Bool
   false)
-(define-fun x_2_8 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
 (define-fun x_4_6 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
+  20)
 (define-fun u_4_3 () Bool
   false)
 (define-fun u_4_2 () Bool
@@ -208,64 +228,44 @@
   false)
 (define-fun u_5_1 () Bool
   false)
-(define-fun u_3_5 () Bool
-  false)
+(define-fun a_1 () Int
+  1)
+(define-fun x_3_4 () Int
+  11)
 (define-fun x_1_8 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639942)
-(define-fun a_1 () Int
-  0)
-(define-fun x_3_4 () Int
-  10)
-(define-fun x_4_7 () Int
-  20)
-(define-fun u_2_7 () Bool
-  true)
 (define-fun u_2_3 () Bool
   true)
-(define-fun x_3_2 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639940)
 (define-fun x_6_8 () Int
-  26)
-(define-fun u_0_3 () Bool
-  true)
-(define-fun u_0_6 () Bool
-  true)
-(define-fun u_3_4 () Bool
-  false)
-(define-fun u_5_5 () Bool
-  false)
-(define-fun u_2_1 () Bool
-  true)
+  30)
 (define-fun u_6_5 () Bool
   false)
-(define-fun u_0_8 () Bool
-  true)
 (define-fun u_0_1 () Bool
   true)
-(define-fun x_4_2 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
-(define-fun t_8 () Int
-  2)
-(define-fun x_3_7 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
-(define-fun a_5 () Int
-  0)
-(define-fun x_4_5 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
-(define-fun u_4_7 () Bool
-  false)
-(define-fun x_2_7 () Int
-  115792089237316195423570985008687907853269984665640564039457584007913129639941)
-(define-fun x_5_1 () Int
-  3)
 (define-fun u_1_8 () Bool
   true)
 (define-fun u_5_8 () Bool
   false)
-(define-fun x_6_2 () Int
-  6)
 (define-fun x_1_7 () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639942)
+(define-fun t_8 () Int
+  2)
+(define-fun t_7 () Int
+  2)
+(define-fun t_6 () Int
+  2)
+(define-fun t_5 () Int
+  2)
+(define-fun t_4 () Int
+  3)
+(define-fun t_3 () Int
+  16)
+(define-fun t_2 () Int
+  15)
+(define-fun t_1 () Int
+  4)
+(define-fun t_0 () Int
+  17)
 (define-fun |s(8)| () Int
   115792089237316195423570985008687907853269984665640564039457584007913129639944)
 (define-fun |s(7)| () Int
