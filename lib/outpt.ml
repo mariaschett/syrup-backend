@@ -84,7 +84,7 @@ type rslt = {
   lower_bound : int option;
   upper_bound : int option;
   shown_optimal : bool;
-  timed_out : bool;
+  no_model_found : bool;
   current_cost : int;
   saved_gas: int option;
   slvr_outpt : string;
@@ -97,7 +97,7 @@ let mk_default_rslt block_id params outpt =
     upper_bound = None;
     shown_optimal = false;
     saved_gas = None;
-    timed_out = false;
+    no_model_found = false;
     current_cost = params.curr_cst;
     slvr_outpt = outpt;
   }
@@ -124,8 +124,8 @@ let set_range lower_bound upper_bound prtl_rslt =
      upper_bound = Some upper_bound;
   }
 
-let set_timeout prtl_rslt =
-  { prtl_rslt with timed_out = true}
+let set_no_model_found prtl_rslt =
+  { prtl_rslt with no_model_found = true}
 
 let parse_slvr_outpt_z3 outpt =
   let open Sedlexing in
@@ -149,10 +149,10 @@ let parse_slvr_outpt_z3 outpt =
         let _ = "(model" ^ (Latin1.lexeme buf) in
         set_range lb ub
       | ws, ")", ws, ")", ws, ")", ws, "(error" ->
-        set_timeout
+        set_no_model_found
       | _ -> failwith "Parse error."
     end
-  | "timeout" -> set_timeout
+  | "timeout" -> set_no_model_found
   | _ -> Fn.id
 
 let parse_slvr_outpt_bclt outpt =
@@ -178,7 +178,7 @@ let parse_slvr_outpt_bclt outpt =
         set_range lb ub
       | _ -> failwith "Parse error."
     end
-  | ws, "unknown" -> set_timeout
+  | ws, "unknown" -> set_no_model_found
   | _ -> Fn.id
 
 let parse_slvr_outpt_oms outpt =
@@ -204,7 +204,7 @@ let parse_slvr_outpt_oms outpt =
         set_range lb ub
       |  _ -> failwith "Parse error."
     end
-  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_timeout
+  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_no_model_found
   | _ -> Fn.id
 
 let parse_slvr_outpt outpt slvr block_id params =
@@ -223,7 +223,7 @@ let show_csv_header =
     "lower_bound";
     "upper_bound";
     "shown_optimal";
-    "timed_out";
+    "no_model_found";
     "current_cost";
     "saved_gas";
     "solver_time_in_sec";
@@ -238,7 +238,7 @@ let show_csv rslt omit_csv_header slvr_time_in_sec =
      (Option.value_map ~default:"" ~f:([%show: int]) rslt.lower_bound);
      (Option.value_map ~default:"" ~f:([%show: int]) rslt.upper_bound);
      [%show: bool] rslt.shown_optimal;
-     [%show: bool] rslt.timed_out;
+     [%show: bool] rslt.no_model_found;
      [%show: int] rslt.current_cost;
      (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
      [%show: float] slvr_time_in_sec;
