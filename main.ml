@@ -82,7 +82,7 @@ let () =
                 let call_to_slvr = path_to_slvr in
                 exec_slvr ~call_to_slvr enc
             in
-            let rslt = parse_slvr_outpt slvr_outpt slvr path params in
+            let rslt = parse_slvr_outpt slvr_outpt slvr fn params in
             (* count system and user time of child process to also count memory allocation etc.
                get actual time used by process *)
             let slvr_time_in_sec = (let t = Unix.times () in (t.tms_cutime +. t.tms_cstime)) in
