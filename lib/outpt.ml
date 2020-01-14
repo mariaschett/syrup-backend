@@ -77,7 +77,7 @@ let write_all ~path ~slvr ~enc ~obj ~params =
   write_map (path^"/instruction") params;
   write_objectives (path^"/objectives") ~data:obj;
 
-(* pretty print output *)
+(* print output in csv *)
 
 type rslt = {
   block_id : string;
