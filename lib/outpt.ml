@@ -1,6 +1,7 @@
 open Core
 open Consts
 open Params
+open Sexplib
 
 type slvr =
     Z3
@@ -87,6 +88,7 @@ type rslt = {
   source_gas_cost : int;
   saved_gas: int option;
   slvr_outpt : string;
+  target_program : string option;
 } [@@deriving show]
 
 let mk_default_rslt block_id params outpt =
@@ -98,10 +100,12 @@ let mk_default_rslt block_id params outpt =
     no_model_found = false;
     source_gas_cost = params.curr_cst;
     slvr_outpt = outpt;
+    target_program = None;
   }
 
 let ws = [%sedlex.regexp? Star white_space]
 let digits = [%sedlex.regexp? Plus '0'..'9']
+let remainder = [%sedlex.regexp? Star any]
 
 let parse_int buf =
   let open Sedlexing in
@@ -109,10 +113,17 @@ let parse_int buf =
   | digits -> Int.of_string (Latin1.lexeme buf)
   | _ -> failwith "Failed to parse int."
 
-let set_optimal bound prtl_rslt =
+let parse_remainder buf =
+  let open Sedlexing in
+  match%sedlex buf with
+  | remainder -> Latin1.lexeme buf
+  | _ -> failwith "Parse error."
+
+let set_optimal bound trgt_prgr prtl_rslt =
   {prtl_rslt with
      target_gas_cost = Some bound;
-     shown_optimal = true
+     shown_optimal = true;
+     target_program = Some trgt_prgr
   }
 
 let set_target_gas_cost target_gas_cost prtl_rslt =
@@ -123,6 +134,20 @@ let set_target_gas_cost target_gas_cost prtl_rslt =
 let set_no_model_found prtl_rslt =
   { prtl_rslt with no_model_found = true}
 
+let rec find_consts_Z3 const = function
+  | Sexp.Atom _ -> []
+  | Sexp.List [Sexp.Atom "define-fun";
+               Sexp.Atom id;
+               Sexp.List _ ;
+               Sexp.Atom "Int"; Sexp.Atom vl]
+    when String.is_prefix id ~prefix:(const ^ "_") -> [(id, vl)]
+  | Sexp.List ss -> List.concat_map ss ~f:(find_consts_Z3 const)
+
+let parse_target_Z3 mdl =
+  let exp = Sexp.of_string mdl in
+  [%show: (string * string) list] (find_consts_Z3 "t" exp) ^
+  [%show: (string * string) list] (find_consts_Z3 "a" exp)
+
 let parse_slvr_outpt_z3 outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
@@ -132,8 +157,9 @@ let parse_slvr_outpt_z3 outpt =
     begin
       match%sedlex buf with
       | ws, ")", ws, ")" ->
-        let _ = Latin1.lexeme buf in
-        set_optimal optimal
+        let mdl = parse_remainder buf in
+        let trgt_prgr = parse_target_Z3 mdl in
+        set_optimal optimal trgt_prgr
       | _ -> failwith "Parse error."
     end
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws, digits ->
@@ -150,6 +176,8 @@ let parse_slvr_outpt_z3 outpt =
   | "timeout" -> set_no_model_found
   | _ -> Fn.id
 
+let parse_target_BCLT = parse_target_Z3
+
 let parse_slvr_outpt_bclt outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
@@ -159,8 +187,9 @@ let parse_slvr_outpt_bclt outpt =
     begin
       match%sedlex buf with
       | ws, ")", ws ->
-        let _ = Latin1.lexeme buf in
-        set_optimal optimal
+        let mdl = parse_remainder buf in
+        let trgt_prgr = parse_target_BCLT mdl in
+        set_optimal optimal trgt_prgr
       | _ -> failwith "Parse error."
     end
   | ws, "(cost", ws ->
@@ -175,6 +204,18 @@ let parse_slvr_outpt_bclt outpt =
   | ws, "unknown" -> set_no_model_found
   | _ -> Fn.id
 
+let rec find_consts_OMS const = function
+  | Sexp.Atom _ -> []
+  | Sexp.List [Sexp.Atom id;
+               Sexp.Atom vl]
+    when String.is_prefix id ~prefix:(const ^ "_") -> [(id, vl)]
+  | Sexp.List ss -> List.concat_map ss ~f:(find_consts_OMS const)
+
+let parse_target_OMS mdl =
+  let exp = Sexp.of_string mdl in
+  [%show: (string * string) list] (find_consts_OMS "t" exp) ^
+  [%show: (string * string) list] (find_consts_OMS "a" exp)
+
 let parse_slvr_outpt_oms outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
@@ -184,8 +225,9 @@ let parse_slvr_outpt_oms outpt =
     begin
       match%sedlex buf with
       | ws, ")", ws, ")", ws ->
-        let _ = Latin1.lexeme buf in
-        set_optimal optimal
+        let mdl = parse_remainder buf in
+        let trgt_prgr = parse_target_OMS mdl in
+        set_optimal optimal trgt_prgr
       | _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws, digits ->
@@ -220,6 +262,7 @@ let show_csv_header =
     "saved_gas";
     "solver_time_in_sec";
     "solver_output";
+    "target_program"
   ]
   in
   (String.concat ~sep:"," csv_header) ^ "\n"
@@ -234,6 +277,7 @@ let show_csv rslt omit_csv_header slvr_time_in_sec =
      (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
      [%show: float] slvr_time_in_sec;
      "\"" ^  rslt.slvr_outpt ^ "\"";
+     (Option.value_map ~default:"" ~f:([%show: string]) rslt.target_program);
     ]
   in
   (if omit_csv_header then "" else show_csv_header) ^
