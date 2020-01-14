@@ -84,7 +84,7 @@ type rslt = {
   upper_bound : int option;
   shown_optimal : bool;
   no_model_found : bool;
-  current_cost : int;
+  source_gas_cost : int;
   saved_gas: int option;
   slvr_outpt : string;
 } [@@deriving show]
@@ -96,7 +96,7 @@ let mk_default_rslt block_id params outpt =
     shown_optimal = false;
     saved_gas = None;
     no_model_found = false;
-    current_cost = params.curr_cst;
+    source_gas_cost = params.curr_cst;
     slvr_outpt = outpt;
   }
 
@@ -207,7 +207,7 @@ let parse_slvr_outpt outpt slvr block_id params =
     | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
     | OMS -> parse_slvr_outpt_oms outpt dflt_rslt
   in
-  let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.current_cost - ub) 0) prtl_rslt.upper_bound in
+  let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.source_gas_cost - ub) 0) prtl_rslt.upper_bound in
   {prtl_rslt with saved_gas = saved_gas}
 
 let show_csv_header =
@@ -216,7 +216,7 @@ let show_csv_header =
     "upper_bound";
     "shown_optimal";
     "no_model_found";
-    "current_cost";
+    "source_gas_cost";
     "saved_gas";
     "solver_time_in_sec";
     "solver_output";
@@ -230,7 +230,7 @@ let show_csv rslt omit_csv_header slvr_time_in_sec =
      (Option.value_map ~default:"" ~f:([%show: int]) rslt.upper_bound);
      [%show: bool] rslt.shown_optimal;
      [%show: bool] rslt.no_model_found;
-     [%show: int] rslt.current_cost;
+     [%show: int] rslt.source_gas_cost;
      (Option.value_map ~default:"0" ~f:([%show: int]) rslt.saved_gas);
      [%show: float] slvr_time_in_sec;
      "\"" ^  rslt.slvr_outpt ^ "\"";
