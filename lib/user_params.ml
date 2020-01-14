@@ -31,10 +31,16 @@ type user_instr = {
   gas : int;
 } [@@deriving yojson]
 
-let mk_user_instr ui =
-  Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas ~disasm:ui.disasm ~is_commutative:ui.commutative
-    ~in_ws:(List.map ui.inpt_sk ~f:enc_user_word)
-    ~out_ws:(List.map ui.outpt_sk ~f:enc_user_word)
+let mk_user_instr tgt_ws ui =
+  let out_ws = List.map ui.outpt_sk ~f:enc_user_word in
+  let iota =
+    Instruction.mk_userdef ui.id ~opcode:ui.opcode ~gas:ui.gas ~disasm:ui.disasm ~is_commutative:ui.commutative
+      ~in_ws:(List.map ui.inpt_sk ~f:enc_user_word)
+      ~out_ws
+  in
+  let in_tgt_ws out_ws = List.exists out_ws ~f:(List.mem tgt_ws ~equal:Z3.Expr.equal) in
+  let in_tgt_opt = if in_tgt_ws out_ws then Some iota else None in
+  (iota, in_tgt_opt)
 
 type user_params = {
   n : int [@key "max_progr_len"];

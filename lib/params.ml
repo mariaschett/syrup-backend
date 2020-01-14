@@ -3,6 +3,7 @@ open Instruction
 
 type params = {
   instrs : Instruction.t list;
+  instrs_in_tgt : Instruction.t list;
   instr_int_map : (Instruction.t * int) list;
   k : int;
   n : int;
@@ -16,16 +17,21 @@ type params = {
 let mk predef user_params =
   let open User_params in
   let max_wsz = Z.pow (Z.of_int 2) 256 in
-  let instrs =  predef ~k:user_params.k @ (List.map user_params.user_instrs ~f:User_params.mk_user_instr) in
+  let tgt_ws = User_params.mk_ws user_params.tgt_ws in
+  let predef_instrs =  predef ~k:user_params.k in
+  let (userdef_instrs, instrs_in_tgt_opt) =
+     List.map user_params.user_instrs ~f:(User_params.mk_user_instr tgt_ws) |> List.unzip in
+  let instrs = predef_instrs @ userdef_instrs in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
   let n = if user_params.n <= 0 then 1 else user_params.n in
   { instrs = instrs;
+    instrs_in_tgt = List.filter_opt instrs_in_tgt_opt;
     instr_int_map = map;
     k = user_params.k;
     n = n;
     max_wsz = max_wsz;
     src_ws = User_params.mk_ws user_params.src_ws;
-    tgt_ws = User_params.mk_ws user_params.tgt_ws;
+    tgt_ws = tgt_ws;
     ss = List.map user_params.ss ~f:Consts.mk_user_const;
     curr_cst = user_params.curr_cst;
   }
