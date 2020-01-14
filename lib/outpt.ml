@@ -42,7 +42,8 @@ let show_bclt_smt cmn_smt =
   (* barcelogic requires additional ) of assert-soft *)
   let cp =  "gas)" and  cp' = "gas))" in
   let replacd_op = replace_all (create op) ~in_:cmn_smt ~with_:op' in
-  replace_all ~in_:replacd_op (create cp) ~with_:cp'
+  (replace_all ~in_:replacd_op (create cp) ~with_:cp') ^
+  "(get-model)\n"
 
 let show_smt slvr enc enc_weights timeout =
   let cmn_smt =
@@ -142,8 +143,25 @@ let parse_slvr_outpt_bclt outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
-  | ws, "(optimal", ws -> set_optimal (parse_int buf)
-  | ws, "(cost", ws -> set_range 0 (parse_int buf)
+  | ws, "(optimal", ws ->
+    let optimal = parse_int buf in
+    begin
+      match%sedlex buf with
+      | ws, ")", ws ->
+        let _ = Latin1.lexeme buf in
+        set_optimal optimal
+      | _ -> failwith "Parse error."
+    end
+  | ws, "(cost", ws ->
+    let lb = 0 in
+    let ub = parse_int buf in
+    begin
+      match%sedlex buf with
+      | ws, ")", ws ->
+        let _ = Latin1.lexeme buf in
+        set_range lb ub
+      | _ -> failwith "Parse error."
+    end
   | ws, "unknown" -> set_timeout
   | _ -> Fn.id
 
@@ -177,7 +195,11 @@ let parse_slvr_outpt outpt slvr block_id params =
   let dflt_rslt = mk_default_rslt block_id params outpt in
   let prtl_rslt = match slvr with
     | Z3 -> parse_slvr_outpt_z3 outpt dflt_rslt
-    | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
+    | BCLT ->
+      let result = parse_slvr_outpt_bclt outpt dflt_rslt in
+      (* hack, we cannot write the solver output any more,
+         this would print model and blow up *)
+      {result with slvr_outpt = ""}
     | OMS ->
       let result = parse_slvr_outpt_oms outpt dflt_rslt in
       (* hack, we cannot write the solver output any more,
