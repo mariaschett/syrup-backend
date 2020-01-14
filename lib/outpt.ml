@@ -81,7 +81,7 @@ let write_all ~path ~slvr ~enc ~obj ~params =
 
 type rslt = {
   block_id : string;
-  upper_bound : int option;
+  target_gas_cost : int option;
   shown_optimal : bool;
   no_model_found : bool;
   source_gas_cost : int;
@@ -92,7 +92,7 @@ type rslt = {
 let mk_default_rslt block_id params outpt =
   {
     block_id = block_id;
-    upper_bound = None;
+    target_gas_cost = None;
     shown_optimal = false;
     saved_gas = None;
     no_model_found = false;
@@ -111,13 +111,13 @@ let parse_int buf =
 
 let set_optimal bound prtl_rslt =
   {prtl_rslt with
-     upper_bound = Some bound;
+     target_gas_cost = Some bound;
      shown_optimal = true
   }
 
-let set_range upper_bound prtl_rslt =
+let set_target_gas_cost target_gas_cost prtl_rslt =
   { prtl_rslt with
-     upper_bound = Some upper_bound;
+     target_gas_cost = Some target_gas_cost;
   }
 
 let set_no_model_found prtl_rslt =
@@ -137,12 +137,12 @@ let parse_slvr_outpt_z3 outpt =
       | _ -> failwith "Parse error."
     end
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws, digits ->
-    let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
+    let upper_bound =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
     begin
       match%sedlex buf with
       | ws, ")", ws, ")", ws, ")", ws, "(model" ->
         let _ = "(model" ^ (Latin1.lexeme buf) in
-        set_range ub
+        set_target_gas_cost upper_bound
       | ws, ")", ws, ")", ws, ")", ws, "(error" ->
         set_no_model_found
       | _ -> failwith "Parse error."
@@ -164,12 +164,12 @@ let parse_slvr_outpt_bclt outpt =
       | _ -> failwith "Parse error."
     end
   | ws, "(cost", ws ->
-    let ub = parse_int buf in
+    let upper_bound = parse_int buf in
     begin
       match%sedlex buf with
       | ws, ")", ws ->
         let _ = Latin1.lexeme buf in
-        set_range ub
+        set_target_gas_cost upper_bound
       | _ -> failwith "Parse error."
     end
   | ws, "unknown" -> set_no_model_found
@@ -189,12 +189,12 @@ let parse_slvr_outpt_oms outpt =
       | _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws, digits ->
-    let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
+    let upper_bound =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
     begin
       match%sedlex buf with
       | ws, "]", ws, ")", ws ->
         let _ = Latin1.lexeme buf in
-        set_range ub
+        set_target_gas_cost upper_bound
       |  _ -> failwith "Parse error."
     end
   | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_no_model_found
@@ -207,13 +207,13 @@ let parse_slvr_outpt outpt slvr block_id params =
     | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
     | OMS -> parse_slvr_outpt_oms outpt dflt_rslt
   in
-  let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.source_gas_cost - ub) 0) prtl_rslt.upper_bound in
+  let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.source_gas_cost - ub) 0) prtl_rslt.target_gas_cost in
   {prtl_rslt with saved_gas = saved_gas}
 
 let show_csv_header =
   let csv_header = [
     "block_id";
-    "upper_bound";
+    "target_gas_cost";
     "shown_optimal";
     "no_model_found";
     "source_gas_cost";
@@ -227,7 +227,7 @@ let show_csv_header =
 let show_csv rslt omit_csv_header slvr_time_in_sec =
   let data =
     [rslt.block_id;
-     (Option.value_map ~default:"" ~f:([%show: int]) rslt.upper_bound);
+     (Option.value_map ~default:"" ~f:([%show: int]) rslt.target_gas_cost);
      [%show: bool] rslt.shown_optimal;
      [%show: bool] rslt.no_model_found;
      [%show: int] rslt.source_gas_cost;
