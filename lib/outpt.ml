@@ -239,7 +239,7 @@ let show_csv rslt omit_csv_header slvr_time_in_sec =
   (if omit_csv_header then "" else show_csv_header) ^
   (String.concat ~sep:"," data)
 
-(* pretty print from model *)
+(* pretty print from internal model *)
 
 let dec_arg mdl i =
   let a_i = Z3util.eval_const mdl (mk_a i) in
