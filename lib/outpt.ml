@@ -30,7 +30,10 @@ let show_oms_smt cmn_smt =
     let mg = "(check-sat)" in let mg' = "(minimize gas)\n" ^ mg in
     replace_all ~in_:cmn_smt (create mg) ~with_:mg'
   in
-  cmn_smt' ^ "(get-objectives)\n"
+  "(set-option :produce-models true)\n" ^ cmn_smt' ^
+  "(get-objectives)\n" ^
+  "(load-objective-model -1)\n" ^
+  "(get-model)\n"
 
 let show_bclt_smt cmn_smt =
   let open String.Search_pattern in
@@ -51,7 +54,8 @@ let show_smt slvr enc enc_weights timeout =
     let timeout_in_ms = timeout * 1000 in
     "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ (show_z3_smt cmn_smt)
   | BCLT -> show_bclt_smt cmn_smt
-  | OMS -> "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^ (show_oms_smt cmn_smt)
+  | OMS -> "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^
+           (show_oms_smt cmn_smt)
 
 let write_smt ~data ~path slvr =
   let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in
@@ -147,12 +151,26 @@ let parse_slvr_outpt_oms outpt =
   let open Sedlexing in
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
-  | "sat", ws, "(objectives", ws, "(gas", ws -> set_optimal (parse_int buf)
-  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_timeout
+  | "sat", ws, "(objectives", ws, "(gas", ws ->
+    let optimal = parse_int buf in
+    begin
+      match%sedlex buf with
+      | ws, ")", ws, ")", ws ->
+        let _ = Latin1.lexeme buf in
+        set_optimal optimal
+      | _ -> failwith "Parse error."
+    end
   | ws, "(objectives", ws, "(gas ", digits, "), partial search, range: [", ws ->
     let lb = parse_int buf in
     let ub =  match%sedlex buf with | ",", ws -> parse_int buf | _ -> failwith "Parse error." in
-    set_range lb ub
+    begin
+      match%sedlex buf with
+      | ws, "]", ws, ")", ws ->
+        let _ = Latin1.lexeme buf in
+        set_range lb ub
+      |  _ -> failwith "Parse error."
+    end
+  | ws, "(objectives", ws, "(gas unknown), range: [ 0, +INF ]" -> set_timeout
   | _ -> Fn.id
 
 let parse_slvr_outpt outpt slvr block_id params =
@@ -160,7 +178,11 @@ let parse_slvr_outpt outpt slvr block_id params =
   let prtl_rslt = match slvr with
     | Z3 -> parse_slvr_outpt_z3 outpt dflt_rslt
     | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
-    | OMS -> parse_slvr_outpt_oms outpt dflt_rslt
+    | OMS ->
+      let result = parse_slvr_outpt_oms outpt dflt_rslt in
+      (* hack, we cannot write the solver output any more,
+         this would print model and blow up *)
+      {result with slvr_outpt = ""}
   in
   let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.current_cost - ub) 0) prtl_rslt.upper_bound in
   {prtl_rslt with saved_gas = saved_gas}
