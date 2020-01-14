@@ -18,12 +18,23 @@ let string_of_slvr = function
   | BCLT -> "BCLT"
   | OMS -> "OMS"
 
-let show_z3_smt cmn_smt =
+let show_smt_Z3 cmn_smt =
   cmn_smt ^
   (* hack to get objectives, there should be an API call *)
-  "(get-objectives)\n"
+  "(get-objectives)\n" ^
+  "(get-model)\n"
 
-let show_oms_smt cmn_smt =
+let show_smt_BCLT cmn_smt =
+  let open String.Search_pattern in
+  (* barcelogic requires different start of assert-soft *)
+  let op = "assert-soft (" and op' = "assert-soft (! (" in
+  (* barcelogic requires additional ) of assert-soft *)
+  let cp =  "gas)" and  cp' = "gas))" in
+  let replacd_op = replace_all (create op) ~in_:cmn_smt ~with_:op' in
+  (replace_all ~in_:replacd_op (create cp) ~with_:cp') ^
+  "(get-model)\n"
+
+let show_smt_OMS cmn_smt =
   let open String.Search_pattern in
   (* optiMaxSAT requires to have (minimize gas) before (check sat) *)
   let cmn_smt' =
@@ -35,16 +46,6 @@ let show_oms_smt cmn_smt =
   "(load-objective-model -1)\n" ^
   "(get-model)\n"
 
-let show_bclt_smt cmn_smt =
-  let open String.Search_pattern in
-  (* barcelogic requires different start of assert-soft *)
-  let op = "assert-soft (" and op' = "assert-soft (! (" in
-  (* barcelogic requires additional ) of assert-soft *)
-  let cp =  "gas)" and  cp' = "gas))" in
-  let replacd_op = replace_all (create op) ~in_:cmn_smt ~with_:op' in
-  (replace_all ~in_:replacd_op (create cp) ~with_:cp') ^
-  "(get-model)\n"
-
 let show_smt slvr enc enc_weights timeout =
   let cmn_smt =
     (* hack to set logic, there should be an API call *)
@@ -53,10 +54,10 @@ let show_smt slvr enc enc_weights timeout =
   in match slvr with
   | Z3 ->
     let timeout_in_ms = timeout * 1000 in
-    "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ (show_z3_smt cmn_smt)
-  | BCLT -> show_bclt_smt cmn_smt
+    "(set-option :timeout " ^ [%show: int] timeout_in_ms ^ ".0)\n" ^ (show_smt_Z3 cmn_smt)
+  | BCLT -> show_smt_BCLT cmn_smt
   | OMS -> "(set-option :timeout " ^ [%show: int] timeout ^".0)\n" ^
-           (show_oms_smt cmn_smt)
+           (show_smt_OMS cmn_smt)
 
 let write_smt ~data ~path slvr =
   let fn = path ^ "/encoding_" ^ (string_of_slvr slvr) ^ ".smt2" in
@@ -131,11 +132,26 @@ let parse_slvr_outpt_z3 outpt =
   let buf = Latin1.from_string outpt in
   match%sedlex buf with
   | "sat", ws, "(objectives", ws, "(gas", ws ->
-    set_optimal (parse_int buf)
+    let optimal = parse_int buf in
+    begin
+      match%sedlex buf with
+      | ws, ")", ws, ")" ->
+        let _ = Latin1.lexeme buf in
+        set_optimal optimal
+      | _ -> failwith "Parse error."
+    end
   | "unknown", ws, "(objectives", ws, "(gas", ws, "(interval", ws ->
     let lb = parse_int buf in
     let ub =  match%sedlex buf with | ws -> parse_int buf | _ -> failwith "Parse error." in
-    set_range lb ub
+    begin
+      match%sedlex buf with
+      | ws, ")", ws, ")", ws, ")", ws, "(model" ->
+        let _ = "(model" ^ (Latin1.lexeme buf) in
+        set_range lb ub
+      | ws, ")", ws, ")", ws, ")", ws, "(error" ->
+        set_timeout
+      | _ -> failwith "Parse error."
+    end
   | "timeout" -> set_timeout
   | _ -> Fn.id
 
@@ -195,16 +211,8 @@ let parse_slvr_outpt outpt slvr block_id params =
   let dflt_rslt = mk_default_rslt block_id params outpt in
   let prtl_rslt = match slvr with
     | Z3 -> parse_slvr_outpt_z3 outpt dflt_rslt
-    | BCLT ->
-      let result = parse_slvr_outpt_bclt outpt dflt_rslt in
-      (* hack, we cannot write the solver output any more,
-         this would print model and blow up *)
-      {result with slvr_outpt = ""}
-    | OMS ->
-      let result = parse_slvr_outpt_oms outpt dflt_rslt in
-      (* hack, we cannot write the solver output any more,
-         this would print model and blow up *)
-      {result with slvr_outpt = ""}
+    | BCLT -> parse_slvr_outpt_bclt outpt dflt_rslt
+    | OMS -> parse_slvr_outpt_oms outpt dflt_rslt
   in
   let saved_gas = Option.map ~f:(fun ub -> Int.max (prtl_rslt.current_cost - ub) 0) prtl_rslt.upper_bound in
   {prtl_rslt with saved_gas = saved_gas}
