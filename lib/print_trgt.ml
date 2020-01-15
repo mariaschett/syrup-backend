@@ -31,11 +31,11 @@ let compute_cost params ~dec_instr =
 (* pretty print target program from t_i/a_i list *)
 
 let dec_instr_from_slvr ts params i =
-  let t_i = List.Assoc.find_exn ts ("t_" ^ [%show: int] i) ~equal:(=) in
+  let t_i = List.Assoc.find_exn ts ("t_" ^ [%show: int] i) ~equal:String.equal in
   instr_of_int params (Int.of_string t_i)
 
 let dec_arg_from_slvr as_ i =
-  let a_i = List.Assoc.find_exn as_ ("a_" ^ [%show: int] i) ~equal:(=) in
+  let a_i = List.Assoc.find_exn as_ ("a_" ^ [%show: int] i) ~equal:String.equal in
   Z.of_string a_i
 
 let show_disasm_from_slvr params ts as_ =
