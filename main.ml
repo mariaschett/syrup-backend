@@ -44,6 +44,8 @@ let () =
           ~doc:"TO set timeout in seconds"
       and omit_csv_header = flag "omit-csv-header" no_arg
           ~doc:"omit writing the csv header of the output"
+      and print_slvr_outpt = flag "print-solver-output" no_arg
+          ~doc:"print the output of the solver"
       and
         fn = anon ("USER_PARAMS" %: string)
       in
@@ -87,6 +89,9 @@ let () =
                get actual time used by process *)
             let slvr_time_in_sec = (let t = Unix.times () in (t.tms_cutime +. t.tms_cstime)) in
             let csv = show_csv rslt omit_csv_header slvr_time_in_sec in
-            Out_channel.print_endline csv
+            Out_channel.print_endline csv;
+            if print_slvr_outpt
+            then Out_channel.print_endline slvr_outpt
+            else ()
     ]
   |> Command.run ~version:"0.0"
