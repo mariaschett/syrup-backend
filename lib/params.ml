@@ -53,3 +53,14 @@ let group_instr_by_gas params =
   List.fold params.instrs ~init:Core.Int.Map.empty
     ~f:(fun m iota -> Map.add_multi m ~key:iota.gas ~data:iota)
   |> Int.Map.to_alist ~key_order:`Increasing
+
+let group_instr_combine_expensive params =
+  let most_expensive_instr = List.max_elt (Instruction.predef ~k:params.k)
+      ~compare:(fun iota1 iota2 -> Int.compare iota1.gas iota2.gas) in
+  let max_gas = (Option.value_exn most_expensive_instr).gas in
+  let (below, above) = List.fold (group_instr_by_gas params) ~init:([],[])
+      ~f:(fun (below, above) (i, instrs) ->
+          if i > max_gas
+          then (below,  above @ [(i, instrs)])
+          else (below @ [(i, instrs)], above))
+  in below @ [(max_gas + 1, List.concat_map above ~f:(fun (_, instrs) -> instrs)) ]

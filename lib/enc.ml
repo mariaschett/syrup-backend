@@ -56,7 +56,7 @@ let pick_from params instrs j =
   disj (List.map instrs ~f:(fun iota -> enc_to_int iota == mk_t j))
 
 let enc_weight_at params j =
-  List.fold (group_instr_by_gas params)
+  List.fold (group_instr_combine_expensive params)
     ~init:((0, []), [])
     ~f:(fun ((prev_gas, all_prev_instrs), constrs) (curr_gas, instrs)  ->
         let weight = curr_gas - prev_gas in
