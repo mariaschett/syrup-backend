@@ -263,7 +263,6 @@ let show_csv_header =
     "source_gas_cost";
     "saved_gas";
     "solver_time_in_sec";
-    "solver_output";
     "target_disasm";
     "target_opcode"
   ]
