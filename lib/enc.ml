@@ -39,7 +39,7 @@ let force_instrs_in_tgt params =
   let force_instr iota = disj (List.init params.n ~f:(fun j -> instr iota == mk_t j)) in
   conj (List.map params.instrs_in_tgt ~f:force_instr)
 
-let enc_block params =
+let enc_block ?rm_tgt_instr:(rm_tgt_instr = false) params =
   let source_sk = sk_init params.k 0 params.src_ws in
   let target_sk = sk_init params.k params.n params.tgt_ws in
   let ns = List.range ~start:`inclusive ~stop:`exclusive 0 params.n in
@@ -48,7 +48,8 @@ let enc_block params =
   conj (List.map ns ~f:(pick_instr params))
   && nop_propagate params
   && bounds_push_args params
-  && force_instrs_in_tgt params
+  && (if rm_tgt_instr then top else force_instrs_in_tgt params)
+
 
 let pick_from params instrs j =
   let enc_to_int iota = num (instr_to_int params iota) in

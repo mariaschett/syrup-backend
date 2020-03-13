@@ -49,6 +49,8 @@ let () =
       and scale_progr_len = flag "scale-progr-len"
           (optional_with_default 100 (Arg_type.create int_of_string))
           ~doc:"give scale of program length in percent, e.g., 50 for half, 200 for double"
+      and rm_tgt_instr = flag "rm-tgt-instr" no_arg
+          ~doc:"remove constraint to force instruction in target program"
       and
         fn = anon ("USER_PARAMS" %: string)
       in
@@ -59,7 +61,7 @@ let () =
         (* create parameters for encoding *)
         let params = Params.mk ~scale_progr_len Instruction.predef user_params in
         (* compute encodings *)
-        let enc = Enc.enc_block params in
+        let enc = Enc.enc_block ~rm_tgt_instr params in
         let enc_weights = Enc.enc_weight params in
         let obj = Z3util.get_objectives enc enc_weights in
         (* write files *)
