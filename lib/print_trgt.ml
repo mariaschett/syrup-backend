@@ -69,7 +69,7 @@ let dec_arg mdl i =
 
 let dec_instr mdl params i =
   let t_i = Z3util.eval_const mdl (mk_t i) in
-  instr_of_int params (Big_int.int_of_big_int (Z3.Arithmetic.Integer.get_big_int t_i))
+  instr_of_int params (Z.to_int (Z3.Arithmetic.Integer.get_big_int t_i))
 
 let show_disasm_mdl mdl params = show_disasm params
     ~dec_instr:(dec_instr mdl params)
