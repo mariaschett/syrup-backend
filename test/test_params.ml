@@ -145,20 +145,20 @@ let user_instrs = [
   "Contains instr with id ADD_1">:: (fun _ ->
       let ps = Params.mk Instruction.predef ups_1 in
       assert_bool ""
-        (List.exists ps.instrs ~f:(fun iota -> iota.id = "ADD_1"))
+        (List.exists ps.instrs ~f:(fun iota -> String.equal iota.id "ADD_1"))
     );
 
   "Instruction with id ADD_1 has correct gas and opcode">:: (fun _ ->
       let ps = Params.mk Instruction.predef ups_1 in
-      let iota = List.find_exn ps.instrs ~f:(fun iota -> iota.id = "ADD_1") in
+      let iota = List.find_exn ps.instrs ~f:(fun iota -> String.equal iota.id "ADD_1") in
       assert_bool ""
-        (iota.gas = add_1.gas && iota.opcode = add_1.opcode)
+        (iota.gas = add_1.gas && String.equal iota.opcode add_1.opcode)
     );
 
   "Contains instr with id TIMESTAMP">:: (fun _ ->
       let ps = Params.mk Instruction.predef ups_2 in
       assert_bool ""
-        (List.exists ps.instrs ~f:(fun iota -> iota.id = "TIMESTAMP"))
+        (List.exists ps.instrs ~f:(fun iota -> String.equal iota.id "TIMESTAMP"))
     );
 ]
 
@@ -226,7 +226,7 @@ let gas_grouping =
       assert_bool ""
         (List.for_all params.instrs
            ~f:(fun iota -> List.exists gg ~f:(fun (_, iotas) ->
-               List.mem iotas iota ~equal:(fun i1 i2 -> i1.id = i2.id))))
+               List.mem iotas iota ~equal:(fun i1 i2 -> String.equal i1.id i2.id))))
     );
 
   "Every instruction is in at most one group">:: (fun _ ->
