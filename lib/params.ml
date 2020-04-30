@@ -14,13 +14,13 @@ type params = {
   curr_cst : int;
 }
 
-let mk ?scale_progr_len:(scale_progr_len=100) predef user_params =
+let mk ?scale_progr_len:(scale_progr_len=100) ?scale_sk_sz:(scale_sk_sz=100) predef user_params =
   let open User_params in
   let max_wsz = Z.pow (Z.of_int 2) 256 in
   let tgt_ws = User_params.mk_ws user_params.tgt_ws in
   let predef_instrs = predef ~k:user_params.k in
   let (userdef_instrs, instrs_in_tgt_opt) =
-     List.map user_params.user_instrs ~f:(User_params.mk_user_instr tgt_ws) |> List.unzip in
+    List.map user_params.user_instrs ~f:(User_params.mk_user_instr tgt_ws) |> List.unzip in
   let instrs = predef_instrs @ userdef_instrs in
   let map = List.mapi instrs ~f:(fun i iota -> (iota, i)) in
   let n =
@@ -28,10 +28,11 @@ let mk ?scale_progr_len:(scale_progr_len=100) predef user_params =
     then 1
     else (scale_progr_len / 100) * user_params.init_progr_len
   in
+  let k = (scale_sk_sz / 100) * user_params.k in
   { instrs = instrs;
     instrs_in_tgt = List.filter_opt instrs_in_tgt_opt;
     instr_int_map = map;
-    k = user_params.k;
+    k = k;
     n = n;
     max_wsz = max_wsz;
     src_ws = User_params.mk_ws user_params.src_ws;
