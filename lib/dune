@@ -1,5 +1,5 @@
-(library (name opti)
+(library (name syrup_backend)
  (libraries core z3 sedlex zarith yojson)
  (preprocess (pps ppx_sexp_conv ppx_deriving_yojson ppx_enumerate ppx_deriving.std sedlex.ppx ppx_compare))
- (public_name opti)
+ (public_name syrup_backend)
 )

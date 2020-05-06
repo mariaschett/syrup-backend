@@ -1,5 +1,5 @@
 open Core
-open Opti
+open Syrup_backend
 open Outpt
  
 type output_options =
@@ -28,7 +28,7 @@ let set_options write_only slvr omit_csv_header =
 
 let () =
   let open Command.Let_syntax in
-  Command.basic ~summary:"opti: an optimizer"
+  Command.basic ~summary:"syrup backend: the backend of the syrup toolchain"
     [%map_open
       let
         write_only = flag "write-only" no_arg

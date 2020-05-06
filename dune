@@ -1,9 +1,9 @@
 (executable (name main)
  (modules main)
- (libraries core z3 opti yojson ppx_deriving_yojson.runtime)
+ (libraries core z3 syrup_backend yojson ppx_deriving_yojson.runtime)
  (preprocess (pps ppx_jane ppx_deriving.std ppx_deriving_yojson))
  (link_flags -cc g++)
- (public_name opti)
+ (public_name syrup_backend)
 )
 
 (env (static (flags -cc g++ -ccopt -static)))

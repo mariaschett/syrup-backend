@@ -1,6 +1,6 @@
 (executables
  (names test_sk_util test_instr test_params test_enc test_outpt)
- (libraries core opti oUnit z3)
+ (libraries core syrup_backend oUnit z3)
  (preprocess (pps ppx_deriving.std))
  (link_flags -cc g++)
 )
