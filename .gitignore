@@ -3,4 +3,3 @@
 _build/
 .#*
 *.install
-solvers/
