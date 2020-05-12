@@ -94,4 +94,4 @@ let () =
             then Out_channel.print_endline slvr_outpt
             else ()
     ]
-  |> Command.run ~version:"0.0"
+  |> Command.run ~version:"1.0"
