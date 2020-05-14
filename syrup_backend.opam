@@ -5,21 +5,19 @@ synopsis: "backend of the syrup toolchain"
 maintainer: [ "mail@maria-a-schett.net" ]
 authors: [ "mail@maria-a-schett.net" ]
 license: "Apache-2.0"
-homepage: ""
-dev-repo: ""
-bug-reports: ""
+homepage: "https://github.com/mariaschett/syrup-backend"
+dev-repo: "https://github.com/mariaschett/syrup-backend"
+bug-reports: "https://github.com/mariaschett/syrup-backend"
 depends: [
   "ocaml"
   "dune"
   "ocamlfind"
-  "z3" 
   "core"
-  "sedlex"
-  "zarith"
-  "ounit" {with-test}
-  "ppx_sexp_conv"
+  "z3" {= "4.8.7"}
   "ppx_deriving"
   "ppx_deriving_yojson"
+  "sedlex"
+  "ounit" {with-test}
 ]
 build: [
   [ "dune" "subst" ] {pinned}
