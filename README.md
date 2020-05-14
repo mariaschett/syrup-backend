@@ -25,13 +25,21 @@ For this SFS `syrup_backend` produces the EVM bytecode:
 
 ```ADD SWAP2 ADD SWAP1.```
 
-In [`examples/cav2020/input.json`](examples/cav2020/input.json) is the SFS for
-* source_stack: `[]`
-* target_stack: `[]`
+In the running example of CAV 2020 we take a block
 
-For this SFS `syrup_backend` produces the EVM bytecode:
+```PUSH 0 DUP1 PUSH 0 DUP6 DUP8 ADD SWAP2 POP DUP4 DUP6 ADD SWAP1 POP DUP1 DUP3 EXP SWAP3 POP POP POP SWAP5 SWAP4 POP POP POP POP.```
 
-```.```
+from the `Solidity`
+file in
+[`examples/cav2020/running-example.sol`](examples/cav2020/running-example.sol)
+compiled to the bytecode
+[`examples/cav2020/running-example.evm`](examples/cav2020/running-example.evm).
+
+In [`examples/cav2020/input.json`](examples/cav2020/input.json) is the
+SFS generated from the bytecode with a current cost of 126. For this
+SFS `syrup_backend` produces the EVM bytecode reducing the cost to 72:
+
+```ADD SWAP2 ADD EXP SWAP1```
 
 ## Install & Run
 
